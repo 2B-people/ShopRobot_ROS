@@ -17,9 +17,9 @@
      <param name="world_frame" value="enu" />
   </node>
 
-  <node name="riki_base_node" pkg="rikirobot" type="riki_base_node">
+  <!-- <node name="riki_base_node" pkg="rikirobot" type="riki_base_node">
     <param name="angular_scale" type="double" value="0.85" />
     <param name="linear_scale" type="double" value="1.0" />
-  </node>
+  </node> -->
 </launch>
 
