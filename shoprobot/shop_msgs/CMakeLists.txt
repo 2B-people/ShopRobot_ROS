@@ -7,6 +7,7 @@ add_message_files(
   DIRECTORY msgs
   FILES
   imu.msg
+  Velocities.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)
