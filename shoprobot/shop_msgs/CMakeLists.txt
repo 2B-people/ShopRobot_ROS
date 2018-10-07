@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation std_msgs geometry_msg
 add_message_files(
   DIRECTORY msgs
   FILES
+  PID.msg
   imu.msg
   Velocities.msg
 )
