@@ -1,14 +1,4 @@
 float32 p1
-float32 d1
 float32 i1
-float32 p2
-float32 d2
-float32 i2
-float32 p3
-float32 d3
-float32 i3
-float32 p4
-float32 d4
-float32 i4
-float32 min
-float32 max
+float32 d1
+
