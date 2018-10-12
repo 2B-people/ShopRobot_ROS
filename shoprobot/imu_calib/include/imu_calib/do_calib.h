@@ -33,67 +33,52 @@
 *********************************************************************/
 
 /**
- * \file accel_calib.h
- * \author Daniel Koch <danielpkoch@gmail.com>
+ * \file do_calib.h
+ * \author Daniel Koch <daniel.p.koch@gmail.com>
  *
- * Class for calculating and applying accelerometer calibration parameters
+ * Class for performing IMU calibration
  */
 
-#if !defined(SHOP_IMU_ACCELCALIB_H_)
-#define SHOP_IMU_ACCELCALIB_H_
+#include <ros/ros.h>
 
-#include <Eigen/Dense>
+#include <shop_msgs/Imu.h>
+
 #include <string>
+#include <vector>
+#include <queue>
+
+#include <imu_calib/accel_calib.h>
 
 namespace imu_calib
 {
 
-class AccelCalib
+class DoCalib
 {
 public:
+  DoCalib();
 
-  enum Orientation { XPOS = 0, XNEG, YPOS, YNEG, ZPOS, ZNEG };
+  bool running();
 
-  AccelCalib();
-  AccelCalib(std::string calib_file);
+private:
+  enum DoCalibState { START, SWITCHING, RECEIVING, COMPUTING, DONE };
 
-    // status
-  bool calibReady();
-  bool 
-  // file I/O
-  bool loadCalib(std::string calib_file);
-  bool saveCalib(std::string calib_file);
+  AccelCalib calib_;
 
-  // calibration procedure
-  void beginCalib(int measurements, double reference_acceleration);
-  bool addMeasurement(Orientation orientation, double ax, double ay, double az);
-  bool computeCalib();
+  DoCalibState state_;
 
-  // calibration application
-  void applyCalib(double raw[3], double corrected[3]);
-  void applyCalib(double raw_x, double raw_y, double raw_z, double *corr_x, double *corr_y, double *corr_z);
+  int measurements_per_orientation_;
+  int measurements_received_;
 
-protected:
-  static const int reference_index_[6];
-  static const int reference_sign_[6];
-  bool calib_ready_;
+  double reference_acceleration_;
+  std::string output_file_;
 
-  Eigen::Matrix3d SM_; //!< combined scale and misalignment parameters
-  Eigen::Vector3d bias_; //!< scaled and rotated bias parameters
+  std::queue<AccelCalib::Orientation> orientations_;
+  AccelCalib::Orientation current_orientation_;
 
-  double reference_acceleration_; //!< expected acceleration measurement (e.g. 1.0 for unit of g's, 9.80665 for unit of m/s^2)
+  std::string orientation_labels_[6];
 
-  bool calib_initialized_;
-  int orientation_count_[6];
-
-  Eigen::MatrixXd meas_; //!< least squares measurements matrix
-  Eigen::VectorXd ref_; //!< least squares expected measurements vector
-  int num_measurements_; //!< number of measurements expected for this calibration
-  int measurements_received_; //!< number of measurements received for this calibration
+  ros::Subscriber imu_sub_;
+  void imuCallback(shop_msgs::imu::ConstPtr imu);
 };
 
 } // namespace accel_calib
-
-#endif // SHOP_IMU_ACCELCALIB_H_
-
-
