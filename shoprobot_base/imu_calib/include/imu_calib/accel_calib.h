@@ -39,9 +39,6 @@
  * Class for calculating and applying accelerometer calibration parameters
  */
 
-#if !defined(SHOP_IMU_ACCELCALIB_H_)
-#define SHOP_IMU_ACCELCALIB_H_
-
 #include <Eigen/Dense>
 #include <string>
 
@@ -59,7 +56,7 @@ public:
 
     // status
   bool calibReady();
-  bool 
+  
   // file I/O
   bool loadCalib(std::string calib_file);
   bool saveCalib(std::string calib_file);
@@ -94,6 +91,6 @@ protected:
 
 } // namespace accel_calib
 
-#endif // SHOP_IMU_ACCELCALIB_H_
+
 
 
