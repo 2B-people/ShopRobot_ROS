@@ -1,5 +1,0 @@
-<launch>
-  <include file="$(find shop_tools)/launch/lidar/$(env SHOPLIDAR).launch" />
-  <include file="$(find shop_tools)/param/navigation/slam_gmapping.xml" />
-  <include file="$(find shop_tools)/param/navigation/move_base.xml" />
-</launch>
