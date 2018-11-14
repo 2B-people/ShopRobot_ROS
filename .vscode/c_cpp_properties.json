@@ -1,18 +1,17 @@
 {
-  "configurations": [
-    {
-      "browse": {
-        "databaseFilename": "",
-        "limitSymbolsToIncludedHeaders": true
-      },
-      "includePath": [
-        "/home/nqq09/ShopRobot_ws/devel/include",
-        "/home/nqq09/tutorial_ws/devel/include",
-        "/opt/ros/kinetic/include",
-        "/home/nqq09/ShopRobot_ws/src/ShopRobot_ROS/modules/control/imu_calib/include",
-        "/usr/include"
-      ],
-      "name": "Linux"
-    }
-  ]
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/opt/ros/kinetic/include",
+                "/usr/include"
+            ],
+            "name": "Linux",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
 }

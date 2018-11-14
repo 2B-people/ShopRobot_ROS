@@ -3,5 +3,8 @@
         "/home/nqq09/ShopRobot_ws/devel/lib/python2.7/dist-packages",
         "/home/nqq09/tutorial_ws/devel/lib/python2.7/dist-packages",
         "/opt/ros/kinetic/lib/python2.7/dist-packages"
-    ]
+    ],
+    "files.associations": {
+        "csignal": "cpp"
+    }
 }
