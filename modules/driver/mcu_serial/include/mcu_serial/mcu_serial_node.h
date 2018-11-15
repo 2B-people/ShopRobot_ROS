@@ -13,7 +13,6 @@ namespace serial
         private:
         serial::Serial ser_;
         void initSerial();
-        virtual void Run();
         
     };
 }
