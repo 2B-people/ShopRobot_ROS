@@ -20,7 +20,6 @@
 #include <string>
 #include <ros/ros.h>
 
-namespace rrts {
 namespace common {
 /**
  * @brief The base class which runs in main function interface.
@@ -42,6 +41,7 @@ class RRTS {
    * @note The inheriting class is not recommendded to override this function which may cause a chaos of callback process
    */
   virtual void Run();
+
   /**
    * @brief Destructor function
    */
@@ -55,5 +55,5 @@ class RRTS {
 };
 
 } //namespace common
-} //namespace rrts
+
 #endif //COMMON_RRTS_H

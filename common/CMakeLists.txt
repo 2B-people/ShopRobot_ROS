@@ -16,3 +16,11 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
 )
+
+# rrts library
+add_library(rrts
+  src/rrts.cpp
+)
+target_link_libraries(rrts
+  ${YAML_LIBRARIES}
+)

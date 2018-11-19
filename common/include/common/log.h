@@ -1,5 +1,5 @@
-#ifndef RRTS_COMMON_LOG_H_
-#define RRTS_COMMON_LOG_H_
+#ifndef RRTS_COMMON_LOG_H
+#define RRTS_COMMON_LOG_H
 
 #define NOTICE(text) {               \
   static bool flag = true;           \
@@ -9,4 +9,4 @@
   }                                  \
 }                                    \
 
-#endif  // RRTS_COMMON_LOG_H_
+#endif  // RRTS_COMMON_LOG_H

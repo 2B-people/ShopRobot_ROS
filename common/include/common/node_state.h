@@ -17,7 +17,6 @@
 
 #ifndef RRTS_NODE_STATE_H
 #define RRTS_NODE_STATE_H
-namespace rrts{
 namespace common {
 enum NodeState{
   IDLE,
@@ -27,6 +26,5 @@ enum NodeState{
   FAILURE
 };
 } //namespace common
-} //namespace rrts
 
 #endif //RRTS_NODE_STATE_H

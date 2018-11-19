@@ -45,7 +45,7 @@ void SignalHandler(int signal){
     RRTS_CLASS rrts(module_name);                                                  \
     rrts.Run();                                                                    \
     return 0;                                                                      \
-  }
+  }                                                                                
 
 #endif //COMMON_MAIN_INTERFACE_H
 
