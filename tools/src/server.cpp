@@ -5,33 +5,36 @@
 
 #include "pid_config/pid_lib.h"
 
+namespace tools{
+namespace config {
+
 tools::config::MoveMotorPid MovePid;
 tools::config::LiftMotorPid LiftPid;
 
-void callback(pid_config::PIDConfig &config, double level)
+void CB(pid_config::PIDConfig &config, double level)
 {
-    
+
     switch (config.equipment)
     {
-        case 0:
-            MovePid.setPid(config.p,config.i,config.d,config.test);
-            break;
-        case 1:
-            LiftPid.setPid(config.p,config.i,config.d,config.test);
-            break;    
-        default:
-            break;
+    case 0:
+        MovePid.setPid(config.p, config.i, config.d, config.test);
+        break;
+    case 1:
+        LiftPid.setPid(config.p, config.i, config.d, config.test);
+        break;
+    default:
+        break;
     }
 }
 
 int main(int argc, char const *argv[])
 {
-    
+
     ros::init(argc, agrv, "shop_pid");
-    
+
     dynamic_reconfigure::Server<pid_config::PIDConfig> server;
     dynamic_reconfigure::Server<pid_config::PIDConfig>::CallbackType f;
-    f = boost::bind(&callback, _1, _2);
+    f = boost::bind(&CB, _1, _2);
     server.setCallback(f);
 
     ros::Rate r(rate);
@@ -47,3 +50,5 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
+} // namespace config
+} // namespace tools

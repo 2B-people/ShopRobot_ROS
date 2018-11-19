@@ -10,10 +10,8 @@ includes <data::Pid.h>
 
 #include <pid_config/PIDconfig.h>
 
-namespace tools
-{
-namespace config
-{
+namespace tools{
+namespace config {
 
 class PidCfg
 {

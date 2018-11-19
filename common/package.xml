@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>common</name>
+  <version>0.0.1</version>
+  <description>The common package</description>
+  <maintainer email="nqq0915@163.com">2bpeople</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+
+  <build_export_depend>roscpp</build_export_depend>
+
+  <exec_depend>roscpp</exec_depend>
+
+
+
+  <export>
+  </export>
+</package>

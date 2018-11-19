@@ -34,11 +34,11 @@ void SignalHandler(int signal){
 
 /**
  * @brief Macro definition for main function interface
+ *        统一接口
  * @param RRTS_CLASS The class which inherits RRTS base-class interface
  */
 #define MAIN(RRTS_CLASS,module_name)                                               \
   int main(int argc, char **argv){                                                 \
-    rrts::common::GLogWrapper glog_wrapper(argv[0]);                               \
     signal(SIGINT, SignalHandler);                                                 \
     signal(SIGTERM,SignalHandler);                                                 \
     ros::init(argc, argv, module_name, ros::init_options::NoSigintHandler);        \

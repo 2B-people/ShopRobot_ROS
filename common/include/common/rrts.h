@@ -30,6 +30,7 @@ class RRTS {
  public:
   /**
    * @brief Constructor function to set the thread number of callback queue and the module name.
+   *        在这个function中打开CB和使用的算法
    * @param thread_num the thread number of callback queue
    * @param name the module name
    */
@@ -37,6 +38,7 @@ class RRTS {
 
   /**
    * @brief Start to run the all the callbacks in the queue
+   *        不要重写这个函数，这是开始调用cb的函数
    * @note The inheriting class is not recommendded to override this function which may cause a chaos of callback process
    */
   virtual void Run();

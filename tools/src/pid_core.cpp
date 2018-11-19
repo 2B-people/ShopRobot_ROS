@@ -1,9 +1,7 @@
 #include "pid_config/pid_core.h"
 
-namespace tools
-{
-namespace config
-{
+namespace tools{
+namespace config {
 PidCfg::PidCfg(std::string name)
 {
     ros::NodeHandle nh;
