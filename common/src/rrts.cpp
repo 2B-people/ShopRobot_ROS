@@ -18,7 +18,7 @@
 #include "common/rrts.h"
 
 
-namespace rrts {
+
 namespace common {
 
   RRTS::RRTS( std::string name,uint32_t thread_num):name_(name),thread_num_(thread_num) {}
@@ -31,5 +31,4 @@ namespace common {
 
 
 } //namespace common
-} //namespace rrts
 

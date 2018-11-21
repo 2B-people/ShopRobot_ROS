@@ -3,9 +3,12 @@
 
 #include "geometry_msgs/PoseStamped.h"
 
+#include <ros/ros.h>
 #include <common/timer.h>
 #include <common/rrts.h>
-#include <ros/ros.h>
+
+#define PRINT         printf("Daa");
+
 
 namespace example
 {

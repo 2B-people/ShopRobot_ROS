@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-
+import cv2
 from geometry_msgs.msg import Twist
 
 import sys
@@ -118,9 +118,9 @@ if __name__ == "__main__":
                 if angular_z_now < 0:
                     angular_z_now = 0                
                 print vels(linear_x_now, linear_y_now, angular_z_now)
-                if (status == 14):
+                if (status == 10):
                     print msg
-                status = (status + 1) % 15
+                status = (status + 1) % 11
             elif key == ' ' or key == 'k':
                 x = 0
                 y = 0
