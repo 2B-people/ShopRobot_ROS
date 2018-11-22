@@ -7,8 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES common
-#  CATKIN_DEPENDS roscpp 
+  LIBRARIES rrts
+  CATKIN_DEPENDS roscpp 
 )
 
 include_directories(include)
@@ -17,9 +17,9 @@ include_directories(
 )
 
 # rrts library
-add_library(common src/rrts.cpp
+add_library(rrts src/rrts.cpp
 )
-target_link_libraries(common
+target_link_libraries(rrts
   ${catkin_LIBRARIES}
 )
 

@@ -3,14 +3,15 @@
 
 namespace common
 {
-    class AlgorithmBase 
-    {
-    public:
-        virtual bool initAlgorithm() = 0;
-        virtual ~AlgorithmBase();
-    protected:
-        AlgorithmBase();
-    };
-}
+class AlgorithmBase
+{
+  public:
+    virtual bool initAlgorithm() = 0;
+    virtual ~AlgorithmBase();
+
+  protected:
+    AlgorithmBase();
+};
+} // namespace common
 
 #endif

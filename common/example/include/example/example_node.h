@@ -7,9 +7,6 @@
 #include <common/timer.h>
 #include <common/rrts.h>
 
-#define PRINT         printf("Daa");
-
-
 namespace example
 {
 class MainTest : public common::RRTS

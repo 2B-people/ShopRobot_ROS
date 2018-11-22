@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(example)
 
-
 set(CMAKE_CXX_STANDARD 11)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -15,14 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 #find_package(Boost REQUIRED COMPONENTS system)
 
-catkin_package(
-# INCLUDE_DIRS include
-# LIBRARIES example_node
-# CATKIN_DEPENDS     roscpp 
-#  DEPENDS system_lib
-)
+catkin_package()
 
-link_directories(common)
+link_directories(rrts)
 
 include_directories(include)
 include_directories( ${catkin_INCLUDE_DIRS})
@@ -30,8 +24,8 @@ include_directories( ${catkin_INCLUDE_DIRS})
 ## Build ##
 ###########
 add_executable(example_node src/example_node.cpp )
-add_dependencies(example_node common ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(example_node common ${catkin_LIBRARIES} )
+add_dependencies(example_node rrts ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(example_node rrts ${catkin_LIBRARIES} )
 
 
 #############
