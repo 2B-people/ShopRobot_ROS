@@ -17,14 +17,10 @@
 
 #ifndef RRTS_NODE_STATE_H
 #define RRTS_NODE_STATE_H
+namespace shop {
 namespace common {
-enum NodeState{
-  IDLE,
-  RUNNING,
-  PAUSE,
-  SUCCESS,
-  FAILURE
-};
-} //namespace common
+enum NodeState { IDLE, RUNNING, PAUSE, SUCCESS, FAILURE };
+} // namespace common
+}
 
-#endif //RRTS_NODE_STATE_H
+#endif // RRTS_NODE_STATE_H

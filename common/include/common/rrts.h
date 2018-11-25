@@ -17,28 +17,31 @@
 
 #ifndef COMMON_RRTS_H
 #define COMMON_RRTS_H
-#include <string>
 #include <ros/ros.h>
+#include <string>
 
+namespace shop {
 namespace common {
 /**
  * @brief The base class which runs in main function interface.
  * It should be inherited by each module
  */
 class RRTS {
- public:
+public:
   /**
-   * @brief Constructor function to set the thread number of callback queue and the module name.
+   * @brief Constructor function to set the thread number of callback queue and
+   * the module name.
    *        在这个function中打开CB和使用的算法
    * @param thread_num the thread number of callback queue
    * @param name the module name
    */
-  RRTS(std::string name,uint32_t thread_num = 1);
+  RRTS(std::string name, uint32_t thread_num = 1);
 
   /**
    * @brief Start to run the all the callbacks in the queue
    *        不要重写这个函数，这是开始调用cb的函数
-   * @note The inheriting class is not recommendded to override this function which may cause a chaos of callback process
+   * @note The inheriting class is not recommendded to override this function
+   * which may cause a chaos of callback process
    */
   virtual void Run();
 
@@ -47,13 +50,12 @@ class RRTS {
    */
   virtual ~RRTS() = default;
 
- protected:
-
+protected:
   std::string name_;
   uint32_t thread_num_;
-
 };
 
-} //namespace common
+} // namespace common
+}
 
-#endif //COMMON_RRTS_H
+#endif // COMMON_RRTS_H

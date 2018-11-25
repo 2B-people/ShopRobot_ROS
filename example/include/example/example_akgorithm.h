@@ -3,7 +3,7 @@
 
 #include <common/algorithm_base.h>
 
-class example_akgorithm: common::AlgorithmBase{
+class example_akgorithm: shop::common::AlgorithmBase{
 public:
 
 };

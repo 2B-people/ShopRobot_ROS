@@ -14,15 +14,6 @@ McuSerial::~McuSerial()
     
 }
 
-McuSerial::Run()
-{
-    ros::AsyncSpinner async_spinner(thread_num_);
-    async_spinner.start();
-
-    while (1)
-    {
-    }
-}
 
 McuSerial::initSerial()
 {
