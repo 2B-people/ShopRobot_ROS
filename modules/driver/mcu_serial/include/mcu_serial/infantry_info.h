@@ -1,3 +1,8 @@
+#ifndef INFANTRY_INFO_H_
+#define INFANTRY_INFO_H_
+
+#include <stdint.h>
+
 typedef struct
 {
 	uint8_t Type_L;
@@ -45,3 +50,4 @@ void Set_Data(Connect_Typedef co,uint32_t data)
 }
 
 
+#endif
