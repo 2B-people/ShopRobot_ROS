@@ -19,6 +19,7 @@ add_message_files(DIRECTORY msg
                       Twist.msg
                       TwistWithCovariance.msg
                       Vector3.msg
+                      SerialTest.msg
                  )
 
 add_service_files(DIRECTORY srv
