@@ -20,6 +20,8 @@ add_message_files(DIRECTORY msg
                       TwistWithCovariance.msg
                       Vector3.msg
                       SerialTest.msg
+                      Remote.msg
+                      CarScan.msg
                  )
 
 add_service_files(DIRECTORY srv
