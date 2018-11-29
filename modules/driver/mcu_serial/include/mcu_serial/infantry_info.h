@@ -5,14 +5,14 @@
 
 typedef struct
 {
-	uint8_t Type_L;
-	uint8_t Type_H;
-	uint8_t Date[4];
+	uint16_t type;
+	uint32_t data;
 } Connect_Typedef;
 
 #define MSG_vel_x 0X0001
 #define MSG_vel_y 0X0002
 #define MSG_vel_z 0X0003
+
 #define MSG_distance_f 0X0004 //前距离
 #define MSG_distance_b 0X0005 //后距离
 #define MSG_distance_l 0X0006 //左距离
