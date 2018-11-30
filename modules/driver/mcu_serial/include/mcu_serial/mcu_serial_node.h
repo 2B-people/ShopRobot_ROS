@@ -40,6 +40,7 @@ private:
   //void controlCB(const geometry_msgs::Twist::ConstPtr &vel);
   void ReceiveLoop();
   void SendPack();
+  void TopicLoop();
 
   //running state
   bool is_open_;
@@ -49,8 +50,7 @@ private:
   //fifo
   fifo_t_e send_fifo_p_;
   fifo_t_e read_fifo_P_;  
-  Connect_Typedef send_fifo_[10];
-  Connect_Typedef read_fifo_[10];
+
 
   float distance_f_, distance_b_, distance_l_, distance_r_;
 
@@ -59,7 +59,7 @@ private:
   ros::Subscriber sub_cmd_vel_;
 
   //thread
-  std::thread *receive_loop_thread_, *send_loop_thread_;
+  std::thread *read_thread_, *send_loop_thread_ ,*topic_thread_;
 
 
   //ttyUSB setting

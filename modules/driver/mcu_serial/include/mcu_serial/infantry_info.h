@@ -9,20 +9,35 @@ typedef struct
 	uint32_t data;
 } Connect_Typedef;
 
-#define MSG_vel_x 0X0001
-#define MSG_vel_y 0X0002
-#define MSG_vel_z 0X0003
+enum
+{
+	SVEL=1,
+	SREMOTE,
+	SLAS
+};	
 
-#define MSG_distance_f 0X0004 //前距离
-#define MSG_distance_b 0X0005 //后距离
-#define MSG_distance_l 0X0006 //左距离
-#define MSG_distance_r 0X0007 //右距离
-#define MSG_remote_ch0 0x0008 //遥控器ch0
-#define MSG_remote_ch1 0x0008 //遥控器ch1
-#define MSG_remote_ch2 0x0009 //遥控器ch2
-#define MSG_remote_ch3 0x000A //遥控器ch3
-#define MSG_remote_s1 0x000B  //遥控器s1
-#define MSG_remote_s2 0x000C  //遥控器s2
+#define MSGHANDL 0x49
+#define MSGHANDW 0x39
 
+#define MSGVELX 0x01
+#define MSGVELY 0X02
+#define MSGVELZ 0X03
+
+#define MSGDISTANCEF 0X04 //前距离
+#define MSGDISTANCEB 0X05 //后距离
+#define MSGDISTANCEL 0X06 //左距离
+#define MSGDISTANCER 0X07 //右距离
+#define MSGREMOTECH0 0x08 //遥控器ch0
+#define MSGREMOTECH1 0x08 //遥控器ch1
+#define MSGREMOTECH2 0x09 //遥控器ch2
+#define MSGREMOTECH4 0x0A //遥控器ch3
+#define MSGREMOTES1 0x0B  //遥控器s1
+#define MSGREMOTES2 0x0C  //遥控器s2G
+
+#define MSGRUNSTATE 0x0d  //运行状态
+
+#define MSGCOORDINATEX 0x0e
+#define MSGCOORDINATEX 0x0f
+#define MSGCOORDINATEATTITUDE 0x10
 
 #endif
