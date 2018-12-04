@@ -12,6 +12,26 @@ McuSerial::McuSerial(std::string name)
   stop_read_ = false;
   stop_send_ = false;
   stop_topic_ = false;
+
+  send_fifo_p_.read = 0;
+  send_fifo_p_.front = 0;
+  read_fifo_p_.read = 0;
+  read_fifo_p_.front = 0;
+
+  for (size_t i = 0; i < BUFF_MAX; i++)
+  {
+    send_buff_[i].type = 0;
+    send_buff_[i].data_16 = 0;
+    send_buff_[i].data_32 = 0;
+    send_buff_[i].data_16_u = 0;
+    send_buff_[i].data_32_u = 0;
+    read_buff_[i].type = 0;
+    read_buff_[i].data_16 = 0;
+    read_buff_[i].data_32 = 0;
+    read_buff_[i].data_16_u = 0;
+    read_buff_[i].data_32_u = 0;
+  }
+  
   nh_private_.getParam("Prot", mcu_port_);
   nh_private_.getParam("Baudrate", mcu_baudrate_);
 
