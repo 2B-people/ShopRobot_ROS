@@ -54,8 +54,10 @@ private:
   // ros
   ros::Publisher scan_pub_, romote_pub_;
   ros::Subscriber sub_cmd_vel_;
-  ros::Timer romote_public_, scan_public_;
 
+  // data
+  data::Remote remote_msg_;
+  data::CarScan carscan_msg_;
   // thread
   std::thread *read_thread_, *send_loop_thread_, *topic_thread_;
 
@@ -70,8 +72,6 @@ private:
   void TopicLoop();
 
   // TODO topic
-  void RomoteCB(const ros::TimerEvent &);
-  void ScanCB((const ros::TimerEvent&);
 
   void ReceiveDataHandle(uint8_t *data);
   void SendDataHandle(Connect_Typedef co);
