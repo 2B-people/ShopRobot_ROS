@@ -3,41 +3,39 @@
 
 #include <stdint.h>
 
-typedef struct
-{
-	uint16_t type;
-	uint32_t data;
+typedef struct {
+  uint8_t type;
+  int16_t data_16;
+  int32_t data_32;
+  uint16_t data_16_u;
+  uint32_t data_32_u;
 } Connect_Typedef;
 
-enum
-{
-	SVEL=1,
-	SREMOTE,
-	SLAS
-};	
+enum State{ SVEL = 1, SREMOTE, SLAS };
+enum NumType { INT16_T_TYPE, INT32_T_TYPE, UINT16_T_TYPE, UINT32_T_TYPE };
 
-#define MSGHANDL 0x49
-#define MSGHANDW 0x39
+#define MSG_HAND_L 0x49
+#define MSG_HAND_W 0x39
 
-#define MSGVELX 0x01
-#define MSGVELY 0X02
-#define MSGVELZ 0X03
+#define MSG_VEL_X 0x01
+#define MSG_VEL_Y 0X02
+#define MSG_VEL_Z 0X03
 
-#define MSGDISTANCEF 0X04 //前距离
-#define MSGDISTANCEB 0X05 //后距离
-#define MSGDISTANCEL 0X06 //左距离
-#define MSGDISTANCER 0X07 //右距离
-#define MSGREMOTECH0 0x08 //遥控器ch0
-#define MSGREMOTECH1 0x08 //遥控器ch1
-#define MSGREMOTECH2 0x09 //遥控器ch2
-#define MSGREMOTECH4 0x0A //遥控器ch3
-#define MSGREMOTES1 0x0B  //遥控器s1
-#define MSGREMOTES2 0x0C  //遥控器s2G
+#define MSG_DISTANCE_F 0X04 //前距离
+#define MSG_DISTANCE_B 0X05 //后距离
+#define MSG_DISTANCE_L 0X06 //左距离
+#define MSG_DISTANCE_R 0X07 //右距离
+#define MSG_REMOTE_CH0 0x08 //遥控器ch0
+#define MSG_REMOTE_CH1 0x08 //遥控器ch1
+#define MSG_REMOTE_CH2 0x09 //遥控器ch2
+#define MSG_REMOTE_CH3 0x0A //遥控器ch3
+#define MSG_REMOTE_S1 0x0B  //遥控器s1
+#define MSG_REMOTE_S2 0x0C  //遥控器s2G
 
-#define MSGRUNSTATE 0x0d  //运行状态
+#define MSG_RUN_STATE 0x0d //运行状态
 
-#define MSGCOORDINATEX 0x0e
-#define MSGCOORDINATEX 0x0f
-#define MSGCOORDINATEATTITUDE 0x10
+#define MSG_COORDINATE_X 0x0e
+#define MSG_COORDINATE_Y 0x0f
+#define MSG_COORDINATE_ATTITUDE 0x10
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <stdio.h>
 #include <stdint.h>
 
 using namespace std;
@@ -29,7 +30,11 @@ float DatatoInt(uint8_t *buff)
 //main
 int main(int argc, char *argv[])
 {
-	uint32_t bug = -3;
-	cout << bug << endl;
+	uint8_t hand = 0x15;
+	 uint8_t i = hand & 0x0F;
+	 uint8_t d = (uint8_t)(hand>>4) &0x0F;
+	//cout << i << endl;
+	printf("and: %d %d",i,d);
+
 	return 0;
 }
