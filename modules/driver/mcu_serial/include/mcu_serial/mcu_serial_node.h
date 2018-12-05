@@ -27,7 +27,8 @@ typedef struct FifoData {
   int front;
 } fifo_t_e;
 
-#define BUFF_MAX 100
+#define FIFO_BUFF_MAX 20
+#define SEND_FRAME_MAX 100
 
 class McuSerial : public shop::common::rrts {
 public:
@@ -48,8 +49,12 @@ private:
   // fifo
   fifo_t_e send_fifo_p_;
   fifo_t_e read_fifo_P_;
-  Connect_Typedef send_buff_[BUFF_MAX];
-  Connect_Typedef read_buff_[BUFF_MAX];
+  Connect_Typedef send_fifo_buff_[BUFF_MAX];
+  Connect_Typedef read_fifo_buff_[BUFF_MAX];
+
+  //send
+  uint8_t send__frames_buff_[SEND_FRAME_MAX];
+  uint8_t frames_len_ ;
 
   // ros
   ros::Publisher scan_pub_, romote_pub_;

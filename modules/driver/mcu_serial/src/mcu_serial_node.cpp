@@ -1,7 +1,9 @@
 #include <mcu_serial/mcu_serial_node.h>
 
-namespace shop {
-namespace serial {
+namespace shop
+{
+namespace serial
+{
 
 McuSerial::McuSerial(std::string name)
     : common::RRTS(name), mcu_port_("/dev/ttyUSB0"), mcu_baudrate_(115200),
@@ -21,16 +23,16 @@ McuSerial::McuSerial(std::string name)
 
   for (size_t i = 0; i < BUFF_MAX; i++)
   {
-    send_buff_[i].type = 0;
-    send_buff_[i].data_16 = 0;
-    send_buff_[i].data_32 = 0;
-    send_buff_[i].data_16_u = 0;
-    send_buff_[i].data_32_u = 0;
-    read_buff_[i].type = 0;
-    read_buff_[i].data_16 = 0;
-    read_buff_[i].data_32 = 0;
-    read_buff_[i].data_16_u = 0;
-    read_buff_[i].data_32_u = 0;
+    send_fifo_buff_[i].type = 0;
+    send_fifo_buff_[i].data_16 = 0;
+    send_fifo_buff_[i].data_32 = 0;
+    send_fifo_buff_[i].data_16_u = 0;
+    send_fifo_buff_[i].data_32_u = 0;
+    read_fifo_buff_[i].type = 0;
+    read_fifo_buff_[i].data_16 = 0;
+    read_fifo_buff_[i].data_32 = 0;
+    read_fifo_buff_[i].data_16_u = 0;
+    read_fifo_buff_[i].data_32_u = 0;
   }
 
   nh_private_.getParam("Prot", mcu_port_);
@@ -203,6 +205,12 @@ void McuSerial::SendPack()
     co.data_32 = send_fifo_[send_fifo_p_.front].data_32;
     co.data_16_u = send_fifo_[send_fifo_p_.front].data_16_u;
     co.data_32_u = send_fifo_[send_fifo_p_.front].data_32_u;
+    //发送句柄
+    if (co.type != 0)
+    {
+      SendDataHandle(co);
+    }
+
     send_fifo_[send_fifo_p_.front].type = 0;
     send_fifo_[send_fifo_p_.front].data_16 = 0;
     send_fifo_[send_fifo_p_.front].data_32 = 0;
@@ -227,7 +235,10 @@ void SerialComNode::ReceiveDataHandle(uint8_t len, uint8_t type)
 }
 
 //重写
-void McuSerial::SendDataHandle(Connect_Typedef co) {}
+void McuSerial::SendDataHandle(Connect_Typedef co)
+{
+  
+}
 
 void McuSerial::ReadDatatoTopicHandle(uint8_t *buff, uint8_t type)
 {
