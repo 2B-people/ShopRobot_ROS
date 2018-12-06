@@ -23,3 +23,7 @@ include_directories( ${catkin_INCLUDE_DIRS})
 
 add_executable(mcu_serial_test src/mcu_serial_test.cpp)
 target_link_libraries(mcu_serial_test  ${catkin_LIBRARIES} )
+
+add_executable(mcu_serial_node src/mcu_serial_node.cpp )
+add_dependencies(mcu_serial_node rrts ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mcu_serial_node rrts ${catkin_LIBRARIES} )

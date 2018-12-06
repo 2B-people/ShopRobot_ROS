@@ -7,6 +7,7 @@
 #include <serial/serial.h>
 
 #include <stdint.h>
+#include <string.h>
 #include <thread>
 #include <unistd.h>
 
@@ -30,7 +31,7 @@ typedef struct FifoData {
 #define FIFO_BUFF_MAX 20
 #define SEND_FRAME_MAX 100
 
-class McuSerial : public shop::common::rrts {
+class McuSerial : public shop::common::RRTS {
 public:
   McuSerial(std::string name);
   ~McuSerial();
@@ -39,26 +40,28 @@ public:
   void Resume();
 
 private:
-  void initSerial();
-
   // running state
   bool is_open_;
   bool stop_read_;
   bool stop_send_;
+  bool stop_topic_;
 
   // fifo
   fifo_t_e send_fifo_p_;
-  fifo_t_e read_fifo_P_;
-  Connect_Typedef send_fifo_buff_[BUFF_MAX];
-  Connect_Typedef read_fifo_buff_[BUFF_MAX];
+  fifo_t_e read_fifo_p_;
+  Connect_Typedef send_fifo_buff_[FIFO_BUFF_MAX];
+  Connect_Typedef read_fifo_buff_[FIFO_BUFF_MAX];
 
-  //send
-  uint8_t send__frames_buff_[SEND_FRAME_MAX];
-  uint8_t frames_len_ ;
+  // send
+  uint8_t send_frames_buff_[SEND_FRAME_MAX];
+  uint8_t frames_len_;
+  uint8_t frames_type_;
+  uint16_t frames_now_;
 
   // ros
   ros::Publisher scan_pub_, romote_pub_;
   ros::Subscriber sub_cmd_vel_;
+  ros::NodeHandle nh_;
 
   // data
   data::Remote remote_msg_;
@@ -75,22 +78,28 @@ private:
   void ReceiveLoop();
   void SendPack();
   void TopicLoop();
+  // TODO topic回调函数
 
-  // TODO topic
-
-  void ReceiveDataHandle(uint8_t *data);
+  void ReceiveDataHandle(uint8_t len, uint8_t type);
   void SendDataHandle(Connect_Typedef co);
-
   void ReadDatatoTopicHandle(uint8_t *buff, uint8_t type);
 
+  void initSerial();
+
+  // fifo
   void AddSendFifo(Connect_Typedef co);
   void AddReadFifo(Connect_Typedef co);
+  void GetSendFifo(Connect_Typedef *co);
+  void GetReadFifo(Connect_Typedef *co);
 
+  // tool
+  void SendFramesZero();
   int16_t DatatoInt16(uint8_t *buff);
   int32_t DatatoInt32(uint8_t *buff);
   uint16_t DatatoUint16(uint8_t *buff);
   uint32_t DatatoUint32(uint8_t *buff);
   float DatatoFloat(uint8_t *buff, int mult);
+  void TypetoData(uint8_t len, uint8_t type, uint8_t *data_type);
 
   void Int16toData(int16_t data, uint8_t *data_type);
   void Int32toData(int32_t data, uint8_t *data_type);
