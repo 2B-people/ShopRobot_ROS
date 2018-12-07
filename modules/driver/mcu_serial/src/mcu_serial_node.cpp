@@ -46,8 +46,8 @@ McuSerial::McuSerial(std::string name)
   nh_private_.getParam("McuSerialBaudrate", mcu_baudrate_);
 
   //publish init
-  scan_pub_ = nh_.advertiseService("scan_data", &data::CanScan, this);
-  romote_pub_ = nh_.advertiseService("romote_status", &data::Romote, this);
+  scan_pub_ = nh_.advertise<data::Remote>("remote",30);
+  romote_pub_ = nh_.advertise<data::CarScan>("carscan",30);
 }
 
 void McuSerial::Run()
@@ -163,7 +163,7 @@ void McuSerial::TopicLoop()
       break;
     case MSG_DISTANCE_R:
       carscan_msg_.distance_r = (float)(co.data_32 / 100);
-      romote_pub_.publish(romote_pub_);
+      scan_pub_.publish(carscan_msg_);
       break;
     case MSG_REMOTE_CH0:
       remote_msg_.ch0 = co.data_16_u;
@@ -322,25 +322,25 @@ void McuSerial::AddSendFifo(Connect_Typedef co)
 {
   if ((send_fifo_p_.read + 1) % 10 == send_fifo_p_.front)
   {
-    ROS_WARN("Fifo is full!!")
-    sleep(100);
+    ROS_WARN("Fifo is full!!");
+    ros::Duration(0.05).sleep();
     if ((send_fifo_p_.read + 1) % 10 == send_fifo_p_.front)
     {
-      send_fifo_[send_fifo_p_.read].type = co.type;
-      send_fifo_[send_fifo_p_.read].data_16 = co.data_16;
-      send_fifo_[send_fifo_p_.read].data_32 = co.data_32;
-      send_fifo_[send_fifo_p_.read].data_16_u = co.data_16_u;
-      send_fifo_[send_fifo_p_.read].data_32_u = co.data_32_u;
+      send_fifo_buff_[send_fifo_p_.read].type = co.type;
+      send_fifo_buff_[send_fifo_p_.read].data_16 = co.data_16;
+      send_fifo_buff_[send_fifo_p_.read].data_32 = co.data_32;
+      send_fifo_buff_[send_fifo_p_.read].data_16_u = co.data_16_u;
+      send_fifo_buff_[send_fifo_p_.read].data_32_u = co.data_32_u;
       send_fifo_p_.read = (send_fifo_p_.read + 1) % FIFO_BUFF_MAX;
     }
   }
   else
   {
-    send_fifo_[send_fifo_p_.read].type = co.type;
-    send_fifo_[send_fifo_p_.read].data_16 = co.data_16;
-    send_fifo_[send_fifo_p_.read].data_32 = co.data_32;
-    send_fifo_[send_fifo_p_.read].data_16_u = co.data_16_u;
-    send_fifo_[send_fifo_p_.read].data_32_u = co.data_32_u;
+    send_fifo_buff_[send_fifo_p_.read].type = co.type;
+    send_fifo_buff_[send_fifo_p_.read].data_16 = co.data_16;
+    send_fifo_buff_[send_fifo_p_.read].data_32 = co.data_32;
+    send_fifo_buff_[send_fifo_p_.read].data_16_u = co.data_16_u;
+    send_fifo_buff_[send_fifo_p_.read].data_32_u = co.data_32_u;
     send_fifo_p_.read = (send_fifo_p_.read + 1) % FIFO_BUFF_MAX;
   }
 }
@@ -349,8 +349,8 @@ void McuSerial::AddReadFifo(Connect_Typedef co)
 {
   if ((read_fifo_p_.read + 1) % 10 == read_fifo_p_.front)
   {
-    ROS_WARN("Fifo is full!!")
-    sleep(100);
+    ROS_WARN("Fifo is full!!");
+    ros::Duration(0.05).sleep();
     if ((read_fifo_p_.read + 1) % 10 == read_fifo_p_.front)
     {
       read_fifo_buff_[read_fifo_p_.read].type = co.type;
@@ -358,7 +358,7 @@ void McuSerial::AddReadFifo(Connect_Typedef co)
       read_fifo_buff_[read_fifo_p_.read].data_32 = co.data_32;
       read_fifo_buff_[read_fifo_p_.read].data_16_u = co.data_16_u;
       read_fifo_buff_[read_fifo_p_.read].data_32_u = co.data_32_u;
-      read_fifo_buff_.read = (read_fifo_p_.read + 1) % FIFO_BUFF_MAX;
+      read_fifo_p_.read = (read_fifo_p_.read + 1) % FIFO_BUFF_MAX;
     }
   }
   else
@@ -368,17 +368,17 @@ void McuSerial::AddReadFifo(Connect_Typedef co)
     read_fifo_buff_[read_fifo_p_.read].data_32 = co.data_32;
     read_fifo_buff_[read_fifo_p_.read].data_16_u = co.data_16_u;
     read_fifo_buff_[read_fifo_p_.read].data_32_u = co.data_32_u;
-    read_fifo_buff_.read = (read_fifo_p_.read + 1) % FIFO_BUFF_MAX;
+    read_fifo_p_.read = (read_fifo_p_.read + 1) % FIFO_BUFF_MAX;
   }
 }
 
 void McuSerial::GetReadFifo(Connect_Typedef *co)
 {
-  *co.type = read_fifo_buff_[read_fifo_p_.front].type;
-  *co.data_16 = read_fifo_buff_[read_fifo_p_.front].data_16;
-  *co.data_32 = read_fifo_buff_[read_fifo_p_.front].data_32;
-  *co.data_16_u = read_fifo_buff_[read_fifo_p_.front].data_16_u;
-  *co.data_32_u = read_fifo_buff_[read_fifo_p_.front].data_32_u;
+  co->type = read_fifo_buff_[read_fifo_p_.front].type;
+  co->data_16 = read_fifo_buff_[read_fifo_p_.front].data_16;
+  co->data_32 = read_fifo_buff_[read_fifo_p_.front].data_32;
+  co->data_16_u = read_fifo_buff_[read_fifo_p_.front].data_16_u;
+  co->data_32_u = read_fifo_buff_[read_fifo_p_.front].data_32_u;
   read_fifo_buff_[read_fifo_p_.front].type = 0;
   read_fifo_buff_[read_fifo_p_.front].data_16 = 0;
   read_fifo_buff_[read_fifo_p_.front].data_32 = 0;
@@ -389,17 +389,17 @@ void McuSerial::GetReadFifo(Connect_Typedef *co)
 
 void McuSerial::GetSendFifo(Connect_Typedef *co)
 {
-  *co.type = send_fifo_buff_[send_fifo_p_.front].type;
-  *co.data_16 = send_fifo_buff_[send_fifo_p_.front].data_16;
-  *co.data_32 = send_fifo_buff_[send_fifo_p_.front].data_32;
-  *co.data_16_u = send_fifo_buff_[send_fifo_p_.front].data_16_u;
-  *co.data_32_u = send_fifo_buff_[send_fifo_p_.front].data_32_u;
+  co->type = send_fifo_buff_[send_fifo_p_.front].type;
+  co->data_16 = send_fifo_buff_[send_fifo_p_.front].data_16;
+  co->data_32 = send_fifo_buff_[send_fifo_p_.front].data_32;
+  co->data_16_u = send_fifo_buff_[send_fifo_p_.front].data_16_u;
+  co->data_32_u = send_fifo_buff_[send_fifo_p_.front].data_32_u;
   send_fifo_buff_[send_fifo_p_.front].type = 0;
   send_fifo_buff_[send_fifo_p_.front].data_16 = 0;
   send_fifo_buff_[send_fifo_p_.front].data_32 = 0;
   send_fifo_buff_[send_fifo_p_.front].data_16_u = 0;
   send_fifo_buff_[send_fifo_p_.front].data_32_u = 0;
-  send_fifo_buff_.front = (send_fifo_p_.front + 1) % FIFO_BUFF_MAX;
+  send_fifo_p_.front = (send_fifo_p_.front + 1) % FIFO_BUFF_MAX;
 }
 /***************************************************/
 
@@ -445,7 +445,7 @@ uint16_t McuSerial::DatatoUint16(uint8_t *buff)
 
 uint32_t McuSerial::DatatoUint32(uint8_t *buff)
 {
-  uin32_t data;
+  uint32_t data;
   data = buff[0];
   for (int i = 1; i < 4; i++)
   {
@@ -506,7 +506,7 @@ void McuSerial::Uint32toData(uint32_t data, uint8_t *data_type)
 
 float McuSerial::FloattoData(float data_float, int mult, uint8_t *data_type)
 {
-  uin32_t data = (uin32_t)(data_float * mult);
+  uint32_t data = (uint32_t)(data_float * mult);
   data_type[0] = (uint8_t)data & 0x000000FF;
   data_type[1] = (uint8_t)(data >> 8) & 0x000000FF;
   data_type[2] = (uint8_t)(data >> 16) & 0x000000FF;
@@ -527,4 +527,4 @@ void McuSerial::SendFramesZero()
 } // namespace mcuserial
 } // namespace shop
 
-MAIN("mcu_serial", shop::serial::McuSerial)
+MAIN(shop::mcuserial::McuSerial,"mcu_serial")

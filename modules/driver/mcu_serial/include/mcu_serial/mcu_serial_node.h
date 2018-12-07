@@ -99,8 +99,9 @@ private:
   uint16_t DatatoUint16(uint8_t *buff);
   uint32_t DatatoUint32(uint8_t *buff);
   float DatatoFloat(uint8_t *buff, int mult);
-  void TypetoData(uint8_t len, uint8_t type, uint8_t *data_type);
+  uint16_t DatatoType(uint8_t *buff);
 
+  void TypetoData(uint8_t len, uint8_t type, uint8_t *data_type);
   void Int16toData(int16_t data, uint8_t *data_type);
   void Int32toData(int32_t data, uint8_t *data_type);
   void Uint16toData(uint16_t data, uint8_t *data_type);

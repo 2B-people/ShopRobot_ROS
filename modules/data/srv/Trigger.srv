@@ -1,3 +1,0 @@
----
-bool success   # 标示srv是否成功运行
-string message # 信息，如错误信息等
