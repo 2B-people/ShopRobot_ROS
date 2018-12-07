@@ -46,8 +46,8 @@ McuSerial::McuSerial(std::string name)
   nh_private_.getParam("McuSerialBaudrate", mcu_baudrate_);
 
   //publish init
-  scan_pub_ = nh_.advertise<data::Remote>("remote",30);
-  romote_pub_ = nh_.advertise<data::CarScan>("carscan",30);
+  scan_pub_ = nh_.advertise<data::Remote>("remote", 30);
+  romote_pub_ = nh_.advertise<data::CarScan>("carscan", 30);
 }
 
 void McuSerial::Run()
@@ -149,49 +149,52 @@ void McuSerial::TopicLoop()
   while (is_open_ && !stop_topic_ && ros::ok())
   {
     GetReadFifo(&co);
-
-    switch (co.type)
+    if (co.type != 0)
     {
-    case MSG_DISTANCE_F:
-      carscan_msg_.distance_f = (float)(co.data_32 / 100);
-      break;
-    case MSG_DISTANCE_B:
-      carscan_msg_.distance_b = (float)(co.data_32 / 100);
-      break;
-    case MSG_DISTANCE_L:
-      carscan_msg_.distance_l = (float)(co.data_32 / 100);
-      break;
-    case MSG_DISTANCE_R:
-      carscan_msg_.distance_r = (float)(co.data_32 / 100);
-      scan_pub_.publish(carscan_msg_);
-      break;
-    case MSG_REMOTE_CH0:
-      remote_msg_.ch0 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
-    case MSG_REMOTE_CH1:
-      remote_msg_.ch1 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
-    case MSG_REMOTE_CH2:
-      remote_msg_.ch2 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
-    case MSG_REMOTE_CH3:
-      remote_msg_.ch3 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
-    case MSG_REMOTE_S1:
-      remote_msg_.s1 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
-    case MSG_REMOTE_S2:
-      remote_msg_.s2 = co.data_16_u;
-      romote_pub_.publish(remote_msg_);
-      break;
 
-    default:
-      ROS_WARN("Warn:no msg ,please debug in mcu");
+      switch (co.type)
+      {
+      case MSG_DISTANCE_F:
+        carscan_msg_.distance_f = (float)(co.data_32 / 100);
+        break;
+      case MSG_DISTANCE_B:
+        carscan_msg_.distance_b = (float)(co.data_32 / 100);
+        break;
+      case MSG_DISTANCE_L:
+        carscan_msg_.distance_l = (float)(co.data_32 / 100);
+        break;
+      case MSG_DISTANCE_R:
+        carscan_msg_.distance_r = (float)(co.data_32 / 100);
+        scan_pub_.publish(carscan_msg_);
+        break;
+      case MSG_REMOTE_CH0:
+        remote_msg_.ch0 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+      case MSG_REMOTE_CH1:
+        remote_msg_.ch1 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+      case MSG_REMOTE_CH2:
+        remote_msg_.ch2 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+      case MSG_REMOTE_CH3:
+        remote_msg_.ch3 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+      case MSG_REMOTE_S1:
+        remote_msg_.s1 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+      case MSG_REMOTE_S2:
+        remote_msg_.s2 = co.data_16_u;
+        romote_pub_.publish(remote_msg_);
+        break;
+
+      default:
+        ROS_WARN("Warn:no msg ,please debug in mcu");
+      }
     }
   }
 }
@@ -527,4 +530,4 @@ void McuSerial::SendFramesZero()
 } // namespace mcuserial
 } // namespace shop
 
-MAIN(shop::mcuserial::McuSerial,"mcu_serial")
+MAIN(shop::mcuserial::McuSerial, "mcu_serial")
