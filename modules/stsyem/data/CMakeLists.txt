@@ -12,13 +12,7 @@ add_message_files(DIRECTORY msg
                       CarScan.msg
                  )
 
-add_service_files(DIRECTORY srv
-					FILES
-				)
 
-add_action_files(DIRECTORY action
-                     FILES 
-                )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)
 
