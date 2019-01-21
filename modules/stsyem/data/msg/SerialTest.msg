@@ -1,1 +1,1 @@
-uint8[8] data
+uint8[48] data
