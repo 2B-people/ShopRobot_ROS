@@ -20,34 +20,35 @@ class behavior_tree
 {
   public:
     behavior_tree(BehaviorNode::Ptr root_node_ptr, int cycle_duration)
-        : root_node_ptr_(root_node_ptr), cycle_duration_(cycle_duration)
-        ,running_(false)
-        {};
-    
+        : root_node_ptr_(root_node_ptr), cycle_duration_(cycle_duration), running_(false){};
+    virtual ~behavior_tree() = default;
+
     void Execute()
     {
         running_ = true;
-        uint64_t index = 0
-        ros::spin();
-        while(ros::ok && running_){
-            ros::spin();
-            root_node_ptr_->Run();
-            ROS_INFO("tree is Run");
-            index_++;
+        uint64_t index = 0;
+        while (ros::ok)
+        {
+            if (running_)
+            {
+                ros::spinOnce();
+                root_node_ptr_->Run();
+                ROS_INFO("tree is Run num:%d", index);
+                index++;
+                ROS_INFO("-------------------------------");
+            }
         }
     }
-
+    // @breif 重启行为树
     void Reset()
     {
         running_ = true;
     }
-
+    // @breif 关闭行为树
     void Stop()
     {
         running_ = false;
     }
-
-    virtual ~behavior_tree() = default;
 
   private:
     BehaviorNode::Ptr root_node_ptr_;
@@ -56,6 +57,5 @@ class behavior_tree
 };
 } // namespace decision
 } // namespace shop
-
 
 #endif
