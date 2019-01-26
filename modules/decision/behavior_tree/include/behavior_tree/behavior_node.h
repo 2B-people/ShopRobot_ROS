@@ -211,7 +211,7 @@ class PreconditionNode : public DecoratorNode
 
     virtual void OnInitialize()
     {
-        ROS_INFO("%s", &name_);
+        ROS_INFO("%s", name_.c_str());
     }
     virtual bool Precondition()
     {
@@ -245,18 +245,18 @@ class PreconditionNode : public DecoratorNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_, __FUNCTION__);
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_, __FUNCTION__);
+            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
             return;
         }
     }
@@ -343,7 +343,7 @@ class SelectorNode : public CompositeNode
     virtual void OnInitialize()
     {
         children_node_index_ = 0;
-        ROS_INFO("%s %s", name_, __FUNCTION__);
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__.c_str());
     }
     virtual BehaviorState Update()
     {
@@ -360,7 +360,7 @@ class SelectorNode : public CompositeNode
                 BehaviorState state = children_node_ptr_.at(index)->Run();
                 if (index == children_node_index_)
                 {
-                    ROS_INFO("%s abort goes on!", name_);
+                    ROS_INFO("%s abort goes on!", name_.c_str());
                     if (state != BehaviorState::FAILURE)
                     {
                         return state;
@@ -390,18 +390,18 @@ class SelectorNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_, __FUNCTION__);
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_, __FUNCTION__);
+            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
             return;
         }
     }
@@ -421,7 +421,7 @@ class SequenceNode : public CompositeNode
     virtual void OnInitialize()
     {
         children_node_index_ = 0;
-        ROS_INFO("%s %s", name, __FUNCTION__);
+        ROS_INFO("%s %s", name.c_str(), __FUNCTION__.c_str());
     }
     virtual BehaviorState update()
     {
@@ -450,18 +450,18 @@ class SequenceNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_, __FUNCTION__);
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
             child_node_ptr_->Reset();
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_, __FUNCTION__);
+            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
             return;
         }
     }
@@ -493,7 +493,7 @@ class ParallelNode : public CompositeNode
         //复位
         children_node_done_.clear();
         children_node_done_.resize(children_node_ptr_.szie(), false);
-        ROS_INFO("%s %s", name_, __FUNCTION__);
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__.c_str());
     }
     virtual BehaviorState Update()
     {
@@ -535,17 +535,17 @@ class ParallelNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_, __FUNCTION__);
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_, __FUNCTION__);
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
             ;
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_, __FUNCTION__);
+            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
             return;
         }
         for (unsigned int index = 0; index != children_node_ptr_.size(); index++)

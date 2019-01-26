@@ -1,10 +1,10 @@
 #include <behavior_tree/behavior_tree.h>
 
 namespace shop{
-namespace decison{
+namespace decision{
 
 
 
     
-} // namespace decison
+} // namespace decision
 } // namespace shop

@@ -11,17 +11,15 @@
 #include <behavior_tree/behavior_node.h>
 #include <behavior_tree/black_board.h>
 
-namespace shop
-{
-namespace decision
-{
+namespace shop{
+namespace decision{
 
-class behavior_tree
+class BehaviorTree
 {
   public:
-    behavior_tree(BehaviorNode::Ptr root_node_ptr, int cycle_duration)
+    BehaviorTree(BehaviorNode::Ptr root_node_ptr, int cycle_duration)
         : root_node_ptr_(root_node_ptr), cycle_duration_(cycle_duration), running_(false){};
-    virtual ~behavior_tree() = default;
+    virtual ~BehaviorTree() = default;
 
     void Execute()
     {
