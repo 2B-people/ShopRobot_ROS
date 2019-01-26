@@ -8,8 +8,8 @@
 #include <ros/time.h>
 #include <ros/duration.h>
 
-#include <behavior_tree/behavior_node.h>
-#include <behavior_tree/black_board.h>
+#include <decision/behavior_node.h>
+#include <decision/black_board.h>
 
 namespace shop{
 namespace decision{
@@ -31,10 +31,11 @@ class BehaviorTree
             {
                 ros::spinOnce();
                 root_node_ptr_->Run();
-                ROS_INFO("tree is Run num:%d", index);
+                ROS_INFO("tree is Run num:%d", (int)index);
                 index++;
                 ROS_INFO("-------------------------------");
             }
+            
         }
     }
     // @breif 重启行为树

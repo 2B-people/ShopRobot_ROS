@@ -1,23 +1,15 @@
-#include <behavior_tree/behavior_tree.h>
-#include <behavior_tree/black_board.h>
+#include <decision/behavior_tree.h>
+#include <decision/black_board.h>
 
-
-class black_test : public BlackBoard
-{
-  public:
-    black_test() : BlackBoard::BlackBoard()
-    {};
-    ~black_test() = default;
-
-  private:
-};
+using namespace shop::decision;
 
 class ActionTest : public shop::decision::ActionNode
 {
 
   public:
     ActionTest(std::string name, const Blackboard::Ptr &blackboard_ptr)
-        : ActionNode::ActionNode(name, blackboard_ptr);
+        : ActionNode::ActionNode(name, blackboard_ptr)
+        {}
     ~ActionTest() = default;
 
   private:
@@ -29,7 +21,8 @@ class ActionTest : public shop::decision::ActionNode
     virtual BehaviorState Update()
     {
         ROS_INFO("%s is running!", name_.c_str());
-        return BehaviorState::RUNNING;
+        sleep(5);
+        return BehaviorState::FAILURE;
     }
 
     virtual void OnTerminate(BehaviorState state)
@@ -37,7 +30,6 @@ class ActionTest : public shop::decision::ActionNode
         switch (state)
         {
         case BehaviorState::IDLE:
-
             break;
         case BehaviorState::SUCCESS:
             break;
@@ -49,10 +41,10 @@ class ActionTest : public shop::decision::ActionNode
     }
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-    ros::init(argc, argv "decision_test");
-    auto blackboard_ptr = std::make_shared<black_test>();
+    ros::init(argc, argv ,"decision_test");
+    auto blackboard_ptr = std::make_shared<shop::decision::Blackboard>();
     auto action1_ptr = std::make_shared<ActionTest>("actiontest1", blackboard_ptr);
     auto action2_ptr = std::make_shared<ActionTest>("actiontest2", blackboard_ptr);
     auto action3_ptr = std::make_shared<ActionTest>("actiontest3", blackboard_ptr);
@@ -62,7 +54,7 @@ int main(int argc, char *argv[])
     auto jud1_ptr = std::make_shared<shop::decision::PreconditionNode>("jud1_tests", blackboard_ptr,
                                                                        action1_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->/*TODO*/ ())
+                                                                           if (blackboard_ptr->test1 ())
                                                                            {
                                                                                return true;
                                                                            }
@@ -76,7 +68,7 @@ int main(int argc, char *argv[])
     auto jud2_ptr = std::make_shared<shop::decision::PreconditionNode>("jud2_tests", blackboard_ptr,
                                                                        action2_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->/*TODO*/ ())
+                                                                           if (blackboard_ptr->test2 ())
                                                                            {
                                                                                return true;
                                                                            }
@@ -94,21 +86,14 @@ int main(int argc, char *argv[])
     auto sw1_ptr_node = std::make_shared<shop::decision::PreconditionNode>("sw1_tests_node", blackboard_ptr,
                                                                            sw1_ptr,
                                                                            [&]() {
-                                                                               if (blackboard_ptr->/*TODO*/ ())
-                                                                               {
-                                                                                   return true;
-                                                                               }
-                                                                               else
-                                                                               {
-                                                                                   return false;
-                                                                               }
+                                                                               return true;
                                                                            },
                                                                            shop::decision::AbortType::LOW_PRIORITY);
 
     auto jud3_ptr = std::make_shared<shop::decision::PreconditionNode>("jud3_tests", blackboard_ptr,
                                                                        action3_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->/*TODO*/ ())
+                                                                           if (blackboard_ptr->test4 ())
                                                                            {
                                                                                return true;
                                                                            }
@@ -122,7 +107,7 @@ int main(int argc, char *argv[])
     auto jud4_ptr = std::make_shared<shop::decision::PreconditionNode>("jud4_tests", blackboard_ptr,
                                                                        action4_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->/*TODO*/ ())
+                                                                           if (blackboard_ptr->test5 ())
                                                                            {
                                                                                return true;
                                                                            }
@@ -140,7 +125,7 @@ int main(int argc, char *argv[])
     auto sw2_ptr_node = std::make_shared<shop::decision::PreconditionNode>("sw2_tests_node", blackboard_ptr,
                                                                            sw2_ptr,
                                                                            [&]() {
-                                                                               if (blackboard_ptr->/*TODO*/ ())
+                                                                               if (blackboard_ptr->test6 ())
                                                                                {
                                                                                    return true;
                                                                                }
@@ -155,6 +140,8 @@ int main(int argc, char *argv[])
     robot_ptr->AddChildren(sw1_ptr_node);
     robot_ptr->AddChildren(sw2_ptr_node);
 
-    shop::decision::BehaviorTree root(robot_ptr);
-    root.Execute();
+    shop::decision::BehaviorTree se(robot_ptr,100);
+    se.Execute();
+
 }
+

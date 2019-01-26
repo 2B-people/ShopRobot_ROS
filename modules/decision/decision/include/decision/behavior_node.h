@@ -1,5 +1,5 @@
-#ifndef BEHAVIOR_TREE_H
-#define BEHAVIOR_TREE_H
+#ifndef BEHAVIOR_NODE_H
+#define BEHAVIOR_NODE_H
 
 #include <chrono>
 #include <thread>
@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 
-#include <black_borad.h>
+#include <decision/black_board.h>
 
 namespace shop {
 namespace decision {
@@ -67,10 +67,10 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
             OnInitialize();
         }
         behavior_state_ = Update();
-        //更新后判断状态是否运行
+        //结束调用函数OnTerminate
         if (behavior_state_ != BehaviorState::RUNNING)
         {
-            OnInitialize();
+            OnTerminate(behavior_state_);
         }
         return behavior_state_;
     }
@@ -104,16 +104,19 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
     std::string name_;
     //类型
     BehaviorType behavior_type_;
-    //TODO 对应黑板给入
+    //黑板给入
     Blackboard::Ptr blackboard_ptr_;
     //状态
     BehaviorState behavior_state_;
     //父节点指针
     BehaviorNode::Ptr parent_node_ptr_;
 
-    virtual void OnInitialize() = 0;
-    virtual void OnTerminate(BehaviorState state) = 0;
-    virtual BehaviorState Update() = 0;
+  //逻辑
+  virtual BehaviorState Update() = 0;
+  //获取数据和资源
+  virtual void OnInitialize() = 0;
+  //释放资源
+  virtual void OnTerminate(BehaviorState state) = 0;
 };
 
 //行为节点，最后的执行机制
@@ -131,6 +134,7 @@ class ActionNode : public BehaviorNode
     virtual BehaviorState Update() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
 };
+
 
 //装饰器是只有一个子节点的行为，
 //            A
@@ -155,15 +159,14 @@ class DecoratorNode : public BehaviorNode
     }
 
   protected:
+    BehaviorNode::Ptr child_node_ptr_;
+
     virtual void OnInitialize() = 0;
     virtual BehaviorState Update() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
-    BehaviorNode::Ptr child_node_ptr_;
 };
 
-//初始化节点
-// @brief 最终生成树时使用这个
-// Iterates over the contents of a GargantuanTable.
+// @brief 构造器
 // Example:
 //  auto under_attack_condition_ = \
 //       std::make_shared<rrts::decision::PreconditionNode>("plan buff under attack condition",
@@ -225,7 +228,7 @@ class PreconditionNode : public DecoratorNode
             return false;
         }
     }
-    virtual BehaviorNode Update()
+    virtual BehaviorState Update()
     {
         if (child_node_ptr_ == nullptr)
         {
@@ -245,18 +248,18 @@ class PreconditionNode : public DecoratorNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
             child_node_ptr_->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
             child_node_ptr_->Reset();
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
     }
@@ -267,19 +270,27 @@ class PreconditionNode : public DecoratorNode
 class CompositeNode : public BehaviorNode
 {
   public:
-    CompositeNode(std::string name, BehaviorType behavior_type, const blackboard::Ptr &blackboard_ptr): 
+    CompositeNode(std::string name, BehaviorType behavior_type, const Blackboard::Ptr &blackboard_ptr): 
     BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
         children_node_index_(0) 
         {}
     virtual ~CompositeNode() = default;
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
-        child_node_ptr_.push_back(*child_node_ptr);
-        (*child_node_ptr)->SetParent(shared_from_this());
+        children_node_ptr_.push_back(child_node_ptr);
+        (child_node_ptr)->SetParent(shared_from_this());
+    }
+    virtual void AddChildren(std::initializer_list<BehaviorNode::Ptr> child_node_ptr_list){
+        for (auto child_node_ptr = child_node_ptr_list.begin(); 
+                child_node_ptr!=child_node_ptr_list.end();child_node_ptr++) 
+        {
+            children_node_ptr_.push_back(*child_node_ptr);
+            (*child_node_ptr)->SetParent(shared_from_this());
+        }
     }
     std::vector<BehaviorNode::Ptr> GetChildren()
     {
-        return child_node_ptr_;
+        return children_node_ptr_;
     }
     unsigned int GetChildrenIndex()
     {
@@ -287,18 +298,18 @@ class CompositeNode : public BehaviorNode
     }
     unsigned int GetChildrenNum()
     {
-        return child_node_ptr_.size();
+        return children_node_ptr_.size();
     }
 
   protected:
+    //子节点指针向量容器
+    std::vector<BehaviorNode::Ptr> children_node_ptr_;
+    unsigned int children_node_index_;
+
     virtual BehaviorState Update() = 0;
     virtual void OnInitialize() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
 
-    //子节点指针向量容器
-    std::vector<BehaviorNode::Ptr> child_node_ptr_;
-
-    unsigned int children_node_index_;
 };
 
 // 选择节点
@@ -315,7 +326,7 @@ class SelectorNode : public CompositeNode
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
         CompositeNode::AddChildren(child_node_ptr);
-        children_node_reevaluation_.push_back(child_node_ptr->GetBehaviorTpye() == BehaviorType::PRECONITION
+        children_node_reevaluation_.push_back(child_node_ptr->GetBehaviorType() == BehaviorType::PRECONDITION
                          && (std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY 
                             || std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::BOTH));
     }
@@ -343,11 +354,11 @@ class SelectorNode : public CompositeNode
     virtual void OnInitialize()
     {
         children_node_index_ = 0;
-        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__.c_str());
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
     }
     virtual BehaviorState Update()
     {
-        if (child_node_ptr_.size() == 0)
+        if (children_node_ptr_.size() == 0)
         {
             return BehaviorState::SUCCESS;
         }
@@ -378,7 +389,7 @@ class SelectorNode : public CompositeNode
             {
                 return state;
             }
-            if (++children_node_index_ == children_node_ptr.size())
+            if (++children_node_index_ == children_node_ptr_.size())
             {
                 children_node_index_ = 0;
                 return BehaviorState::FAILURE;
@@ -390,18 +401,17 @@ class SelectorNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
-            child_node_ptr_->Reset();
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
+            children_node_ptr_.at(children_node_index_)->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
-            child_node_ptr_->Reset();
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
     }
@@ -421,7 +431,7 @@ class SequenceNode : public CompositeNode
     virtual void OnInitialize()
     {
         children_node_index_ = 0;
-        ROS_INFO("%s %s", name.c_str(), __FUNCTION__.c_str());
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
     }
     virtual BehaviorState update()
     {
@@ -450,18 +460,17 @@ class SequenceNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
-            child_node_ptr_->Reset();
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
+            children_node_ptr_.at(children_node_index_)->Reset();
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
-            child_node_ptr_->Reset();
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
     }
@@ -473,7 +482,7 @@ class ParallelNode : public CompositeNode
 {
   public:
     ParallelNode(std::string name, const Blackboard::Ptr &blackboard_ptr,unsigned int threshold) 
-                        : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, Blackboard::Ptr & blackboard_ptr),
+                        : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, blackboard_ptr),
                             threshold_(threshold),success_count_(0),
                             failure_count_(0)
                             {}
@@ -492,8 +501,8 @@ class ParallelNode : public CompositeNode
         success_count_ = 0;
         //复位
         children_node_done_.clear();
-        children_node_done_.resize(children_node_ptr_.szie(), false);
-        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__.c_str());
+        children_node_done_.resize(children_node_ptr_.size(), false);
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
     }
     virtual BehaviorState Update()
     {
@@ -508,7 +517,7 @@ class ParallelNode : public CompositeNode
             {
                 BehaviorState state = children_node_ptr_.at(index)->Run();
 
-                if (state = BehaviorState::SUCCESS)
+                if (state == BehaviorState::SUCCESS)
                 {
                     children_node_done_.at(index) = true;
                     if (++success_count_ >= threshold_)
@@ -535,17 +544,17 @@ class ParallelNode : public CompositeNode
         switch (state)
         {
         case BehaviorState::IDLE:
-            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
             break;
         case BehaviorState::SUCCESS:
-            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
             break;
         case BehaviorState::FAILURE:
-            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__.c_str());
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
             ;
             break;
         default:
-            ROS_ERROR_STREAM("%s %s ERROR", name_.c_str(), __FUNCTION__.c_str());
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
         for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
@@ -580,7 +589,7 @@ bool PreconditionNode::Reevaluation()
             if (Precondition())
             {
                 //Abort Measures
-                ROS_INFO("Abort Measures")
+                ROS_INFO("Abort Measures");
                 parent_children.at(parent_selector_node_ptr->GetChildrenIndex())->Reset();
                 parent_selector_node_ptr->SetChildrenIndex(index_in_parent);
                 return true;
