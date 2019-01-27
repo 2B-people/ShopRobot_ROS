@@ -1,10 +1,10 @@
-#include <behavior_tree/behavior_tree.h>
+#include <behavior_tree/behavior_tree.hpp>
+#include <decision/behavior_node.hpp>
+#include <decision/black_board.hpp>
 
-namespace shop{
-namespace decision{
+using namespace shop::decision;
 
-
-
+int main(int argc,char** argv)
+{
     
-} // namespace decision
-} // namespace shop
+}

@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 
-#include <decision/black_board.h>
+#include <decision/black_board.hpp>
 
 namespace shop {
 namespace decision {

@@ -1,8 +1,8 @@
 #include <ros/time.h>
 #include <ros/duration.h>
 
-#include <decision/behavior_tree.h>
-#include <decision/black_board.h>
+#include <decision/behavior_tree.hpp>
+#include <decision/black_board.hpp>
 
 using namespace shop::decision;
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
                                                                        [&]() {
                                                                            if (blackboard_ptr->test1())
                                                                            {
-                                                                               return true;
+                                                                               return false;
                                                                            }
                                                                            else
                                                                            {
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
                                                                        [&]() {
                                                                            if (blackboard_ptr->test2())
                                                                            {
-                                                                               return false;
+                                                                               return true;
                                                                            }
                                                                            else
                                                                            {

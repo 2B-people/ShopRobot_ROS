@@ -8,8 +8,8 @@
 #include <ros/time.h>
 #include <ros/duration.h>
 
-#include <decision/behavior_node.h>
-#include <decision/black_board.h>
+#include <decision/behavior_node.hpp>
+#include <decision/black_board.hpp>
 
 namespace shop{
 namespace decision{
