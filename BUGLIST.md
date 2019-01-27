@@ -66,4 +66,32 @@ Serial’ with no type [-fpermissive] McuSerial::initSerial()
 ctrl-v时注意改值，不然gg！
 
 
+`bug010`
+```shell
+CMakeFiles/decision_test.dir/src/decision_test.cpp.o：在函数‘BlackTest::BlackTest()’中：
+decision_test.cpp:(.text._ZN9BlackTestC2Ev[_ZN9BlackTestC5Ev]+0x19)：对‘vtable for BlackTest’未定义的引用
+collect2: error: ld returned 1 exit status
+ShopRobot_ROS/modules/decision/decision/CMakeFiles/decision_test.dir/build.make:114: recipe for target '/home/nqq09/Shop_robot_WS/devel/lib/decision/decision_test' failed
+make[2]: *** [/home/nqq09/Shop_robot_WS/devel/lib/decision/decision_test] Error 1
+CMakeFiles/Makefile2:2544: recipe for target 'ShopRobot_ROS/modules/decision/decision/CMakeFiles/decision_test.dir/all' failed
+make[1]: *** [ShopRobot_ROS/modules/decision/decision/CMakeFiles/decision_test.dir/all] Error 2
+Makefile:138: recipe for target 'all' failed
+make: *** [all] Error 2
+Invoking "make -j4 -l4" failed
+```
+```c++
+auto blackboard_ptr = std::make_shared<BlackTest>();
+```
+猜测是上面的调用问题
+`解决`
+不是上述问题,是虚基类的继承问题,是编译器报虚函数没有被实现的
+是因为基类中如果虚函数没有缺省的实现，最好就声明成纯虚函数。
+另外在对各种成员函数包括构造函数之类的最好提供其实现，即使为空也可以。
 
+`bug011`
+ros::time 没有重载条件运算符,使用时注意得转化为double来进入判断
+`重要` 重载了(是我傻逼),应该用以下方法来判断定时
+```c++
+        if(at_now - begin_ >= ros::Duration(3));
+        //ros::time-ros::time 两个Time相减返回Duration类型
+```

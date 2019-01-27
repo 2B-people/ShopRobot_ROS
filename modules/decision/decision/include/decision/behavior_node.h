@@ -216,6 +216,7 @@ class PreconditionNode : public DecoratorNode
     {
         ROS_INFO("%s", name_.c_str());
     }
+    // @berif true return ture ,false printf&&return false
     virtual bool Precondition()
     {
         if (precondition_function_)
@@ -609,6 +610,7 @@ bool PreconditionNode::Reevaluation()
             return false;
         }
     }
+    return true;
 }
 
 

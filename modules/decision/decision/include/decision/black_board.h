@@ -1,40 +1,24 @@
 #ifndef BLACK_BOARD_H
 #define BLACK_BOARD_H
 
+#include <chrono>
+#include <thread>
+#include <vector>
+
+#include <ros/ros.h>
+
 namespace shop{
-namespace decision
+namespace decision{
+
+class Blackboard: public std::enable_shared_from_this<Blackboard>
 {
-class Blackboard
-{
-  public:
+public:
     typedef std::shared_ptr<Blackboard> Ptr;
     Blackboard()
     {};
     virtual ~Blackboard() = default;
+protected:
 
-    bool test1(){
-        return true;
-    }
-    bool test2()
-    {
-        return true;
-    }
-    bool test3()
-    {
-        return true;
-    }
-    bool test4()
-    {
-        return true;
-    }    
-    bool test5()
-    {
-        return true;
-    }    
-    bool test6()
-    {
-        return true;
-    }    
 };
 
 } // namespace decision
