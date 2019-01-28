@@ -148,6 +148,8 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
         ROS_INFO("blackboard is cleared!");
         world_data_map_.clear();
     }
+
+  protected:
     // @breif 取得目标数据字典类的指针
     // @param key:目标数据的key
     // @return 字典类的指针
@@ -169,7 +171,7 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
             return nullptr;
         }
     }
-
+    
   private:
     //数据结构:map容器,储存字典指针
     std::map<std::string, DirBase::Ptr> world_data_map_;
