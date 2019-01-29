@@ -99,3 +99,9 @@ ros::time 没有重载条件运算符,使用时注意得转化为double来进入
         if(at_now - begin_ >= ros::Duration(3));
         //ros::time-ros::time 两个Time相减返回Duration类型
 ```
+
+`bug012`
+```c++
+    DirBase::Ptr GetDirPtr(std::string key);
+```
+此方法只能return基类的指针,所以在使用的时候注意使用std::dynamic_pointer_cast<Temp>来转化类指针类型

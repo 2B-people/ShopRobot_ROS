@@ -28,7 +28,7 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     DirBase(DictionaryType dictionary_type) : dictionary_type_(dictionary_type)
     {};
     virtual ~DirBase() = default;
-    //得到字典值
+    //得到字典类型
     DictionaryType GetDictionaryType()
     {
         return dictionary_type_;
@@ -51,7 +51,7 @@ class BoolDir : public DirBase
         bool_data_ = initial_data_;
     };
     virtual ~BoolDir() = default;
-    bool GetVelar()
+    bool GetValue()
     {
         return bool_data_;
     }
@@ -148,11 +148,10 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
         ROS_INFO("blackboard is cleared!");
         world_data_map_.clear();
     }
-
-  protected:
     // @breif 取得目标数据字典类的指针
+    //       -注意:此方法传回来只能是基类指针,必须使用std::dynamic_pointer_cast<Temp>来转化类型
     // @param key:目标数据的key
-    // @return 字典类的指针
+    // @return 字典基类的指针
     DirBase::Ptr GetDirPtr(std::string key)
     {
         if (world_data_map_.size() == 0)
@@ -171,6 +170,15 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
             return nullptr;
         }
     }
+    //example:
+    bool GetBoolValue(std::string key)
+    {
+        auto dir_ptr = GetDirPtr(key);
+        auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
+        return bool_dir_ptr->GetValue();
+    }
+
+  protected:
     
   private:
     //数据结构:map容器,储存字典指针

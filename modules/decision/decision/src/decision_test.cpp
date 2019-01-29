@@ -8,38 +8,13 @@ using namespace shop::decision;
 
 class BlackTest : public Blackboard
 {
-  public:
-    BlackTest() : Blackboard::Blackboard()
-    {
-        running_ = true;
-    };
-    virtual ~BlackTest() = default;
-    bool test1()
-    {
-        return true;
-    }
-    bool test2()
-    {
-        return true;
-    }
-    bool test3()
-    {
-        return true;
-    }
-    bool test4()
-    {
-        return true;
-    }
-    bool test5()
-    {
-        return true;
-    }
-    bool test6()
-    {
-        return true;
-    }
-private:
-    bool running_;
+    public:
+        BlackTest():Blackboard::Blackboard(){
+            auto test_bool = std::make_shared<BoolDir>(true);
+            AddDataIntoWorld("test1",test_bool);
+        }
+    private:
+        
 };
 
 class ActionTest : public shop::decision::ActionNode
@@ -109,28 +84,14 @@ int main(int argc, char **argv)
     auto jud1_ptr = std::make_shared<shop::decision::PreconditionNode>("jud1_tests", blackboard_ptr,
                                                                        action1_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->test1())
-                                                                           {
                                                                                return false;
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               return false;
-                                                                           }
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);
 
     auto jud2_ptr = std::make_shared<shop::decision::PreconditionNode>("jud2_tests", blackboard_ptr,
                                                                        action2_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->test2())
-                                                                           {
-                                                                               return true;
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               return true;
-                                                                           }
+                                                                                return false;
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);
 
@@ -148,28 +109,15 @@ int main(int argc, char **argv)
     auto jud3_ptr = std::make_shared<shop::decision::PreconditionNode>("jud3_tests", blackboard_ptr,
                                                                        action3_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->test4())
-                                                                           {
-                                                                               return false;
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               return false;
-                                                                           }
+                                                                                return false;
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);
 
     auto jud4_ptr = std::make_shared<shop::decision::PreconditionNode>("jud4_tests", blackboard_ptr,
                                                                        action4_ptr,
                                                                        [&]() {
-                                                                           if (blackboard_ptr->test5())
-                                                                           {
-                                                                               return true;
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               return false;
-                                                                           }
+                                                                           auto dir_ptr = std::dynamic_pointer_cast<BoolDir>(blackboard_ptr->GetDirPtr("test1"));
+                                                                           return dir_ptr->GetValue();
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);
     auto sw2_ptr = std::make_shared<shop::decision::SelectorNode>("sw2_tests", blackboard_ptr);
