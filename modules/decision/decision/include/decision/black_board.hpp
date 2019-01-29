@@ -110,6 +110,19 @@ class CoordinateDir : public DirBase
     uint16_t y_data_;
 };
 
+
+// class PosaDir:public 
+// {
+// private:
+//     /* data */
+// public:
+//     PosaDir(/* args */);
+//     ~PosaDir();
+// };
+
+
+
+
 //黑板基类
 class Blackboard : public std::enable_shared_from_this<Blackboard>
 {

@@ -1,6 +1,8 @@
 #include <ros/time.h>
 #include <ros/duration.h>
+#include<string>
 
+#include <data/SerialTest.h>
 #include <decision/behavior_tree.hpp>
 #include <decision/black_board.hpp>
 
@@ -33,14 +35,19 @@ class ActionTest : public shop::decision::ActionNode
 
   public:
     ActionTest(std::string name, const Blackboard::Ptr &blackboard_ptr)
-        : ActionNode::ActionNode(name, blackboard_ptr)
+        : ActionNode::ActionNode(name, blackboard_ptr),index_(0)
     {
-         ros::Time::init();
+        ros::Time::init();
+        test_pub_ = nh_.advertise<data::SerialTest>("actiontest",1);
     }
     ~ActionTest() = default;
 
   private:
+    ros::Publisher test_pub_;
+    data::SerialTest test_msg_;
+    ros::NodeHandle nh_;
     ros::Time begin_;
+    uint64_t index_;
     virtual void OnInitialize()
     {
         begin_ = ros::Time::now();
@@ -59,7 +66,11 @@ class ActionTest : public shop::decision::ActionNode
         else
         {
             ROS_INFO("%s is running!", name_.c_str());
-            sleep(1);
+            for(size_t i = 0; i < 30; i++)
+            {
+                test_msg_.data[i] = index_;
+            }
+            test_pub_.publish(test_msg_);
             return BehaviorState::RUNNING;  
         }
         
