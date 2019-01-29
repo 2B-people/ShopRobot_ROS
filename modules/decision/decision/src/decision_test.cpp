@@ -6,11 +6,22 @@
 
 using namespace shop::decision;
 
+class TestDir:public BoolDir
+{
+
+public:
+    TestDir(bool key):BoolDir(key){
+    };
+    virtual ~TestDir() = default;
+};
+
+
+
 class BlackTest : public Blackboard
 {
     public:
         BlackTest():Blackboard::Blackboard(){
-            auto test_bool = std::make_shared<BoolDir>(true);
+            auto test_bool = std::make_shared<TestDir>(true);
             AddDataIntoWorld("test1",test_bool);
         }
     private:
@@ -116,7 +127,7 @@ int main(int argc, char **argv)
     auto jud4_ptr = std::make_shared<shop::decision::PreconditionNode>("jud4_tests", blackboard_ptr,
                                                                        action4_ptr,
                                                                        [&]() {
-                                                                           auto dir_ptr = std::dynamic_pointer_cast<BoolDir>(blackboard_ptr->GetDirPtr("test1"));
+                                                                           auto dir_ptr = std::dynamic_pointer_cast<TestDir>(blackboard_ptr->GetDirPtr("test1"));
                                                                            return dir_ptr->GetValue();
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);
