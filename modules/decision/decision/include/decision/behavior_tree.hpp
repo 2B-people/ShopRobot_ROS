@@ -20,7 +20,7 @@ class BehaviorTree
     BehaviorTree(BehaviorNode::Ptr root_node_ptr, int cycle_duration)
         : root_node_ptr_(root_node_ptr), cycle_duration_(cycle_duration), running_(false){};
     virtual ~BehaviorTree() = default;
-
+    // @ breif run方法
     void Execute()
     {
         running_ = true;

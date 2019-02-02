@@ -9,22 +9,21 @@
 
 #include <blackboard/black_board.hpp>
 
-namespace shop
-{
-namespace decision
-{
+namespace shop{
+namespace decision{
 
 //布尔类型
 class BoolDir : public DirBase
 {
   public:
     BoolDir(bool initial_data)
-        : DirBase::DirBase(DictionaryType::BOOL), initial_bool_(initial_data)
+        : DirBase(DictionaryType::BOOL), initial_bool_(initial_data)
     {
         middle_bool_ = initial_bool_;
         real_bool_ = middle_bool_;
     };
     virtual ~BoolDir() = default;
+    // @breif bool的字典只有一个值
     bool GetValue()
     {
         return real_bool_;
@@ -62,7 +61,7 @@ class CoordinateDir : public DirBase
 {
   public:
     CoordinateDir(uint16_t initial_x, uint16_t initial_y)
-        : DirBase::DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y)
+        : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y)
     {
         middle_x_ = initial_x_;
         middle_y_ = initial_y_;
@@ -112,7 +111,6 @@ class CoordinateDir : public DirBase
     uint16_t real_y_;
 };
 
-
 //货物类别
 enum class GoodsName : int
 {
@@ -131,7 +129,7 @@ enum class GoodsName : int
     TLS,
 };
 
-//TODO 用一个基类来包装goods类型,可以储存分数
+//TODO 用一个基类来包装goods类型,可以储存数据分数,可以容错
 // class GoodsKey
 // {
 //   public:
@@ -144,7 +142,7 @@ enum class GoodsName : int
 class GoodsDir : public DirBase
 {
   public:
-    GoodsDir() : DirBase::DirBase(DictionaryType::GOODS)
+    GoodsDir() : DirBase(DictionaryType::GOODS)
     {
         location_goods_.fill(GoodsName::NONE);
         location_goods_lock_flag_.fill(true);
@@ -157,6 +155,7 @@ class GoodsDir : public DirBase
     }
 
   protected:
+    //goods数据为一个数组,所以重写了几个函数,只是改变了参数
     void Lock(const int location)
     {
         location_goods_lock_flag_[location] = false;
@@ -190,8 +189,8 @@ class GoodsDir : public DirBase
     }
 
   private:
-    std::array<GoodsName, 10> location_goods_;
-    std::array<bool, 10> location_goods_lock_flag_;
+    std::array<GoodsName, 12> location_goods_;
+    std::array<bool, 12> location_goods_lock_flag_;
 };
 
 } // namespace decision

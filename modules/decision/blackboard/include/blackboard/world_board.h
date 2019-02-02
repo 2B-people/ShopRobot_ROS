@@ -21,13 +21,11 @@ class WorldBoard : public Blackboard, shop::common::RRTS
 
   private:
     ros::NodeHandle nh_;
-    ros::ServiceServer service_;
-    ros::Publication 	
+    ros::ServiceServer service_;	
     
 };
 
 } // namespace decision
-
 } // namespace shop
 
 #endif

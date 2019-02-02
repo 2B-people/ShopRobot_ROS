@@ -39,6 +39,7 @@ class DirBase : public std::enable_shared_from_this<DirBase>
 
   protected:
     bool flag_;
+
     virtual void RepeatInit() = 0;
     virtual void Lock()
     {
@@ -99,6 +100,13 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
     //       -注意:此方法传回来只能是基类指针,必须使用std::dynamic_pointer_cast<Temp>来转化类型
     // @param key:目标数据的key
     // @return 字典基类的指针
+    //example:
+    // bool GetBoolValue(std::string key)
+    // {
+    //     auto dir_ptr = GetDirPtr(key);
+    //     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
+    //     return bool_dir_ptr->GetValue();
+    // }
     DirBase::Ptr GetDirPtr(std::string key)
     {
         if (black_map_.size() == 0)
@@ -117,13 +125,7 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
             return nullptr;
         }
     }
-    //example:
-    // bool GetBoolValue(std::string key)
-    // {
-    //     auto dir_ptr = GetDirPtr(key);
-    //     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
-    //     return bool_dir_ptr->GetValue();
-    // }
+
 
   protected:
     //数据结构:map容器,储存字典指针
@@ -132,4 +134,5 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
 
 } // namespace decision
 } // namespace shop
+
 #endif
