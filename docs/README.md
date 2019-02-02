@@ -9,23 +9,23 @@ HDU ShopRobot ROS coding
 
 ##文件架构
 
--common
+- common
     此目录为整个项目公用代码仓库
--docs
+- docs
     此目录为文档仓库
--example
+- example
     此目录为实例,意在能理解统一接口
--modules
+- modules
     此目录为具体开发
-    -decision
+    - decision
         任务决策的内容
-    -driver
+    - driver
         与外界的交流,具体为各种通信
-    -planning
+    - planning
         为具体的规划,eg:路径规划,识别等
-    -stsyem
+    - stsyem
         为整个系统的配置与通信协议
--tools
+- tools
     此目录为dubug工具
 
 

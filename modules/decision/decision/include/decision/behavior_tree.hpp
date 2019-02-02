@@ -9,7 +9,7 @@
 #include <ros/duration.h>
 
 #include <decision/behavior_node.hpp>
-#include <decision/black_board.hpp>
+#include <blackboard/black_board.hpp>
 
 namespace shop{
 namespace decision{

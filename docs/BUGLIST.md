@@ -112,3 +112,4 @@ make[2]: 警告：检测到时钟错误。您的创建可能是不完整的。
 Scanning dependencies of target decision_test
 make[2]: Warning: File '/home/nqq09/Shop_robot_WS/devel/lib/decision/decision_test' has modification time 27184 s in the future
 ```
+???莫名解决,再运行基没有了,神奇
