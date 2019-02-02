@@ -124,4 +124,4 @@ catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp 
 )
-这是给外部包提供依
+这是给外部包提供依赖所使用的代码
