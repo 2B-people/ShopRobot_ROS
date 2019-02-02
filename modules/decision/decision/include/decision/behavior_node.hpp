@@ -7,7 +7,8 @@
 
 #include <ros/ros.h>
 
-#include <decision/black_board.h>
+#include <common/rrts.h>
+#include <blackboard/black_board.hpp>
 
 namespace shop {
 namespace decision {
@@ -55,11 +56,10 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
                                                           blackboard_ptr_(blackboard_ptr),
                                                           behavior_state_(BehaviorState::IDLE),
                                                           parent_node_ptr_(nullptr)
-    {
-    }
+    {}
     virtual ~BehaviorNode() = default;
 
-    //运行函数
+    //运行函数,封装统一接口
     BehaviorState Run()
     {
         if (behavior_state_ != BehaviorState::RUNNING)
@@ -75,6 +75,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
         return behavior_state_;
     }
 
+    // @ breif 重新挂载节点
     virtual void Reset()
     {
         if (behavior_state_ != BehaviorState::RUNNING)
@@ -113,7 +114,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 
   //逻辑
   virtual BehaviorState Update() = 0;
-  //获取数据和资源
+  //获取数据和资源,初始化
   virtual void OnInitialize() = 0;
   //释放资源
   virtual void OnTerminate(BehaviorState state) = 0;
@@ -135,8 +136,8 @@ class ActionNode : public BehaviorNode
     virtual void OnTerminate(BehaviorState state) = 0;
 };
 
-
-//装饰器是只有一个子节点的行为，
+// @breif 装饰节点
+// 装饰器是只有一个子节点的行为，
 //            A
 //            |
 //            |
@@ -168,22 +169,15 @@ class DecoratorNode : public BehaviorNode
 
 // @brief 构造器
 // Example:
-//  auto under_attack_condition_ = \
-//       std::make_shared<rrts::decision::PreconditionNode>("plan buff under attack condition",
-//                                                    blackboard_ptr_,
-//                                                    turn_to_hurt_action_,
-//                                                    [&](){
-//                                                          if (blackboard_ptr_->GetArmorAttacked()
-//                                                            != rrts::decision::ArmorAttacked::NONE
-//                                                           && blackboard_ptr_->GetArmorAttacked()
-//                                                            != rrts::decision::ArmorAttacked::FRONT) 
-//                                                                      {
-//                                                                          return true;
-//                                                                       } 
-//                                                                       else {
-//                                                                           return false;
-//                                                                       }
-//                                                           }, rrts::decision::AbortType::LOW_PRIORITY);
+//   auto jud1_ptr = std::make_shared<shop::decision::PreconditionNode>
+//                       ("jud1_tests", blackboard_ptr,
+//                           action1_ptr,
+//                           [&]() 
+//                           {
+//                              return false;
+//                           },
+//                           shop::decision::AbortType::LOW_PRIORITY
+//                       );
 //
 //  @param name: 描述节点名字
 //         blackboard_ptr: 黑板类指针
@@ -216,6 +210,7 @@ class PreconditionNode : public DecoratorNode
     {
         ROS_INFO("%s", name_.c_str());
     }
+    // @berif true return ture ,false printf&&return false
     virtual bool Precondition()
     {
         if (precondition_function_)
@@ -612,6 +607,7 @@ bool PreconditionNode::Reevaluation()
             return false;
         }
     }
+    return true;
 }
 
 

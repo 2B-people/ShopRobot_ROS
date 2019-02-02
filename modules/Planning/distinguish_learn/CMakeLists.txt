@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(decision)
+project(distinguish_learn)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -11,15 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   common
   data
   roscpp
+  rospy
   std_msgs
-  blackboard
 )
 
-catkin_package()
-
-include_directories(include)
-include_directories( ${catkin_INCLUDE_DIRS})
-
-add_executable(decision_test src/decision_test.cpp)
-add_dependencies(decision_test  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(decision_test PRIVATE  ${catkin_LIBRARIES})

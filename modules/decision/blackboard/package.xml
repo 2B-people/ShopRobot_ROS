@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>decision</name>
+  <name>blackboard</name>
   <version>0.0.0</version>
-  <description>The decision package</description>
+  <description>The blackboard package</description>
 
   <maintainer email="nqq09@163.com">nqq09</maintainer>
 
@@ -13,19 +13,20 @@
   <build_depend>common</build_depend>
   <build_depend>data</build_depend>
   <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>blackboard</build_depend>
+
   <build_export_depend>common</build_export_depend>
   <build_export_depend>data</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
-  <build_export_depend>blackboard</build_export_depend>
+  
   <exec_depend>common</exec_depend>
   <exec_depend>data</exec_depend>
   <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>blackboard</exec_depend>
-
 
 
   <!-- The export tag contains other, unspecified, tags -->
