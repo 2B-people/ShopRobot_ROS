@@ -4,7 +4,7 @@
 #include <iostream> // std::cout
 #include <thread>   // std::thread
 
-void thread_task() {
+void dasd() {
     std::cout << "hello thread" << std::endl;
 }
 
@@ -16,8 +16,11 @@ void thread_task() {
  */
 int main(int argc, const char *argv[])
 {
-    std::thread t(thread_task);
-    t.join();
+    std::thread t(dasd);
+    std::thread
+    std::thread t(dasd);
+    std::thread t(dasd);
+    t.dsa();
 
     return EXIT_SUCCESS;
 }  /* ----------  end of function main  ---------- */

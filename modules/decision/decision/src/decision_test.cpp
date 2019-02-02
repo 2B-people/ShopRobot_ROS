@@ -5,8 +5,8 @@ using namespace shop::decision;
 
 class ActionTest : public shop::decision::ActionNode
 {
-
   public:
+
     ActionTest(std::string name, const Blackboard::Ptr &blackboard_ptr)
         : ActionNode::ActionNode(name, blackboard_ptr)
         {}

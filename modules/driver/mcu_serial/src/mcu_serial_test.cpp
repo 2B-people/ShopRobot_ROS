@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < 8; i++) {
               msg.data[i] = data[i];
             }
-
             pub.publish(msg);
           }
         else

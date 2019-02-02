@@ -58,6 +58,7 @@ printf("%d",i);//这个i是没定义的。
 error: ISO C++ forbids declaration of ‘init
 Serial’ with no type [-fpermissive] McuSerial::initSerial()
 ```
+
 `bug009`
 ```shell
  error: ‘i’ was not declared in this scope
@@ -65,5 +66,12 @@ Serial’ with no type [-fpermissive] McuSerial::initSerial()
 ```
 ctrl-v时注意改值，不然gg！
 
-
+`bug010`
+```cpp
+void test(string *name){
+  string te ="ads";
+  name = &te;//错误，这样值不能传递出去
+  *name = te;//正确的
+}
+```
 
