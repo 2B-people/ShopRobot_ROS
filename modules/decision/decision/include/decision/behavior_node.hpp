@@ -7,6 +7,7 @@
 
 #include <ros/ros.h>
 
+#include <common/rrts.h>
 #include <blackboard/black_board.hpp>
 
 namespace shop {

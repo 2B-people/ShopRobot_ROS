@@ -112,4 +112,16 @@ make[2]: 警告：检测到时钟错误。您的创建可能是不完整的。
 Scanning dependencies of target decision_test
 make[2]: Warning: File '/home/nqq09/Shop_robot_WS/devel/lib/decision/decision_test' has modification time 27184 s in the future
 ```
-???莫名解决,再运行基没有了,神奇
+???莫名解决,再运行就没有了,神奇,网上说的时cmake时间的问题,猜测是在win10上修改时,影响了cmakelist时间线
+
+`bug014`
+```shell
+/home/nqq09/Shop_robot_WS/src/ShopRobot_ROS/modules/decision/decision/include/decision/behavior_node.hpp:11:38: fatal error: blackboard/black_board.hpp: 没有那个文件或目录
+```
+原因:
+cmake里没有加以下语句
+catkin_package(
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS roscpp 
+)
+这是给外部包提供依

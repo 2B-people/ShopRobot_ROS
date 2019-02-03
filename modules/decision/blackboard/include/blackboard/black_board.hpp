@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include <chrono>
-#include <thread>
 #include <stdint.h>
 
 #include <ros/ros.h>

@@ -10,9 +10,13 @@ add_message_files(DIRECTORY msg
                       Vector3.msg
                       Remote.msg
                       CarScan.msg
+                      Roadblock.msg
                  )
 
-
+add_service_files(FILES
+                      Goods.srv
+                      SetBool.srv
+                 )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)
 

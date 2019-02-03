@@ -17,11 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES rrts
   CATKIN_DEPENDS roscpp 
 )
 
 include_directories(include)
-include_directories(  
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories( ${catkin_INCLUDE_DIRS})
+
+add_executable(world_board_node src/world_board.cpp )
+add_dependencies(world_board_node rrts ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(world_board_node rrts ${catkin_LIBRARIES} )
