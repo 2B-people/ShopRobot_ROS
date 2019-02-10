@@ -219,7 +219,6 @@ class PreconditionNode : public DecoratorNode
         }
         else
         {
-            ROS_ERROR_STREAM("There is no chosen precondition function, then return false by default!");
             return false;
         }
     }

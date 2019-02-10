@@ -35,8 +35,13 @@ class BehaviorTree
                 index++;
                 ROS_INFO("-------------------------------");
             }
-            
+            else
+            {
+                ROS_INFO("tree is shop ,in num%d",(int)index);
+                ROS_INFO("-------------------------------");
+            }   
         }
+        
     }
     // @breif 重启行为树
     void Reset()
