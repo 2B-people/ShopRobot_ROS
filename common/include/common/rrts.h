@@ -39,7 +39,7 @@ public:
 
   /**
    * @brief Start to run the all the callbacks in the queue
-   *        不要重写这个函数，这是开始调用cb的函数
+   *        尽量不要重写这个函数，这是开始调用ros通信的固定方法
    * @note The inheriting class is not recommendded to override this function
    * which may cause a chaos of callback process
    */
@@ -56,6 +56,6 @@ protected:
 };
 
 } // namespace common
-}
+} //namespace shop
 
 #endif // COMMON_RRTS_H
