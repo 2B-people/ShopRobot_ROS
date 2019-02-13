@@ -11,6 +11,7 @@ add_message_files(DIRECTORY msg
                       Remote.msg
                       CarScan.msg
                       Roadblock.msg
+                      Coordinate.msg
                  )
 
 add_service_files(FILES

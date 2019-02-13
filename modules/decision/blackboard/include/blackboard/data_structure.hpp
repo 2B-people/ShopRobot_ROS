@@ -9,8 +9,10 @@
 
 #include <blackboard/black_board.hpp>
 
-namespace shop{
-namespace decision{
+namespace shop
+{
+namespace decision
+{
 
 //布尔类型
 class BoolDir : public DirBase
@@ -29,7 +31,6 @@ class BoolDir : public DirBase
         return real_bool_;
     }
 
-  protected:
     void Set(bool set_data)
     {
         middle_bool_ = set_data;
@@ -43,6 +44,7 @@ class BoolDir : public DirBase
         }
     }
 
+  protected:
     void RepeatInit()
     {
         middle_bool_ = initial_bool_;
@@ -78,7 +80,6 @@ class CoordinateDir : public DirBase
         return real_y_;
     }
 
-  protected:
     void Set(uint16_t set_x, uint16_t set_y)
     {
         middle_x_ = set_x;
@@ -93,6 +94,8 @@ class CoordinateDir : public DirBase
             ROS_WARN(" is lock");
         }
     }
+
+  protected:
     void RepeatInit()
     {
         OpenLock();
@@ -112,7 +115,7 @@ class CoordinateDir : public DirBase
 };
 
 //货物类别
-enum class GoodsName : int
+enum class GoodsName : int8_t
 {
     NONE = 0, //空,放好或者未识别
     RED,
@@ -149,22 +152,21 @@ class GoodsDir : public DirBase
     };
     virtual ~GoodsDir() = default;
 
-    GoodsName GetLocationGoods(const int location)
+    GoodsName GetLocationGoods(int location)
     {
         return location_goods_[location];
     }
 
-  protected:
     //goods数据为一个数组,所以重写了几个函数,只是改变了参数
-    void Lock(const int location)
+    void Lock(int location)
     {
         location_goods_lock_flag_[location] = false;
     }
-    void OpenLock(const int location)
+    void OpenLock(int location)
     {
         location_goods_lock_flag_[location] = true;
     }
-    void Set(const int location, GoodsName name)
+    void Set(int location, GoodsName name)
     {
         if (location_goods_lock_flag_.at(location))
         {
@@ -188,6 +190,7 @@ class GoodsDir : public DirBase
         location_goods_lock_flag_.fill(true);
     }
 
+  protected:
   private:
     std::array<GoodsName, 12> location_goods_;
     std::array<bool, 12> location_goods_lock_flag_;

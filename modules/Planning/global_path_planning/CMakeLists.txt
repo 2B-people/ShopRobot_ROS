@@ -13,3 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
 )
+
+catkin_package()
+
+include_directories(include)
+include_directories( ${catkin_INCLUDE_DIRS})
+

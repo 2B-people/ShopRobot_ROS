@@ -35,10 +35,6 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     {
         return dictionary_type_;
     }
-
-  protected:
-    bool flag_;
-
     virtual void RepeatInit() = 0;
     virtual void Lock()
     {
@@ -48,6 +44,10 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     {
         flag_ = true;
     }
+
+  protected:
+    bool flag_;
+
 
   private:
     DictionaryType dictionary_type_;

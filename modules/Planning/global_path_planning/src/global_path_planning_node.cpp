@@ -1,9 +1,7 @@
 #include <global_path_planning_node.h>
 
-namespace shop
-{
-namespace pathplan
-{
+namespace shop{
+namespace pathplan{
 
 
 

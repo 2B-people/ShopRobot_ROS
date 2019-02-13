@@ -12,8 +12,6 @@ namespace pathplan
 GlobalPlan::GlobalPlan(std::string name):shop::common::RRTS(name)
 {
     ros::NodeHandle nh("~");
-    
-    nh.getParam()
 }
 GlobalPlan::~GlobalPlan()
 {

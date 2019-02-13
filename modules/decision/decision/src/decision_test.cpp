@@ -142,6 +142,7 @@ int main(int argc, char **argv)
                                                                        action4_ptr,
                                                                        [&]() {
                                                                            auto dir_ptr = std::dynamic_pointer_cast<TestDir>(blackboard_ptr->GetDirPtr("test1"));
+                                                                           dir_ptr->Set(true);
                                                                            return dir_ptr->GetValue();
                                                                        },
                                                                        shop::decision::AbortType::LOW_PRIORITY);

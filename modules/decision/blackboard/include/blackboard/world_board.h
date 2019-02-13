@@ -10,6 +10,8 @@
 #include <common/main_interface.h>
 #include <data/SetBool.h>
 #include <data/Goods.h>
+#include <data/Roadblock.h>
+#include <data/Coordinate.h>
 #include <blackboard/black_board.hpp>
 #include <blackboard/data_structure.hpp>
 
@@ -26,6 +28,10 @@ class WorldBoard : public Blackboard,public shop::common::RRTS
   private:
     ros::NodeHandle nh_;
     ros::ServiceServer goods_srv_;	
+    ros::Publisher coordinate_target_1_pub_;
+    ros::Publisher coordinate_target_2_pub_;
+    ros::Publisher coordinate_target_3_pub_;
+    ros::Publisher coordinate_target_4_pub_;
 
     bool GoodsCB(data::Goods::Request &req,data::Goods::Response &res);
     
