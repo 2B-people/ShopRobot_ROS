@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdint.h>
+#include <string>
 #include <stdio.h>
 
 #include <ros/ros.h>
@@ -14,13 +15,15 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "web_serial_test");
     ros::NodeHandle nh;
-
+    std::string server_addr_;
+    server_addr_ = "127.0.0.1";
     ros::Publisher pub = nh.advertise<data::SerialTest>("test_vel", 10);
 
     int listenfd, connfd;
     struct sockaddr_in servaddr;
     char buff[MAXLINE];
     int n;
+    uint8_t abc = 6666;
 
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -30,8 +33,8 @@ int main(int argc, char *argv[])
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(6666);
+    servaddr.sin_addr.s_addr = inet_addr(server_addr_.c_str());
+    servaddr.sin_port = htons(abc);
 
     if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1)
     {

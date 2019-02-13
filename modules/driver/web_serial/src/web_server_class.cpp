@@ -3,8 +3,9 @@
 namespace shop{
 namespace webserver{
 
-WebServer::WebServer(std::string name)
-    : common::RRTS(name), is_open_(false), stop_topic_(true), stop_read_(true), stop_send_(true);
+WebServer::WebServer(std::string name,std::string addr,uint16_t bind_port) 
+    : common::RRTS(name), is_open_(false), stop_topic_(true), 
+        stop_read_(true), stop_send_(true),server_addr_(addr),bind_port_(bind_port);
 {
     name_ = name;
     ros::NodeHandle nh_private_("~");
@@ -32,7 +33,7 @@ WebServer::WebServer(std::string name)
 
 void WebServer::Run()
 {
-    initweb();
+    InitWeb();
 
     read_thread_ = new std::thread(boost::bind(&ReadLoop, this));
     topic_thread_ = new std::thread(boost::bind(&SendLoop, this));
@@ -81,8 +82,33 @@ void WebServer::Resume()
     stop_topic = false;
 }
 
-void WebServer::initweb()
+void WebServer::InitWeb()
 {
+    int listenfd;
+    struct sockaddr_in servaddr;
+
+    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        printf("create socket error: %s(errno: %d)\n", strerror(errno), errno);
+        return 0;
+    }
+
+    memset(&servaddr, 0, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(server_addr_.c_str());
+    servaddr.sin_port = htons(bind_port_);
+
+    if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1)
+    {
+        ROS_ERROR("%s bind socket error: %s(errno: %d)\n"name_.c_str(), strerror(errno), errno);
+        return 0;
+    }
+
+    if (listen(listenfd, 10) == -1)
+    {
+        ROS_ERROR("%s listen socket error: %s(errno: %d)\n"name_.c_str(), strerror(errno), errno);
+        return 0;
+    }    
 }
 
 void WebServer::ReadLoop()

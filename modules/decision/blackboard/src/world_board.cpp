@@ -13,7 +13,7 @@ WorldBoard::WorldBoard(std::string name)
     coordinate_target_1_pub_ = nh_.advertise<data::Coordinate>("robot1/target_coordinate", 30);
     coordinate_target_2_pub_ = nh_.advertise<data::Coordinate>("robot2/target_coordinate", 30);
     coordinate_target_3_pub_ = nh_.advertise<data::Coordinate>("robot3/target_coordinate", 30);
-    coordinate_target_4_pub_ = nh_.advertise<data::Coordinate>("robot4/target_coordinate", 30);
+    coordinate_target_4_pub_ = nh_.advertise<data::Coordinate>("robot4/ ", 30);
 
 
 }
@@ -23,10 +23,10 @@ WorldBoard::~WorldBoard()
     black_map_.clear();
 }
 
-WorldBoard::Run()
-{
-    ros::spin();
-}
+// WorldBoard::Run()
+// {
+//     ros::spin();
+// }
 
 bool WorldBoard::GoodsCB(data::Goods::Request &req, data::Goods::Response &res)
 {

@@ -53,6 +53,10 @@ private:
   //name
   std::string name_;
 
+  //socket
+  uint16_t bind_port_;
+  std::string server_addr_;
+
   // fifo
   fifo_t_e send_fifo_p_;
   fifo_t_e read_fifo_P_;
@@ -63,7 +67,7 @@ private:
   std::thread *read_thread_, *topic_thread_, *send_thread_;
 
   /*******funtion***********/
-  void initWeb();
+  void InitWeb();
 
   void TopicLoop();
   void SendLoop();
