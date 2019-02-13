@@ -55,7 +55,7 @@ printf("%d",i);//这个i是没定义的。
 
 `bug008`
 ```shell
-error: ISO C++ forbids declaration of ‘init
+error: ISO C++ forbids declaration  of ‘init
 Serial’ with no type [-fpermissive] McuSerial::initSerial()
 ```
 `bug009`
@@ -94,7 +94,7 @@ Invoking "make -j4 -l4" failed
 
 `bug011`
 ros::time 没有重载条件运算符,使用时注意得转化为double来进入判断
-`重要` 重载了(是我傻逼),应该用以下方法来判断定时
+`重要` 重载了(是我傻逼),应该用以下方法来判断定时,就和double相减一个道理，直接相减得到3s为小概率事件
 ```c++
         if(at_now - begin_ >= ros::Duration(3));
         //ros::time-ros::time 两个Time相减返回Duration类型
@@ -124,4 +124,9 @@ catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp 
 )
-这是给外部包提供依
+这是给外部包提供依赖所使用的代码
+
+`bug015`
+```c++
+
+```

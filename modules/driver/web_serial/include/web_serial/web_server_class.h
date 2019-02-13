@@ -19,10 +19,8 @@
 #include "common/main_interface.h"
 #include "common/rrts.h"
 
-namespace shop
-{
-namespace webserver
-{
+namespace shop{
+namespace webserver{
 
 typedef struct FifoData
 {

@@ -219,7 +219,6 @@ class PreconditionNode : public DecoratorNode
         }
         else
         {
-            ROS_ERROR_STREAM("There is no chosen precondition function, then return false by default!");
             return false;
         }
     }
@@ -270,14 +269,18 @@ class CompositeNode : public BehaviorNode
         children_node_index_(0) 
         {}
     virtual ~CompositeNode() = default;
+    // @breif 加入一个子节点
+    // @param child_node_ptr：节点指针
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
         children_node_ptr_.push_back(child_node_ptr);
         (child_node_ptr)->SetParent(shared_from_this());
     }
+    // @breif 加入list节点
+    // @param child_node_ptr_list：节点list
     virtual void AddChildren(std::initializer_list<BehaviorNode::Ptr> child_node_ptr_list){
         for (auto child_node_ptr = child_node_ptr_list.begin(); 
-                child_node_ptr!=child_node_ptr_list.end();child_node_ptr++) 
+                        child_node_ptr!=child_node_ptr_list.end();child_node_ptr++) 
         {
             children_node_ptr_.push_back(*child_node_ptr);
             (*child_node_ptr)->SetParent(shared_from_this());
@@ -317,7 +320,7 @@ class SelectorNode : public CompositeNode
     {}
     virtual ~SelectorNode() = default;
     // @breif 加入单个子节点
-    // @param 节点指针
+    // @param child_node_ptr：节点指针
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
         CompositeNode::AddChildren(child_node_ptr);
@@ -326,7 +329,7 @@ class SelectorNode : public CompositeNode
                             || std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::BOTH));
     }
     // @breif 加入多个子节点
-    // @param 节点指针list
+    // @param child_node_ptr_list：节点list
     virtual void AddChildren(std::initializer_list<BehaviorNode::Ptr> child_node_ptr_list)
     {
         CompositeNode::AddChildren(child_node_ptr_list);
@@ -357,7 +360,7 @@ class SelectorNode : public CompositeNode
         {
             return BehaviorState::SUCCESS;
         }
-        //Reevaluation 估计
+        //Reevaluation 
         for (unsigned int index = 0; index < children_node_index_; index++)
         {
             ROS_INFO("Reevaluation");
@@ -520,7 +523,6 @@ class ParallelNode : public CompositeNode
                         return BehaviorState::SUCCESS;
                     }
                 }
-
                 else if (state == BehaviorState::FAILURE)
                 {
                     children_node_done_.at(index) = true;

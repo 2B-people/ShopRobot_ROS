@@ -35,8 +35,8 @@ class BlackTest : public Blackboard
 
 class ActionTest : public shop::decision::ActionNode
 {
-
   public:
+
     ActionTest(std::string name, const Blackboard::Ptr &blackboard_ptr)
         : ActionNode::ActionNode(name, blackboard_ptr),index_(0)
     {

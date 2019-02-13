@@ -1,9 +1,7 @@
 #include <web_serial/web_server_class.h>
 
-namespace shop
-{
-namespace webserver
-{
+namespace shop{
+namespace webserver{
 
 WebServer::WebServer(std::string name)
     : common::RRTS(name), is_open_(false), stop_topic_(true), stop_read_(true), stop_send_(true);
