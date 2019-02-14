@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in servaddr;
     char buff[MAXLINE];
     int n;
-    uint8_t abc = 6666;
+    uint16_t abc = 1111;
 
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
