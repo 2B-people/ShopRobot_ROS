@@ -19,7 +19,8 @@ enum class DictionaryType
     NONE,
     BOOL,       //布尔
     COORDINATE, //坐标
-    GOODS       //货物
+    GOODS,      //货物
+    ROADBLOCK   //路障
 };
 
 //字典基类,提供接口
@@ -34,6 +35,11 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     DictionaryType GetDictionaryType()
     {
         return dictionary_type_;
+    }
+
+    bool GetLock()
+    {
+        return flag_;
     }
     virtual void RepeatInit() = 0;
     virtual void Lock()
@@ -52,10 +58,6 @@ class DirBase : public std::enable_shared_from_this<DirBase>
   private:
     DictionaryType dictionary_type_;
 };
-
-
-
-
 
 //黑板基类
 class Blackboard : public std::enable_shared_from_this<Blackboard>

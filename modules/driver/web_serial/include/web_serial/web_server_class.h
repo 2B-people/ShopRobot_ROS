@@ -46,9 +46,6 @@ public:
 private:
   //running state
   bool is_open_;
-  bool stop_read_;
-  bool stop_send_;
-  bool stop_topic_;
 
   //name
   std::string name_;
@@ -57,24 +54,7 @@ private:
   uint16_t bind_port_;
   std::string server_addr_;
 
-  // fifo
-  fifo_t_e send_fifo_p_;
-  fifo_t_e read_fifo_P_;
-  std::string[FIFOMAX] send_fifo_buff_;
-  std::string[FIFOMAX] read_fifo_buff_;
 
-  //thread
-  std::thread *read_thread_, *topic_thread_, *send_thread_;
-
-  /*******funtion***********/
-  void InitWeb();
-
-  void TopicLoop();
-  void SendLoop();
-  void ReadLoop();
-
-  void AddFifo(std::string data, uint8_t fun);
-  void GetReadFifo(std::string *data, uint8_t fun)
 };
 
 } // namespace webserver

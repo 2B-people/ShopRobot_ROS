@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 #include <string.h>
+#include <stdint.h>
 #include <vector>
 #include <array>
 
@@ -40,11 +41,10 @@ class BoolDir : public DirBase
         }
         else
         {
-            ROS_WARN(" is lock");
+            ROS_WARN("booldir is lock");
         }
     }
 
-  protected:
     void RepeatInit()
     {
         middle_bool_ = initial_bool_;
@@ -52,6 +52,7 @@ class BoolDir : public DirBase
         OpenLock();
     }
 
+  protected:
   private:
     bool middle_bool_;
     bool initial_bool_;
@@ -91,11 +92,9 @@ class CoordinateDir : public DirBase
         }
         else
         {
-            ROS_WARN(" is lock");
+            ROS_WARN("coordinate is lock");
         }
     }
-
-  protected:
     void RepeatInit()
     {
         OpenLock();
@@ -105,6 +104,7 @@ class CoordinateDir : public DirBase
         real_y_ = initial_y_;
     }
 
+  protected:
   private:
     uint16_t initial_x_;
     uint16_t initial_y_;
@@ -194,6 +194,48 @@ class GoodsDir : public DirBase
   private:
     std::array<GoodsName, 12> location_goods_;
     std::array<bool, 12> location_goods_lock_flag_;
+};
+
+//路障类型
+class RoadblockDir : public DirBase
+{
+  public:
+    RoadblockDir(uint8_t number) : DirBase(DictionaryType::ROADBLOCK)
+    {
+        roadblock_middle_number_ = number;
+        roadblock_initial_number_ = number;
+        roadblock_true_number_ = roadblock_middle_number_;
+    }
+    virtual ~RoadblockDir() = default;
+
+    uint8_t GetRoadbockNumber()
+    {
+        return roadblock_true_number_;
+    }
+    void Set(uint8_t number_set)
+    {
+        roadblock_middle_number_ = number_set;
+        if (flag_)
+        {
+            roadblock_true_number_ = roadblock_middle_number_;
+        }
+        else
+        {
+            ROS_WARN("roadbock number is lock");
+        }
+    }
+    void RepeatInit()
+    {
+        roadblock_middle_number_ = roadblock_initial_number_;
+        roadblock_true_number_ = roadblock_initial_number_;
+        OpenLock();
+    }
+
+  protected:
+  private:
+    uint8_t roadblock_middle_number_;
+    uint8_t roadblock_true_number_;
+    uint8_t roadblock_initial_number_;
 };
 
 } // namespace decision

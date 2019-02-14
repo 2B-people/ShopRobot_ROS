@@ -1,0 +1,9 @@
+int16 x
+int16 y
+
+int8 number
+
+---
+int16 x
+int16 y
+bool success_flag
