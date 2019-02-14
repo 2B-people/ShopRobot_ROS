@@ -29,6 +29,7 @@ public:
 private:
   ros::NodeHandle nh_;
   
+  //server 服务
   ros::ServiceServer goods_write_srv_;
   ros::ServiceServer goods_read_srv_;
   ros::ServiceServer roadblock_write_srv_;

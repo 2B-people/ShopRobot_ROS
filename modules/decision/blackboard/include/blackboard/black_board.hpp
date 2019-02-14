@@ -9,10 +9,11 @@
 #include <ros/ros.h>
 #include <ros/time.h>
 
-namespace shop
-{
-namespace decision
-{
+// bug
+// #include <blackboard/data_structure.hpp>
+
+namespace shop{
+namespace decision{
 
 enum class DictionaryType
 {
@@ -20,7 +21,8 @@ enum class DictionaryType
     BOOL,       //布尔
     COORDINATE, //坐标
     GOODS,      //货物
-    ROADBLOCK   //路障
+    ROADBLOCK,   //路障
+    GOODSHELF   //货架
 };
 
 //字典基类,提供接口

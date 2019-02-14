@@ -127,6 +127,39 @@ catkin_package(
 这是给外部包提供依赖所使用的代码
 
 `bug015`
-```c++
-
+```shell
+ jump to case label
 ```
+问题:case中的定义问题,如果有定义,应用`{}`包含起来
+正确写法为
+```c++
+    auto middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
+    auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+    switch (req.number)
+    {
+    case 1:
+        middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
+        coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+        coordinate_dir_ptr->OpenLock();
+        break;
+    case 2:
+        middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
+        coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+        coordinate_dir_ptr->OpenLock();
+        break;
+    case 3:
+```
+
+`bug016`
+```shell
+/home/nqq09/Shop_robot_WS/src/ShopRobot_ROS/modules/decision/blackboard/src/world_board.cpp:81:24: error: ‘class shop::decision::RoadblockDir’ has no member named ‘Lock’
+     roadblock_dir_ptr->Lock();
+                        ^
+/home/nqq09/Shop_robot_WS/src/ShopRobot_ROS/modules/decision/blackboard/src/world_board.cpp: In member function ‘bool shop::decision::WorldBoard::TargetCoordinateWriteCB1(data::Coordinate::Request&, data::Coordinate::Response&)’:
+```
+这种问题的主要原因是我在编译时在black_board.hpp中
+```c++
+include<blackboard/data_structure.hpp>
+```
+这样编译器优先编译data_structure.hpp,但是在这个文件中需要引用black_board的定义,所以会出现一系列未定义的问题
+注意引用的先后顺序

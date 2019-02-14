@@ -10,7 +10,6 @@ add_message_files(DIRECTORY msg
                       Vector3.msg
                       Remote.msg
                       CarScan.msg
-                      CoordinateMsg.msg
                  )
 
 add_service_files(FILES

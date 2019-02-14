@@ -238,6 +238,47 @@ class RoadblockDir : public DirBase
     uint8_t roadblock_initial_number_;
 };
 
+class GoodShelfDir : public DirBase
+{
+  public:
+    GoodShelfDir() : DirBase(DictionaryType::GOODSHELF)
+    {
+        for (size_t i = 0; i < goods_shelf_barrier_.size(); i++)
+        {
+            goods_shelf_barrier_[i].resize(2);
+        }
+        for (size_t i = 0, i < goods_shelf_barrier_.size(), i++)
+        {
+            for (size_t j = 0; j < goods_shelf_barrier_[0].size(); j++)
+            {
+                goods_shelf_barrier_[i][j] = false;
+            }
+        }
+    }
+    virtual ~GoodShelfDir() = default;
+    bool GetGoodShelfBarrier(uint8_t x, uint8_t y)
+    {
+        return goods_shelf_barrier_[x][y];
+    }
+    void Set(uint8_t x, uint8_t y)
+    {
+    }
+    void RepeatInit()
+    {
+        for (size_t i = 0, i < goods_shelf_barrier_.size(), i++)
+        {
+            for (size_t j = 0; j < goods_shelf_barrier_[0].size(); j++)
+            {
+                goods_shelf_barrier_[i][j] = false;
+            }
+        }
+        OpenLock();
+    }
+
+  private:
+    std::vector<std::vector<bool>> goods_shelf_barrier_(6);
+};
+
 } // namespace decision
 } // namespace shop
 
