@@ -13,6 +13,7 @@
 #include <data/Goods.h>
 #include <data/Roadblock.h>
 #include <data/Coordinate.h>
+#include <data/ShelfBarrier.h>
 #include <blackboard/black_board.hpp>
 #include <blackboard/data_structure.hpp>
 
@@ -28,7 +29,7 @@ public:
 
 private:
   ros::NodeHandle nh_;
-  
+
   //server 服务
   ros::ServiceServer goods_write_srv_;
   ros::ServiceServer goods_read_srv_;
@@ -43,6 +44,14 @@ private:
   ros::ServiceServer robot2_target_coordinate_read_srv_;
   ros::ServiceServer robot3_target_coordinate_read_srv_;
   ros::ServiceServer robot4_target_coordinate_read_srv_;
+  ros::ServiceServer a_shelf_barrier_write_srv_;
+  ros::ServiceServer a_shelf_barrier_read_srv_;
+  ros::ServiceServer b_shelf_barrier_write_srv_;
+  ros::ServiceServer b_shelf_barrier_read_srv_;
+  ros::ServiceServer c_shelf_barrier_write_srv_;
+  ros::ServiceServer c_shelf_barrier_read_srv_;
+  ros::ServiceServer d_shelf_barrier_write_srv_;
+  ros::ServiceServer d_shelf_barrier_read_srv_;
 
   //货物读写服务
   bool GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &res);
@@ -50,11 +59,11 @@ private:
   //路障读写服务
   bool RoadblockWirteCB(data::Roadblock::Request &req, data::Roadblock::Response &res);
   bool RoadblockReadCB(data::Roadblock::Request &req, data::Roadblock::Response &res);
-  
+
   //打开目标坐标锁
   bool TargetCoordinateLockCB(data::Coordinate::Request &req, data::Coordinate::Response &res);
   //breif 写入目标坐标
-  //注: 调用前要打开对应锁
+  //注: 调用前要打开对应锁|
   bool TargetCoordinateWriteCB1(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateWriteCB2(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateWriteCB3(data::Coordinate::Request &req, data::Coordinate::Response &res);
@@ -64,6 +73,16 @@ private:
   bool TargetCoordinateReadCB2(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateReadCB3(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateReadCB4(data::Coordinate::Request &req, data::Coordinate::Response &res);
+
+  //货架障碍物读写服务
+  bool AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool CshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool AshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool BshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool CshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
+  bool DshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
 };
 
 } // namespace decision

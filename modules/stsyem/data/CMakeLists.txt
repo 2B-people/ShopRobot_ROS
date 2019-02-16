@@ -17,6 +17,7 @@ add_service_files(FILES
                       SetBool.srv                      
                       Roadblock.srv
                       Coordinate.srv
+                      ShelfBarrier.srv
                  )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)

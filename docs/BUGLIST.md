@@ -163,3 +163,6 @@ include<blackboard/data_structure.hpp>
 ```
 这样编译器优先编译data_structure.hpp,但是在这个文件中需要引用black_board的定义,所以会出现一系列未定义的问题
 注意引用的先后顺序
+
+`bug017`
+注意使用srv生成文件时一定引用生成头文件...

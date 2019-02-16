@@ -1,0 +1,6 @@
+int8 x
+int8 y
+bool shelf_barrier
+---
+bool success_flag
+bool[12] shelf_barrier_all

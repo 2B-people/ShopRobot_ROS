@@ -13,6 +13,10 @@ WorldBoard::WorldBoard(std::string name)
     auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
     auto robot3_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
     auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
+    auto a_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
+    auto b_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
+    auto c_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
+    auto d_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
 
     //goods
     AddDataIntoWorld("shop_all_goods", goods_dir_ptr);
@@ -38,6 +42,21 @@ WorldBoard::WorldBoard(std::string name)
     robot2_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot2/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB2, this);
     robot3_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot3/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB3, this);
     robot4_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot4/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB4, this);
+
+    // good shelf barrier
+    AddDataIntoWorld("A_shelf_barrier", a_shelf_barrier_dir_ptr);
+    AddDataIntoWorld("B_shelf_barrier", b_shelf_barrier_dir_ptr);
+    AddDataIntoWorld("C_shelf_barrier", c_shelf_barrier_dir_ptr);
+    AddDataIntoWorld("D_shelf_barrier", d_shelf_barrier_dir_ptr);
+    a_shelf_barrier_write_srv_ = nh_.advertiseService("shop/A_shelf_barrier_wirte", &WorldBoard::AshelfWirteCB, this);
+    b_shelf_barrier_write_srv_ = nh_.advertiseService("shop/B_shelf_barrier_wirte", &WorldBoard::BshelfWirteCB, this);
+    c_shelf_barrier_write_srv_ = nh_.advertiseService("shop/C_shelf_barrier_wirte", &WorldBoard::CshelfWirteCB, this);
+    d_shelf_barrier_write_srv_ = nh_.advertiseService("shop/D_shelf_barrier_wirte", &WorldBoard::DshelfWirteCB, this);
+    a_shelf_barrier_read_srv_ = nh_.advertiseService("shop/A_shelf_barrier_read", &WorldBoard::AshelfReadCB, this);
+    b_shelf_barrier_read_srv_ = nh_.advertiseService("shop/B_shelf_barrier_read", &WorldBoard::BshelfReadCB, this);
+    c_shelf_barrier_read_srv_ = nh_.advertiseService("shop/C_shelf_barrier_read", &WorldBoard::CshelfReadCB, this);
+    d_shelf_barrier_read_srv_ = nh_.advertiseService("shop/D_shelf_barrier_read", &WorldBoard::DshelfReadCB, this);
+
 }
 
 WorldBoard::~WorldBoard()
@@ -232,6 +251,133 @@ bool WorldBoard::TargetCoordinateLockCB(data::Coordinate::Request &req, data::Co
         ROS_ERROR("NO ROBOT%d in game", req.number);
         return false;
         break;
+    }
+    return true;
+}
+
+bool WorldBoard::AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
+    if (good_shelf_dir_ptr->GetLock())
+    {
+        res.success_flag = true;
+        good_shelf_dir_ptr->Lock();
+        return true;
+    }
+    else
+    {
+        res.success_flag = false;
+        return false;
+    }
+}
+bool WorldBoard::BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
+    if (good_shelf_dir_ptr->GetLock())
+    {
+        res.success_flag = true;
+        good_shelf_dir_ptr->Lock();
+        return true;
+    }
+    else
+    {
+        res.success_flag = false;
+        return false;
+    }
+}
+bool WorldBoard::CshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
+    if (good_shelf_dir_ptr->GetLock())
+    {
+        res.success_flag = true;
+        good_shelf_dir_ptr->Lock();
+        return true;
+    }
+    else
+    {
+        res.success_flag = false;
+        return false;
+    }
+}
+bool WorldBoard::DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
+    if (good_shelf_dir_ptr->GetLock())
+    {
+        res.success_flag = true;
+        good_shelf_dir_ptr->Lock();
+        return true;
+    }
+    else
+    {
+        res.success_flag = false;
+        return false;
+    }
+}
+
+bool WorldBoard::AshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    for (size_t x = 0; x < 6; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+    }
+    for (size_t x = 6; x < 12; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
+    }
+    return true;
+}
+
+bool WorldBoard::BshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    for (size_t x = 0; x < 6; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+    }
+    for (size_t x = 6; x < 12; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
+    }
+    return true;
+}
+bool WorldBoard::CshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    for (size_t x = 0; x < 6; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+    }
+    for (size_t x = 6; x < 12; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
+    }
+    return true;
+}
+bool WorldBoard::DshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
+    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    for (size_t x = 0; x < 6; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+    }
+    for (size_t x = 6; x < 12; x++)
+    {
+        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
     }
     return true;
 }
