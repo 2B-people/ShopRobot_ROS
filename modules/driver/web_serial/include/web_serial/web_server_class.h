@@ -19,20 +19,15 @@
 #include "common/main_interface.h"
 #include "common/rrts.h"
 
+#include <data/MoveAction.h>
+#include <data/ShopGripAction.h>
+
+#include <data/Goods.h>
+#include <data/ShelfBarrier.h>
+#include <data/Roadblock.h>
+
 namespace shop{
 namespace webserver{
-
-typedef struct FifoData
-{
-  int *base;
-  int read;
-  int front;
-} fifo_t_e;
-
-#define FIFOMAX 100
-
-#define SEND 1
-#define READ 2
 
 class WebServer : public shop::common::RRTS
 {

@@ -286,7 +286,7 @@ class GoodShelfDir : public DirBase
     }
 
   private:
-    std::vector< std::vector< bool > > goods_shelf_barrier_;
+    std::vector<std::vector<bool>> goods_shelf_barrier_;
 };
 
 } // namespace decision

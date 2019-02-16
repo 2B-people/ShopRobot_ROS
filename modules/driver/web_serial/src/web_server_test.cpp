@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <ros/ros.h>
+
 #include <data/SerialTest.h>
 
 #define MAXLINE 4
