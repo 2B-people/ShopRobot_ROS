@@ -16,6 +16,7 @@ add_message_files(DIRECTORY msg
                       Vector3.msg
                       Remote.msg
                       CarScan.msg
+                      Coord.msg
                  )
 
 add_service_files(FILES
@@ -28,7 +29,7 @@ add_service_files(FILES
 
 add_action_files(FILES
                       Test.action
-                      ShopGrip.action
+                      ShopAction.action
                       Move.action
                       Identify.action
                       TakePhoto.action

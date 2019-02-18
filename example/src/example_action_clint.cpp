@@ -47,16 +47,16 @@ int main(int argc, char **argv)
     goal.goal = 10;
     ac.sendGoal(goal, &donecb, &activecb, &feedbackcb);
     //thread1.join();
-    //ros::spin();
-    while (ros::ok)
-    {
-        if (a == 5)
-        {
-            ac.cancelGoal();
-            break;
-        }
-        ros::spinOnce();
-    }
+    ros::spin();
+    // while (ros::ok)
+    // {
+    //     if (a == 5)
+    //     {
+    //         //ac.cancelGoal();
+    //         break;
+    //     }
+    //     ros::spinOnce();
+    // }
 
     return 0;
 }
