@@ -33,6 +33,7 @@ add_action_files(FILES
                       Move.action
                       Identify.action
                       TakePhoto.action
+                      Opening.action
 
 
 )

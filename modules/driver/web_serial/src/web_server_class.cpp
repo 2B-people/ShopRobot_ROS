@@ -6,10 +6,11 @@ namespace webserver
 {
 
 WebServer::WebServer(std::string name)
-    : common::RRTS(name), is_open_(false), move_stop_(true), shop_stop_(true),
+    : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),
       client_sockfd_(0), server_sockfd_(0), server_addr_("127.0.0.1"), bind_port_(80),
+      //atcion初始化
       move_as_(nh_, name + "/move_action", boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
-      opening_as_(nh_, name + "opening_action", boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
+      opening_as_(nh_, name + "/opening_action", boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
       action_as_(nh_, name + "/shop_action", boost::bind(&WebServer::ShopExecuteCB, this, _1), false)
 {
     ros::NodeHandle nh_private_("~");
@@ -27,6 +28,7 @@ WebServer::WebServer(std::string name)
     //param init
     nh_private_.getParam(name_ + "/addr", server_addr_);
     nh_private_.getParam(name_ + "/port", bind_port_);
+
     //publish init
     move_pub_ = nh_.advertise<data::Coord>(name_ + "/coord_now", 1);
 
@@ -49,8 +51,8 @@ WebServer::~WebServer()
     move_stop_ = true;
     shop_stop_ = true;
     ROS_INFO("%s is destrust", name_.c_str());
-
-    close(client_sockfd_); /*关闭套接字*/
+    /*关闭套接字*/
+    close(client_sockfd_);
     close(server_sockfd_);
 }
 
@@ -60,6 +62,7 @@ void WebServer::Stop()
     move_stop_ = true;
     shop_stop_ = true;
 }
+
 void WebServer::Resume()
 {
     is_open_ = true;
@@ -67,6 +70,7 @@ void WebServer::Resume()
     shop_stop_ = false;
 }
 
+//socket 初始化
 bool WebServer::InitWeb()
 {
     socklen_t sin_size;
@@ -89,8 +93,8 @@ bool WebServer::InitWeb()
         return false;
     }
 
-    /*监听连接请求--监听队列长度为5*/
-    if (listen(server_sockfd_, 5) < 0)
+    /*监听连接请求--监听队列长度为10*/
+    if (listen(server_sockfd_, 10) < 0)
     {
         ROS_ERROR("%s listen error", name_.c_str());
         return false;
@@ -99,6 +103,7 @@ bool WebServer::InitWeb()
     sin_size = sizeof(struct sockaddr_in);
 
     /*等待客户端连接请求到达*/
+    //@breif accept为,要一直等待阻塞型
     if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size)) < 0)
     {
         ROS_ERROR("%s accept error", name_.c_str());
@@ -109,28 +114,40 @@ bool WebServer::InitWeb()
     return true;
 }
 
+//RUN MAIN里调用实际运行
+void WebServer::Run()
+{
+    ros::AsyncSpinner async_spinner(thread_num_);
+    InitWeb();
+    async_spinner.start();
+    ros::waitForShutdown();
+}
+
+//移动的回调函数
 void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONSERVER *as)
 {
+    //反馈
     data::MoveFeedback feedback;
+    //结果
     data::MoveResult result;
+
     ROS_INFO("%s is write move", name_.c_str());
 
-    int16_t wirte_x = goal->x;
-    int16_t write_y = goal->y;
-    int8_t write_pose = goal->pose;
-    //TODO:转string
+    //目标转化为string在发下去
+    data::Coord coord_goal;
+    coord_goal.x = goal->x;
+    coord_goal.y = goal->y;
+    coord_goal.pose = goal->pose;
+    std::string coord_goal_str = CoordToData(coord_goal);
 
-    send(client_sockfd_, &goal_buf, BUFF_MAX, 0);
+    send(client_sockfd_, (char *)coord_goal_str.c_str(), BUFF_MAX, 0);
 
+    //得到一次现在的坐标,得到进度计算的分母
     char re_frist_buf[BUFF_MAX];
     recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
-    //得到一次现在的坐标
     data::Coord begin_coord = DataToCoord(re_frist_buf);
     float progress_overall = float((goal->x + goal->y) - (begin_coord.x + begin_coord.y));
-    if (progress_overall < 0)
-    {
-        progress_overall = -progress_overall;
-    }
+    //等待结束,移动到目标坐标
     while (ros::ok)
     {
         if (is_open_)
@@ -141,19 +158,23 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONS
                 recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
                 data::Coord now_coord = DataToCoord(re_buf);
                 now_coord_ = DataToCoord(re_buf);
-
-                feedback->progress = ((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
-                move_as_.publishFeedback(feedback);
-                move_pub_.publish(now_coord);
+                //判断目标坐标
                 if (now_coord.x == goal->x && now_coord.y == goal->y && now_coord.pose == goal->pose)
                 {
                     ROS_INFO("move to target,x:%d,y:%d" goal->x, goal->y);
                     break;
                 }
+                else
+                {
+                    ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
+                    feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
+                    move_as_.publishFeedback(feedback);
+                    move_pub_.publish(now_coord);
+                }
             }
             else
             {
-                ROS_WARN("move_stop is true!!!");
+                ROS_WARN("shop flag is stop!!!");
             }
         }
     }
@@ -161,26 +182,38 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONS
     move_as_.setSucceeded(result);
 }
 
-//TODO
+//shopatcion的回调函数
 void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPACTIONSERVER *as)
 {
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
     ROS_INFO("%s is write action", name_.c_str());
-
-    //TODO to string
-
-    send(client_sockfd_, &goal_buf, BUFF_MAX, 0);
+    //发送指令
+    send(client_sockfd_, goal->action_name.c_str(), BUFF_MAX, 0);
+    //等待结束
     while (ros::ok())
     {
         if (is_open_)
         {
             if (move_stop_ == false)
             {
+                char re_buf[BUFF_MAX];
+                recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+                std::string re_buf_string = re_buf;
+                if (re_buf_string == "finish")
+                {
+                    ROS_INFO("%s is finish", goal->action_name.c_str());
+                    break;
+                }
+                else
+                {
+                    feedback.progress = re_buf_string;
+                    action_as_.publishFeedback(feedback);
+                }
             }
             else
             {
-                ROS_WARN("shop_stop is true!!!");
+                ROS_WARN("shop flag is stop!!!");
             }
         }
     }
@@ -188,13 +221,20 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPA
     action_as_.setSucceeded(result);
 }
 
-void WebServer::OpeningExecuteCB(const data::)
+//开局初始化函数
+void WebServer::OpeningExecuteCB(const data::Opening::ConstPtr &goal, OPENINGACTIONSERVER *as)
 {
+    OpeningFeedback feedback;
+    OpeningResult result;
+    ROS_INFO("%s is write Open",name_.c_str());
+
+    //
 
     result.success_flag = true;
     opening_as_.setSucceeded(result);
 }
 
+//移动抢占中断回调函数
 void WebServer::MovePreemptCB()
 {
 
@@ -228,15 +268,18 @@ void WebServer::MovePreemptCB()
     }
 }
 
+//动作抢占中断回调函数
 void WebServer::ShopPreemptCB()
 {
+    char stop_buf[BUFF_MAX];
     if (action_as_.isActive())
     {
-        //TODO
+        send(client_sockfd_, &stop_buf, BUFF_MAX, 0);
         action_as_.setPreempted();
     }
 }
 
+//开局抢占中断回调函数
 void WebServer::OpenPreemptCB()
 {
     if (opening_as_.isActive())
@@ -246,6 +289,11 @@ void WebServer::OpenPreemptCB()
     }
 }
 
+//---------------------------------------------//
+
+// @breif 数据到坐标
+// @pargm buf,recv读到的数据
+// @return 坐标类型
 data::Coord WebServer::DataToCoord(const char *buf)
 {
     std::string string_buf(buf);
@@ -254,6 +302,20 @@ data::Coord WebServer::DataToCoord(const char *buf)
     rul_coord.y = string_buf[2];
     rul_coord.pose = string_bug[4];
     return rul_coord;
+}
+
+// @breif 坐标到数据
+// @pargm 坐标类型
+// @return string要用send写入的
+// @breif 格式:"1 2 1",
+// - "x y pose"
+std::string WebServer::CoordToData(data::Coord temp)
+{
+    std::string temp_str;
+    temp_str = std::to_string(temp.x) + " " +
+               std::to_string(temp.y) + " " +
+               std::to_string(temp.pose);
+    return temp_str;
 }
 
 } // namespace webserver

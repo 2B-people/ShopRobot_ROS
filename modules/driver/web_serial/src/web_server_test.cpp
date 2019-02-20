@@ -23,6 +23,8 @@ int main(int argc, char *argv[])
     int listenfd, connfd;
     struct sockaddr_in servaddr;
     char buff[MAXLINE];
+    std::string buff_str;
+    buff_str = "aaaa";
     int n;
     uint16_t abc = 1111;
 
@@ -57,7 +59,7 @@ int main(int argc, char *argv[])
             printf("accept socket error: %s(errno: %d)", strerror(errno), errno);
             continue;
         }
-        n = recv(connfd, buff, MAXLINE, 0);
+        n = recv(connfd,(char*) buff_str.c_str(), MAXLINE, 0);
         buff[n] = '\0';
         data::SerialTest msg;
         

@@ -23,19 +23,19 @@ include_directories( ${catkin_INCLUDE_DIRS})
 add_executable(web_server_test src/web_server_test.cpp)
 target_link_libraries(web_server_test  ${catkin_LIBRARIES} )
 
-add_library(web_server src/web_server_class.cpp)
-target_link_libraries(web_server  ${catkin_LIBRARIES})
+# add_library(web_server src/web_server_class.cpp)
+# target_link_libraries(web_server  ${catkin_LIBRARIES})
 
-add_executable(robot1_web_server src/robot1_web_server.cpp)
-target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
+# add_executable(robot1_web_server src/robot1_web_server.cpp)
+# target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
 
-add_executable(robot2_web_server src/robot1_web_server.cpp)
-target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
+# add_executable(robot2_web_server src/robot1_web_server.cpp)
+# target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
 
-add_executable(robot3_web_server src/robot1_web_server.cpp)
-target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
+# add_executable(robot3_web_server src/robot1_web_server.cpp)
+# target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
 
-add_executable(robot4_web_server src/robot1_web_server.cpp)
-target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
+# add_executable(robot4_web_server src/robot1_web_server.cpp)
+# target_link_libraries(robot1_web_server  ${catkin_LIBRARIES} )
 
 

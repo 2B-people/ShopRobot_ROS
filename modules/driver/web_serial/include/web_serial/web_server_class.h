@@ -22,6 +22,7 @@
 
 #include <data/MoveAction.h>
 #include <data/ShopActionAction.h>
+#include <data/OpeningAction.h>
 
 #include <data/Goods.h>
 #include <data/ShelfBarrier.h>
@@ -38,6 +39,7 @@ namespace webserver
 typedef actionlib::SimpleActionServer<data::MoveAction> MOVEACTIONSERVER;
 typedef actionlib::SimpleActionServer<data::ShopActionAction> SHOPACTIONSERVER;
 typedef actionlib::SimpleActionServer<data::OpeningAction> OPENINGACTIONSERVER;
+
 class WebServer : public shop::common::RRTS
 {
 public:
@@ -59,24 +61,32 @@ private:
   std::string server_addr_;
   struct sockaddr_in my_addr_;     //服务器网络地址结构体
   struct sockaddr_in remote_addr_; //客户端网络地址结构体
-
+  //data
+  data::Coord now_coord_;
+  // ros
   ros::NodeHandle nh_;
+  //action
   MOVEACTIONSERVER move_as_;
   SHOPACTIONSERVER action_as_;
   OPENINGACTIONSERVER opening_as_;
+  //service
   ros::ServiceClient roadblock_client;
   ros::ServiceClient shelf_barrier_client;
-
+  //publish
   ros::Publisher move_pub_;
-
-  data::Coord now_coord_;
 
   //function
   bool InitWeb();
-  void MoveExecuteCB();
-  void ShopExecuteCB();
-  void OpeningExecuteCB();
+  void MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONSERVER *as);
+  void ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPACTIONSERVER *as);
+  void OpeningExecuteCB(const data::Opening::ConstPtr &goal, OPENINGACTIONSERVER *as);
+
+  void MovePreemptCB();
+  void ShopPreemptCB();
+  void OpenPreemptCB();
+
   data::Coord DataToCoord(char *buf);
+  std::string CoordToData(data::Coord temp);
 };
 
 } // namespace webserver
