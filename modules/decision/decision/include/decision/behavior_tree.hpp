@@ -10,6 +10,8 @@
 
 #include <decision/behavior_node.hpp>
 #include <blackboard/black_board.hpp>
+#include <decision/action_node.hpp>
+
 
 namespace shop{
 namespace decision{

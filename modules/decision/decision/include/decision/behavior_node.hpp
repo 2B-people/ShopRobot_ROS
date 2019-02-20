@@ -33,10 +33,10 @@ enum class BehaviorState
 };
 
 // AbortType：
-// Self：是否可以中断自身的循环运行，只能中断同级（拥有相同的父节点（装饰节点）的Action节点。
-// LOW_PRIORITY：是否可以中断比自己优先级低的任务的循环运行（从左向右，优先级降低），
-// 当一个高优先级装饰节点A下的Condiontal子节点发生变化时，他只能中断一个低优先级的Action节点（跟A节点同级，但在A节点右侧的Action节点）。
-// Both：都进行中断，子节点Action既中断与自己父类同级的子节点Action（self），又中断与自己同级的子节点Action（lower）。
+// - Self：是否可以中断自身的循环运行，只能中断同级（拥有相同的父节点（装饰节点）的Action节点。
+// - LOW_PRIORITY：是否可以中断比自己优先级低的任务的循环运行（从左向右，优先级降低），
+// - 当一个高优先级装饰节点A下的Condiontal子节点发生变化时，他只能中断一个低优先级的Action节点（跟A节点同级，但在A节点右侧的Action节点）。
+// - Both：都进行中断，子节点Action既中断与自己父类同级的子节点Action（self），又中断与自己同级的子节点Action（lower）。
 enum class AbortType
 {
     NONE,
