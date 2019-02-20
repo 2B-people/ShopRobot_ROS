@@ -10,7 +10,8 @@ typedef actionlib::SimpleActionServer<data::TestAction> Server;
 class TestAction
 {
 public:
-  TestAction(std::string name) : name_(name), as_(nh_, name, boost::bind(&TestAction::ExecuteCB, this, _1), false)
+  TestAction(std::string name) : name_(name),
+   as_(nh_, name, boost::bind(&TestAction::ExecuteCB, this, _1), false)
   {
     ROS_INFO("Action is exit");
     as_.registerPreemptCallback(boost::bind(&TestAction::CancelCB, this));

@@ -4,9 +4,11 @@ find_package(catkin REQUIRED COMPONENTS
                      std_msgs
                      nav_msgs 
                      sensor_msgs 
-                     std_srvs 
+                     std_srvs
+                     actionlib 
                      actionlib_msgs 
-                     message_generation)
+                     message_generation
+                     )
 
 add_message_files(DIRECTORY msg
                       FILES

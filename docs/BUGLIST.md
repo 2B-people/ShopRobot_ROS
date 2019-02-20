@@ -166,3 +166,6 @@ include<blackboard/data_structure.hpp>
 
 `bug017`
 注意使用srv生成文件时一定引用生成头文件...
+
+`bug018`
+ros的param服务器有namespace的限制,使用时需要注意全局或者局部的get方法不一样.

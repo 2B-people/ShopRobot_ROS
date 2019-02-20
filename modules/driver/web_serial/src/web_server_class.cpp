@@ -6,12 +6,12 @@ namespace webserver
 {
 
 WebServer::WebServer(std::string name)
-    : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),
-      client_sockfd_(0), server_sockfd_(0), server_addr_("127.0.0.1"), bind_port_(80),
+    : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),is_debug_(false),
+      client_sockfd_(0), server_sockfd_(0), server_addr_("127.0.0.1"), bind_port_(1234),
       //atcion初始化
-      move_as_(nh_, name + "/move_action", boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
-      opening_as_(nh_, name + "/opening_action", boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
-      action_as_(nh_, name + "/shop_action", boost::bind(&WebServer::ShopExecuteCB, this, _1), false)
+      move_as_(nh_, (name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
+      opening_as_(nh_, (name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
+      action_as_(nh_, (name + "/shop_action"), boost::bind(&WebServer::ShopExecuteCB, this, _1), false)
 {
     ros::NodeHandle nh_private_("~");
 
@@ -25,12 +25,52 @@ WebServer::WebServer(std::string name)
 
     memset(&my_addr_, 0, sizeof(my_addr_)); //数据初始化--清零
 
+    ROS_INFO("%s is begin", name_.c_str());
+
     //param init
-    nh_private_.getParam(name_ + "/addr", server_addr_);
-    nh_private_.getParam(name_ + "/port", bind_port_);
+    nh_.getParam("debug",is_debug_);
+    bool is_get_addr = nh_private_.getParam("addr", server_addr_);
+    bool is_get_port = nh_private_.getParam("port", bind_port_);
+    if (is_debug_)
+    {
+        if (is_get_addr)
+        {
+            ROS_ERROR("%s addr cant get param", name_.c_str());
+        }
+        else
+        {
+            ROS_INFO("%s is %d", name.c_str(), bind_port_);
+        }
+
+        if (is_get_port)
+        {
+            ROS_ERROR("%s port cant get param", name_.c_str());
+        }
+        else
+        {
+            ROS_INFO("%s is %d", name.c_str(), bind_port_);
+        }
+
+        ROS_WARN("%s %s %d", name_.c_str(), server_addr_.c_str(), bind_port_);
+    }
 
     //publish init
     move_pub_ = nh_.advertise<data::Coord>(name_ + "/coord_now", 1);
+
+    roadblock_client_ = nh_.serviceClient<data::Roadblock>("shop/roadblock_write_srv");
+
+    if (name_ == "robot1_web")
+    {
+        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_wirte");
+    }
+    else if (name_ == "robot2_web")
+    {
+        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_wirte");
+    }
+    else if (name_ == "robot3_web")
+    {
+        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
+    }
 
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
@@ -124,7 +164,7 @@ void WebServer::Run()
 }
 
 //移动的回调函数
-void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONSERVER *as)
+void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 {
     //反馈
     data::MoveFeedback feedback;
@@ -161,7 +201,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONS
                 //判断目标坐标
                 if (now_coord.x == goal->x && now_coord.y == goal->y && now_coord.pose == goal->pose)
                 {
-                    ROS_INFO("move to target,x:%d,y:%d" goal->x, goal->y);
+                    ROS_INFO("move to target,x:%d,y:%d", goal->x, goal->y);
                     break;
                 }
                 else
@@ -183,7 +223,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONS
 }
 
 //shopatcion的回调函数
-void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPACTIONSERVER *as)
+void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 {
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
@@ -222,13 +262,53 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPA
 }
 
 //开局初始化函数
-void WebServer::OpeningExecuteCB(const data::Opening::ConstPtr &goal, OPENINGACTIONSERVER *as)
+void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 {
-    OpeningFeedback feedback;
-    OpeningResult result;
-    ROS_INFO("%s is write Open",name_.c_str());
+    data::OpeningFeedback feedback;
+    data::OpeningResult result;
+    ROS_INFO("%s is write Open", name_.c_str());
 
-    //
+    send(client_sockfd_, goal->car_begin.c_str(), BUFF_MAX, 0);
+
+    while (ros::ok())
+    {
+        if (is_open_)
+        {
+            if (open_stop_)
+            {
+                char re_buf[BUFF_MAX];
+                recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+                std::string re_buf_str = re_buf;
+                if (re_buf_str == "finish")
+                {
+                    break;
+                }
+                else if (re_buf_str[0] == 'S')
+                {
+                    data::ShelfBarrier srv = DataToBarrier(re_buf_str);
+                    if (shelf_barrier_client_.call(srv))
+                    {
+                        ROS_INFO("shop barrier is wirte!");
+                    }
+                    else
+                    {
+                        ROS_ERROR("failed to call shop barrier board!");
+                    }
+                    feedback.progress = "Is set barrier";
+                    opening_as_.publishFeedback(feedback);
+                }
+                else
+                {
+                    feedback.progress = re_buf_str;
+                    opening_as_.publishFeedback(feedback);
+                }
+            }
+            else
+            {
+                ROS_WARN("shop flag is stop!!!");
+            }
+        }
+    }
 
     result.success_flag = true;
     opening_as_.setSucceeded(result);
@@ -271,10 +351,10 @@ void WebServer::MovePreemptCB()
 //动作抢占中断回调函数
 void WebServer::ShopPreemptCB()
 {
-    char stop_buf[BUFF_MAX];
+    std::string stop_buf("shop now");
     if (action_as_.isActive())
     {
-        send(client_sockfd_, &stop_buf, BUFF_MAX, 0);
+        send(client_sockfd_, stop_buf.c_str(), BUFF_MAX, 0);
         action_as_.setPreempted();
     }
 }
@@ -282,9 +362,10 @@ void WebServer::ShopPreemptCB()
 //开局抢占中断回调函数
 void WebServer::OpenPreemptCB()
 {
+    std::string stop_buf("shop now");
     if (opening_as_.isActive())
     {
-        //TODO
+        send(client_sockfd_, stop_buf.c_str(), BUFF_MAX, 0);
         opening_as_.setPreempted();
     }
 }
@@ -300,7 +381,7 @@ data::Coord WebServer::DataToCoord(const char *buf)
     data::Coord rul_coord;
     rul_coord.x = string_buf[0];
     rul_coord.y = string_buf[2];
-    rul_coord.pose = string_bug[4];
+    rul_coord.pose = string_buf[4];
     return rul_coord;
 }
 
@@ -316,6 +397,10 @@ std::string WebServer::CoordToData(data::Coord temp)
                std::to_string(temp.y) + " " +
                std::to_string(temp.pose);
     return temp_str;
+}
+
+data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
+{
 }
 
 } // namespace webserver

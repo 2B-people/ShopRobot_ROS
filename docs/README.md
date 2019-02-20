@@ -7,7 +7,7 @@ HDU ShopRobot ROS coding
 @done 与mcu的串口通信,协议可以看infantry_info,@TODO 整理为文档到docs下
 @done web服务器的架构,以及进程之间的队列通信
 
-##文件架构
+## 文件架构
 
 - common
     此目录为整个项目公用代码仓库
@@ -28,6 +28,8 @@ HDU ShopRobot ROS coding
 - tools
     此目录为dubug工具
 
+## 注意
+`debug`为全局的debug宏定义,使用的时候需要在给参数服务器set这个值为ture;
 
 注释模板
 ```C++

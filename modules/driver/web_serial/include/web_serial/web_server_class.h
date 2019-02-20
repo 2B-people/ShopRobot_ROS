@@ -45,6 +45,7 @@ class WebServer : public shop::common::RRTS
 public:
   WebServer(std::string name);
   ~WebServer();
+  void Run();
   void Stop();
   void Resume();
 
@@ -53,11 +54,13 @@ private:
   bool is_open_;
   bool move_stop_;
   bool shop_stop_;
+  bool open_stop_;
 
   //socket
   int client_sockfd_;
   int server_sockfd_;
-  uint16_t bind_port_;
+  int bind_port_;
+  bool is_debug_;
   std::string server_addr_;
   struct sockaddr_in my_addr_;     //服务器网络地址结构体
   struct sockaddr_in remote_addr_; //客户端网络地址结构体
@@ -70,22 +73,23 @@ private:
   SHOPACTIONSERVER action_as_;
   OPENINGACTIONSERVER opening_as_;
   //service
-  ros::ServiceClient roadblock_client;
-  ros::ServiceClient shelf_barrier_client;
+  ros::ServiceClient roadblock_client_;
+  ros::ServiceClient shelf_barrier_client_;
   //publish
   ros::Publisher move_pub_;
 
   //function
   bool InitWeb();
-  void MoveExecuteCB(const data::MoveGoal::ConstrPtr &goal, MOVEACTIONSERVER *as);
-  void ShopExecuteCB(const data::ShopActionGoal::ConstrPtr &goal, SHOPACTIONSERVER *as);
-  void OpeningExecuteCB(const data::Opening::ConstPtr &goal, OPENINGACTIONSERVER *as);
+  void MoveExecuteCB(const data::MoveGoal::ConstPtr &goal);
+  void ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal);
+  void OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal);
 
   void MovePreemptCB();
   void ShopPreemptCB();
   void OpenPreemptCB();
 
-  data::Coord DataToCoord(char *buf);
+  data::Coord DataToCoord(const char *buf);
+  data::ShelfBarrier DataToBarrier(std::string temp);
   std::string CoordToData(data::Coord temp);
 };
 
