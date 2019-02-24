@@ -7,7 +7,7 @@ import sys
 # 统计代码量
 # 使用len(t_coding)function选择统计对象
 baseroot = os.getcwd()
-whiteDict = {'py':['py'],'cpp&c':['cpp','h','hpp','c'],'web':['html','css','ts'],'matlab':['m']}
+whiteDict = {'py':['py'],'cpp&c':['cpp','h','hpp','c'],'web':['html','css','ts','xml'],'matlab':['m']}
 FileList = []
 
 def afileline(f_path):
@@ -65,3 +65,5 @@ class Timer(object):
 
 
 len('cpp&c')
+len('py')
+len('web')

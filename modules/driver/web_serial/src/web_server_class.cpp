@@ -28,7 +28,7 @@ WebServer::WebServer(std::string name)
     ROS_INFO("%s is begin", name_.c_str());
 
     //param init
-    nh_.getParam("debug",is_debug_);
+    nh_.param("debug",is_debug_,false);
     bool is_get_addr = nh_private_.getParam("addr", server_addr_);
     bool is_get_port = nh_private_.getParam("port", bind_port_);
     if (is_debug_)

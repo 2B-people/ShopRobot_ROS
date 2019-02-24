@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <thread>
+#include <iostream>
 
 #include <data/TestAction.h>
 
@@ -20,6 +21,7 @@ void ReadThread(void *arg)
 void donecb(const actionlib::SimpleClientGoalState &state, const data::TestResult::ConstPtr &result)
 {
     ROS_INFO("Done");
+    ROS_INFO("%s", state.toString().c_str());
     ros::shutdown();
 }
 
@@ -44,19 +46,20 @@ int main(int argc, char **argv)
     ac.waitForServer();
     ROS_INFO("Action server is started");
     data::TestGoal goal;
-    goal.goal = 10;
+    goal.goal = 6;
     ac.sendGoal(goal, &donecb, &activecb, &feedbackcb);
+    auto state = ac.getState();
+    ROS_INFO("%s", state.toString().c_str());
     //thread1.join();
-    ros::spin();
-    // while (ros::ok)
-    // {
-    //     if (a == 5)
-    //     {
-    //         //ac.cancelGoal();
-    //         break;
-    //     }
-    //     ros::spinOnce();
-    // }
+    // ros::spin();
+    while (ros::ok)
+    {
+        if (a == 4)
+        {
+            ac.cancelGoal();
+        }
+        ros::spinOnce();
+    }
 
     return 0;
 }
