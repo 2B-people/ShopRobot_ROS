@@ -59,12 +59,50 @@ class BoolDir : public DirBase
     bool real_bool_;
 };
 
+class ActionNameDir : public DirBase
+{
+  public:
+    ActionNameDir(std::string initial_name)
+        : DirBase(DictionaryType::ACTIONNAME), 
+            initial_name_(initial_name), name_(initial_name)
+    {
+    }
+    virtual ~ActionNameDir() = default;
+
+    std::string GetActionName()
+    {
+        return name_;
+    }
+
+    void Set(std::string set_name)
+    {
+        if (flag_)
+        {
+            name_ = set_name;
+        }
+        else
+        {
+            ROS_WARN("%s is lock in %s", set_name.c_str(), __FUNCTION__);
+        }
+    }
+
+    void RepeatInit()
+    {
+        name_ = initial_name_;
+        OpenLock();
+    }
+
+  private:
+    std::string name_;
+    std::string initial_name_;
+};
+
 //坐标类型
 class CoordinateDir : public DirBase
 {
   public:
-    CoordinateDir(uint16_t initial_x, uint16_t initial_y,uint8_t initial_pose)
-        : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y),initial_pose_(initial_pose)
+    CoordinateDir(uint16_t initial_x, uint16_t initial_y, uint8_t initial_pose)
+        : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y), initial_pose_(initial_pose)
     {
         middle_x_ = initial_x_;
         middle_y_ = initial_y_;
@@ -82,12 +120,12 @@ class CoordinateDir : public DirBase
     {
         return real_y_;
     }
-    
+
     uint8_t GetCoordinatePOSE()
     {
         return real_pose_;
     }
-    void Set(uint16_t set_x, uint16_t set_y,uint8_t set_pose)
+    void Set(uint16_t set_x, uint16_t set_y, uint8_t set_pose)
     {
         middle_x_ = set_x;
         middle_y_ = set_y;

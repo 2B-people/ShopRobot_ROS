@@ -20,6 +20,7 @@ enum class DictionaryType
     NONE,
     BOOL,       //布尔
     COORDINATE, //坐标
+    ACTIONNAME, //动作名字
     GOODS,      //货物
     ROADBLOCK,   //路障
     GOODSHELF   //货架

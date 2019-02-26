@@ -12,6 +12,7 @@
 
 #include <decision/behavior_node.hpp>
 #include <blackboard/black_board.hpp>
+#include <blackboard/data_structure.hpp>
 
 namespace shop
 {
@@ -21,26 +22,94 @@ typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 
+
+//行为树专用黑板,
+class PrivateBoard : public Blackboard
+{
+public:
+  typedef std::shared_ptr<PrivateBoard> Ptr;
+  PrivateBoard()
+      : Blackboard()
+  {
+    //game结束的flag
+    auto end_game = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("end_flag", end_game);
+
+    //各类flag
+    auto bool_flag = std::make_shared<BoolDir>(false);
+
+
+    //局部规划的flag
+    auto robot1_local_plan_flag = std::make_shared<BoolDir>(false);
+    auto robot2_local_plan_flag = std::make_shared<BoolDir>(false);
+    auto robot3_local_plan_flag = std::make_shared<BoolDir>(false);
+    auto robot4_local_plan_flag = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot1/local_plan/flag", robot1_local_plan_flag);
+    AddDataIntoWorld("robot2/local_plan/flag", robot2_local_plan_flag);
+    AddDataIntoWorld("robot3/local_plan/flag", robot3_local_plan_flag);
+    AddDataIntoWorld("robot4/local_plan/flag", robot4_local_plan_flag);
+
+    //可以在任何地方写的目标坐标
+    auto robot1_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot2_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot3_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot4_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
+    AddDataIntoWorld("robot1/run_coordinate", robot1_run_coordinate);
+    AddDataIntoWorld("robot2/run_coordinate", robot2_run_coordinate);
+    AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
+    AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
+
+    //目标动作
+    auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
+    AddDataIntoWorld("robot1/action_name", robot1_action_name);
+    AddDataIntoWorld("robot2/action_name", robot2_action_name);
+    AddDataIntoWorld("robot3/action_name", robot3_action_name);
+    AddDataIntoWorld("robot4/action_name", robot4_action_name);
+  }
+  ~PrivateBoard() = default;
+
+  bool GetBoolValue(std::string key)
+  {
+    auto dir_ptr = GetDirPtr(key);
+    auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
+    return bool_dir_ptr->GetValue();
+  }
+
+  void SetBoolValue(bool set_bool, std::string key)
+  {
+    auto dir_ptr = GetDirPtr(key);
+    auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
+    bool_dir_ptr->OpenLock();
+    bool_dir_ptr->Set(set_bool);
+  }
+
+private:
+};
+
+
+//动作任务发布的对象
 class GoalAction
 {
 public:
   typedef std::shared_ptr<GoalAction> Ptr;
 
-
-  GoalAction(const Blackboard::Ptr &blackboard_ptr) : blackboard_ptr_(blackboard_ptr),
-                                                    robot1_move_action_clint_("robot1_web/move_action", true),
-                                                    robot1_open_action_clint_("robot1_web/opening_action", true),
-                                                    robot1_shop_action_clint_("robot1_web/shop_action", true),
-                                                    robot2_move_action_clint_("robot2_web/move_action", true),
-                                                    robot2_open_action_clint_("robot2_web/opening_action", true),
-                                                    robot2_shop_action_clint_("robot2_web/shop_action", true),
-                                                    robot3_move_action_clint_("robot3_web/move_action", true),
-                                                    robot3_open_action_clint_("robot3_web/opening_action", true),
-                                                    robot3_shop_action_clint_("robot3_web/shop_action", true),
-                                                    robot4_move_action_clint_("robot4_web/move_action", true),
-                                                    robot4_shop_action_clint_("robot4_web/shop_action", true)
+  GoalAction(const Blackboard::Ptr &blackboard_ptr) : robot1_move_action_clint_("robot1_web/move_action", true),
+                                                      robot1_open_action_clint_("robot1_web/opening_action", true),
+                                                      robot1_shop_action_clint_("robot1_web/shop_action", true),
+                                                      robot2_move_action_clint_("robot2_web/move_action", true),
+                                                      robot2_open_action_clint_("robot2_web/opening_action", true),
+                                                      robot2_shop_action_clint_("robot2_web/shop_action", true),
+                                                      robot3_move_action_clint_("robot3_web/move_action", true),
+                                                      robot3_open_action_clint_("robot3_web/opening_action", true),
+                                                      robot3_shop_action_clint_("robot3_web/shop_action", true),
+                                                      robot4_move_action_clint_("robot4_web/move_action", true),
+                                                      robot4_shop_action_clint_("robot4_web/shop_action", true)
   {
     ROS_INFO("Waiting for action server to start");
+    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
     robot1_move_action_clint_.waitForServer();
     robot1_open_action_clint_.waitForServer();
     robot1_shop_action_clint_.waitForServer();
@@ -55,7 +124,7 @@ public:
     ROS_INFO(" ALL Action server is started");
   }
   ~GoalAction() = default;
-
+  // @brief 发布车移动目标
   void SendMoveGoal(int8_t robot_num, int16_t x, int16_t y, int8_t pose)
   {
     data::MoveGoal goal;
@@ -71,24 +140,22 @@ public:
                                          MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     case 2:
-      robot2_move_action_clint_.sendGoal(goal, 
+      robot2_move_action_clint_.sendGoal(goal,
                                          MOVEACTIONCLINT::SimpleDoneCallback(),
                                          MOVEACTIONCLINT::SimpleActiveCallback(),
                                          MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     case 3:
-      robot3_move_action_clint_.sendGoal(goal,                                          
+      robot3_move_action_clint_.sendGoal(goal,
                                          MOVEACTIONCLINT::SimpleDoneCallback(),
-                                         MOVEACTIONCLINT::SimpleActiveCallback(), 
-                                         MOVEACTIONCLINT::SimpleFeedbackCallback()
-      );
+                                         MOVEACTIONCLINT::SimpleActiveCallback(),
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     case 4:
-      robot4_move_action_clint_.sendGoal(goal,                                          
+      robot4_move_action_clint_.sendGoal(goal,
                                          MOVEACTIONCLINT::SimpleDoneCallback(),
-                                         MOVEACTIONCLINT::SimpleActiveCallback(), 
-                                         MOVEACTIONCLINT::SimpleFeedbackCallback()
-      );
+                                         MOVEACTIONCLINT::SimpleActiveCallback(),
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
@@ -96,6 +163,7 @@ public:
     }
   }
 
+  // @brief 发布车动作目标
   void SendShopGoal(int8_t robot_num, std::string action_name)
   {
     data::ShopActionGoal goal;
@@ -103,32 +171,28 @@ public:
     switch (robot_num)
     {
     case 1:
-      robot1_shop_action_clint_.sendGoal(goal,                                          
+      robot1_shop_action_clint_.sendGoal(goal,
                                          SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(), 
-                                         SHOPACTION::SimpleFeedbackCallback()
-      );
+                                         SHOPACTION::SimpleActiveCallback(),
+                                         SHOPACTION::SimpleFeedbackCallback());
       break;
     case 2:
-      robot2_shop_action_clint_.sendGoal(goal,                                          
+      robot2_shop_action_clint_.sendGoal(goal,
                                          SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(), 
-                                         SHOPACTION::SimpleFeedbackCallback()
-      );
+                                         SHOPACTION::SimpleActiveCallback(),
+                                         SHOPACTION::SimpleFeedbackCallback());
       break;
     case 3:
-      robot3_shop_action_clint_.sendGoal(goal,                                          
+      robot3_shop_action_clint_.sendGoal(goal,
                                          SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(), 
-                                         SHOPACTION::SimpleFeedbackCallback()
-      );
+                                         SHOPACTION::SimpleActiveCallback(),
+                                         SHOPACTION::SimpleFeedbackCallback());
       break;
     case 4:
-      robot4_shop_action_clint_.sendGoal(goal,                                         
+      robot4_shop_action_clint_.sendGoal(goal,
                                          SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(), 
-                                         SHOPACTION::SimpleFeedbackCallback()
-      );
+                                         SHOPACTION::SimpleActiveCallback(),
+                                         SHOPACTION::SimpleFeedbackCallback());
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
@@ -136,6 +200,10 @@ public:
     }
   }
 
+
+  // @brief 发布发车命令
+  // @note 无robot4,robot4为上位机控制
+  //TODO 需要写一个回调函数来实现不同车的发出
   void SendOpenGoal(int8_t robot_num, std::string car_begin)
   {
     data::OpeningGoal goal;
@@ -143,30 +211,28 @@ public:
     switch (robot_num)
     {
     case 1:
-      robot1_open_action_clint_.sendGoal(goal,                                          
+      robot1_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
-                                         OPENINGCLINT::SimpleActiveCallback(), 
-                                         OPENINGCLINT::SimpleFeedbackCallback()
-      );
+                                         OPENINGCLINT::SimpleActiveCallback(),
+                                         OPENINGCLINT::SimpleFeedbackCallback());
     case 2:
-      robot2_open_action_clint_.sendGoal(goal,                                           
+      robot2_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
-                                         OPENINGCLINT::SimpleActiveCallback(), 
-                                         OPENINGCLINT::SimpleFeedbackCallback()
-      );
+                                         OPENINGCLINT::SimpleActiveCallback(),
+                                         OPENINGCLINT::SimpleFeedbackCallback());
       break;
     case 3:
-      robot2_open_action_clint_.sendGoal(goal,                                           
+      robot2_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
-                                         OPENINGCLINT::SimpleActiveCallback(), 
-                                         OPENINGCLINT::SimpleFeedbackCallback()
-      );
+                                         OPENINGCLINT::SimpleActiveCallback(),
+                                         OPENINGCLINT::SimpleFeedbackCallback());
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
       break;
     }
   }
 
+  // @brief 紧急停车  
   void CancelMoveGoal(int8_t robot_num)
   {
     switch (robot_num)
@@ -193,6 +259,7 @@ public:
     }
   }
 
+  // @brief 紧急停止动作
   void CancelShopGoal(int8_t robot_num)
   {
     switch (robot_num)
@@ -219,6 +286,7 @@ public:
     }
   }
 
+  // @brief 得到move action的状态
   BehaviorState GetMoveBehaviorState(int8_t robot_num)
   {
     auto state = robot1_move_action_clint_.getState();
@@ -263,6 +331,7 @@ public:
     }
   }
 
+  // @brief 得到shop action的状态
   BehaviorState GetShopBehaviorState(int8_t robot_num)
   {
     auto state = robot1_shop_action_clint_.getState();
@@ -307,6 +376,7 @@ public:
     }
   }
 
+  // @brief 得到open action的状态
   BehaviorState GetOpenBehaviorState(int8_t robot_num)
   {
     auto state = robot1_open_action_clint_.getState();
@@ -349,21 +419,22 @@ public:
   }
 
 private:
-  Blackboard::Ptr blackboard_ptr_;
+  PrivateBoard::Ptr private_blackboard_ptr_;
 
   ros::NodeHandle nh_;
+  //robot1
   MOVEACTIONCLINT robot1_move_action_clint_;
   OPENINGCLINT robot1_open_action_clint_;
   SHOPACTION robot1_shop_action_clint_;
-
+  //robot2
   MOVEACTIONCLINT robot2_move_action_clint_;
   OPENINGCLINT robot2_open_action_clint_;
   SHOPACTION robot2_shop_action_clint_;
-
+  //robot3
   MOVEACTIONCLINT robot3_move_action_clint_;
   OPENINGCLINT robot3_open_action_clint_;
   SHOPACTION robot3_shop_action_clint_;
-
+  //robot4
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
 };

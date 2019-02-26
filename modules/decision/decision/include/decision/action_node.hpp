@@ -12,6 +12,7 @@ namespace shop
 namespace decision
 {
 
+//移动的执行叶节点
 class MoveAction : public ActionNode
 {
 public:
@@ -21,6 +22,7 @@ public:
         robot_num_(robot_num),
         goalaction_ptr_(goalaction_ptr)
   {
+    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~MoveAction() = default;
 
@@ -32,19 +34,32 @@ private:
   virtual BehaviorState Update()
   {
     BehaviorState state = goalaction_ptr_->GetMoveBehaviorState(robot_num_);
-    // if (state != BehaviorState::RUNNING)
-    // {
-    //   if(blackboard_ptr_->GetBoolValue("robot%d/local_plan/flag",robot_num_))
-    //   {
-    //     uint16_t target_x = blackboard_ptr_->GetCoordinateX("robot%d",robot_num_);
-    //     uint16_t target_y = blackboard_ptr_->GetCoordinateY("robot%d",robot_num_);
-    //     int8_t target_pose = blackboard_ptr_->GetCoordinatepose("robot%d",robot_num_);
-    //     goalaction_ptr_->SendMoveGoal(robot_num_,target_x,target_y,target_pose);
-    //   }else
-    //   {
-    //     ROS_INFO("%d is wait for local plan");
-    //   }
-    // }
+    //key键的str
+    std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
+    std::string coordinate_key = "robot" + std::to_string(robot_num_) + "/run_coordinate";
+    if (state != BehaviorState::RUNNING)
+    {
+      // if (private_blackboard_ptr_->GetBoolValue(bool_key))
+      // {
+      //   auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key);
+      //   auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+      //   uint16_t target_x = dir_ptr->GetCoordinateX();
+      //   uint16_t target_y = dir_ptr->GetCoordinateY();
+      //   uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
+      //   goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
+      // }
+      // else
+      // {
+      //   ROS_INFO("%d is wait for local plan", robot_num_);
+      // }
+
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key);
+      auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+      uint16_t target_x = dir_ptr->GetCoordinateX();
+      uint16_t target_y = dir_ptr->GetCoordinateY();
+      uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
+      goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
+    }
     return goalaction_ptr_->GetMoveBehaviorState(robot_num_);
   }
 
@@ -70,8 +85,10 @@ private:
 
   int8_t robot_num_;
   GoalAction::Ptr goalaction_ptr_;
+  PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
+//动作节点
 class ShopAction : public ActionNode
 {
 public:
@@ -81,6 +98,7 @@ public:
         robot_num_(robot_num),
         goalaction_ptr_(goalaction_ptr)
   {
+    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~ShopAction() = default;
 
@@ -92,12 +110,14 @@ private:
   virtual BehaviorState Update()
   {
     BehaviorState state = goalaction_ptr_->GetShopBehaviorState(robot_num_);
-    // if (state != BehaviorState::RUNNING)
-    // {
-    //   blackboard_ptr_->;
-
-    //   //todo 读入写的坐标
-    // }
+    std::string name_key = "robot" + std::to_string(robot_num_) + "/action_name";
+    if (state != BehaviorState::RUNNING)
+    {
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(name_key);
+      auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
+      std::string goal_name = dir_ptr->GetActionName();
+      goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
+    }
     return goalaction_ptr_->GetShopBehaviorState(robot_num_);
   }
 
@@ -122,6 +142,7 @@ private:
   }
   uint8_t robot_num_;
   GoalAction::Ptr goalaction_ptr_;
+  PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
 class OpenAction : public ActionNode
@@ -133,6 +154,7 @@ public:
         robot_num_(robot_num),
         goalaction_ptr_(goalaction_ptr)
   {
+    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~OpenAction() = default;
 
@@ -144,12 +166,10 @@ private:
   virtual BehaviorState Update()
   {
     BehaviorState state = goalaction_ptr_->GetOpenBehaviorState(robot_num_);
-    // if (state != BehaviorState::RUNNING)
-    // {
-    //   blackboard_ptr_->;
-
-    //   //todo 读入写的坐标
-    // }
+    if (state != BehaviorState::RUNNING)
+    {
+      goalaction_ptr_->SendOpenGoal(robot_num_, "go");
+    }
     return goalaction_ptr_->GetOpenBehaviorState(robot_num_);
   }
 
@@ -175,6 +195,7 @@ private:
 
   uint8_t robot_num_;
   GoalAction::Ptr goalaction_ptr_;
+  PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
 } // namespace decision
