@@ -1,9 +1,10 @@
 int16 x
 int16 y
-
+int8 pose
 int8 number
 
 ---
 int16 x
 int16 y
+int8 pose
 bool success_flag

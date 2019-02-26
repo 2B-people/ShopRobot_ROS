@@ -63,13 +63,15 @@ class BoolDir : public DirBase
 class CoordinateDir : public DirBase
 {
   public:
-    CoordinateDir(uint16_t initial_x, uint16_t initial_y)
-        : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y)
+    CoordinateDir(uint16_t initial_x, uint16_t initial_y,uint8_t initial_pose)
+        : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y),initial_pose_(initial_pose)
     {
         middle_x_ = initial_x_;
         middle_y_ = initial_y_;
+        middle_pose_ = initial_pose_;
         real_x_ = middle_x_;
         real_y_ = middle_y_;
+        real_pose_ = middle_pose_;
     };
     virtual ~CoordinateDir() = default;
     uint16_t GetCoordinateX()
@@ -80,15 +82,21 @@ class CoordinateDir : public DirBase
     {
         return real_y_;
     }
-
-    void Set(uint16_t set_x, uint16_t set_y)
+    
+    uint8_t GetCoordinatePOSE()
+    {
+        return real_pose_;
+    }
+    void Set(uint16_t set_x, uint16_t set_y,uint8_t set_pose)
     {
         middle_x_ = set_x;
         middle_y_ = set_y;
+        middle_pose_ = set_pose;
         if (flag_)
         {
             real_x_ = middle_x_;
             real_y_ = middle_y_;
+            real_pose_ = middle_pose_;
         }
         else
         {
@@ -102,16 +110,20 @@ class CoordinateDir : public DirBase
         middle_y_ = initial_y_;
         real_x_ = initial_x_;
         real_y_ = initial_y_;
+        real_pose_ = initial_pose_;
     }
 
   protected:
   private:
     uint16_t initial_x_;
     uint16_t initial_y_;
+    uint16_t initial_pose_;
     uint16_t middle_x_;
     uint16_t middle_y_;
+    uint16_t middle_pose_;
     uint16_t real_x_;
     uint16_t real_y_;
+    uint16_t real_pose_;
 };
 
 //货物类别

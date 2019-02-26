@@ -7,7 +7,7 @@
 #include <string>
 
 #include <data/MoveAction.h>
-#include <data/Opening.h>
+#include <data/OpeningAction.h>
 #include <data/ShopActionAction.h>
 
 #include <decision/behavior_node.hpp>
@@ -21,10 +21,13 @@ typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 
-class GoalSend
+class GoalAction
 {
 public:
-  GoalSend(const Blackboard::Ptr &blackboard_ptr) : blackboard_ptr_(blackboard_ptr),
+  typedef std::shared_ptr<GoalAction> Ptr;
+
+
+  GoalAction(const Blackboard::Ptr &blackboard_ptr) : blackboard_ptr_(blackboard_ptr),
                                                     robot1_move_action_clint_("robot1_web/move_action", true),
                                                     robot1_open_action_clint_("robot1_web/opening_action", true),
                                                     robot1_shop_action_clint_("robot1_web/shop_action", true),
@@ -35,7 +38,7 @@ public:
                                                     robot3_open_action_clint_("robot3_web/opening_action", true),
                                                     robot3_shop_action_clint_("robot3_web/shop_action", true),
                                                     robot4_move_action_clint_("robot4_web/move_action", true),
-                                                    robot4_shop_action_clint_("robot4_web/shop_action", true),
+                                                    robot4_shop_action_clint_("robot4_web/shop_action", true)
   {
     ROS_INFO("Waiting for action server to start");
     robot1_move_action_clint_.waitForServer();
@@ -51,7 +54,7 @@ public:
     robot4_shop_action_clint_.waitForServer();
     ROS_INFO(" ALL Action server is started");
   }
-  ~GoalSend() = default;
+  ~GoalAction() = default;
 
   void SendMoveGoal(int8_t robot_num, int16_t x, int16_t y, int8_t pose)
   {
@@ -62,16 +65,30 @@ public:
     switch (robot_num)
     {
     case 1:
-      robot1_move_action_clint_.sendGoal(goal, /*todo*/);
+      robot1_move_action_clint_.sendGoal(goal,
+                                         MOVEACTIONCLINT::SimpleDoneCallback(),
+                                         MOVEACTIONCLINT::SimpleActiveCallback(),
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     case 2:
-      robot2_move_action_clint_.sendGoal(goal, /*todo*/);
+      robot2_move_action_clint_.sendGoal(goal, 
+                                         MOVEACTIONCLINT::SimpleDoneCallback(),
+                                         MOVEACTIONCLINT::SimpleActiveCallback(),
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
     case 3:
-      robot3_move_action_clint_.sendGoal(goal, /*todo*/);
+      robot3_move_action_clint_.sendGoal(goal,                                          
+                                         MOVEACTIONCLINT::SimpleDoneCallback(),
+                                         MOVEACTIONCLINT::SimpleActiveCallback(), 
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback()
+      );
       break;
-    case 3:
-      robot3_move_action_clint_.sendGoal(goal, /*todo*/);
+    case 4:
+      robot4_move_action_clint_.sendGoal(goal,                                          
+                                         MOVEACTIONCLINT::SimpleDoneCallback(),
+                                         MOVEACTIONCLINT::SimpleActiveCallback(), 
+                                         MOVEACTIONCLINT::SimpleFeedbackCallback()
+      );
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
@@ -82,20 +99,36 @@ public:
   void SendShopGoal(int8_t robot_num, std::string action_name)
   {
     data::ShopActionGoal goal;
-    goal.action_name = action_nome;
+    goal.action_name = action_name;
     switch (robot_num)
     {
     case 1:
-      robot1_shop_action_clint_.sendGoal(goal, /*todo*/);
+      robot1_shop_action_clint_.sendGoal(goal,                                          
+                                         SHOPACTION::SimpleDoneCallback(),
+                                         SHOPACTION::SimpleActiveCallback(), 
+                                         SHOPACTION::SimpleFeedbackCallback()
+      );
       break;
     case 2:
-      robot2_shop_action_clint_.sendGoal(goal, /*todo*/);
+      robot2_shop_action_clint_.sendGoal(goal,                                          
+                                         SHOPACTION::SimpleDoneCallback(),
+                                         SHOPACTION::SimpleActiveCallback(), 
+                                         SHOPACTION::SimpleFeedbackCallback()
+      );
       break;
     case 3:
-      robot3_shop_action_clint_.sendGoal(goal, /*todo*/);
+      robot3_shop_action_clint_.sendGoal(goal,                                          
+                                         SHOPACTION::SimpleDoneCallback(),
+                                         SHOPACTION::SimpleActiveCallback(), 
+                                         SHOPACTION::SimpleFeedbackCallback()
+      );
       break;
     case 4:
-      robot4_shop_action_clint_.sendGoal(goal, /*todo*/);
+      robot4_shop_action_clint_.sendGoal(goal,                                         
+                                         SHOPACTION::SimpleDoneCallback(),
+                                         SHOPACTION::SimpleActiveCallback(), 
+                                         SHOPACTION::SimpleFeedbackCallback()
+      );
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
@@ -110,21 +143,31 @@ public:
     switch (robot_num)
     {
     case 1:
-      robot1_open_action_clint_.sendGoal(goal, /*todo*/);
-      break;
+      robot1_open_action_clint_.sendGoal(goal,                                          
+                                         OPENINGCLINT::SimpleDoneCallback(),
+                                         OPENINGCLINT::SimpleActiveCallback(), 
+                                         OPENINGCLINT::SimpleFeedbackCallback()
+      );
     case 2:
-      robot2_open_action_clint_.sendGoal(goal, /*todo*/);
+      robot2_open_action_clint_.sendGoal(goal,                                           
+                                         OPENINGCLINT::SimpleDoneCallback(),
+                                         OPENINGCLINT::SimpleActiveCallback(), 
+                                         OPENINGCLINT::SimpleFeedbackCallback()
+      );
       break;
     case 3:
-      robot2_open_action_clint_.sendGoal(goal, /*todo*/);
-      break;
+      robot2_open_action_clint_.sendGoal(goal,                                           
+                                         OPENINGCLINT::SimpleDoneCallback(),
+                                         OPENINGCLINT::SimpleActiveCallback(), 
+                                         OPENINGCLINT::SimpleFeedbackCallback()
+      );
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
       break;
     }
   }
 
-  void CanaelMoveGoal(int8_t robot_num)
+  void CancelMoveGoal(int8_t robot_num)
   {
     switch (robot_num)
     {
@@ -150,7 +193,7 @@ public:
     }
   }
 
-  void CanaelShopGoal(int8_t robot_num)
+  void CancelShopGoal(int8_t robot_num)
   {
     switch (robot_num)
     {
@@ -193,6 +236,91 @@ public:
       break;
     case 4:
       state = robot4_move_action_clint_.getState();
+      break;
+    default:
+      ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
+      break;
+    }
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
+  BehaviorState GetShopBehaviorState(int8_t robot_num)
+  {
+    auto state = robot1_shop_action_clint_.getState();
+
+    switch (robot_num)
+    {
+    case 1:
+      state = robot1_shop_action_clint_.getState();
+      break;
+    case 2:
+      state = robot2_shop_action_clint_.getState();
+      break;
+    case 3:
+      state = robot3_shop_action_clint_.getState();
+      break;
+    case 4:
+      state = robot4_shop_action_clint_.getState();
+      break;
+    default:
+      ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
+      break;
+    }
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
+  BehaviorState GetOpenBehaviorState(int8_t robot_num)
+  {
+    auto state = robot1_open_action_clint_.getState();
+
+    switch (robot_num)
+    {
+    case 1:
+      state = robot1_open_action_clint_.getState();
+      break;
+    case 2:
+      state = robot2_open_action_clint_.getState();
+      break;
+    case 3:
+      state = robot3_open_action_clint_.getState();
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);

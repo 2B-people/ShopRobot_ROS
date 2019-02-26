@@ -60,7 +60,10 @@ class ActionTest : public shop::decision::ActionNode
     {
         ros::Time at_now = ros::Time::now();
         double begin = begin_.toSec();
-        double at_now_double =at_now.toSec(); 
+        double at_now_double =at_now.toSec();
+        auto dir_ptr = blackboard_ptr_->GetDirPtr("test1");
+        auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
+        bool flag = bool_dir_ptr->GetValue();
         if(at_now - begin_ >= ros::Duration(3))
         {
             ROS_INFO("%s is success", name_.c_str());

@@ -9,10 +9,10 @@ WorldBoard::WorldBoard(std::string name)
 {
     auto goods_dir_ptr = std::make_shared<GoodsDir>();
     auto roadblock_dir_ptr = std::make_shared<RoadblockDir>(0);
-    auto robot1_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
-    auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
-    auto robot3_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
-    auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0);
+    auto robot1_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot3_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
     auto a_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
     auto b_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
     auto c_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
@@ -56,7 +56,6 @@ WorldBoard::WorldBoard(std::string name)
     b_shelf_barrier_read_srv_ = nh_.advertiseService("shop/B_shelf_barrier_read", &WorldBoard::BshelfReadCB, this);
     c_shelf_barrier_read_srv_ = nh_.advertiseService("shop/C_shelf_barrier_read", &WorldBoard::CshelfReadCB, this);
     d_shelf_barrier_read_srv_ = nh_.advertiseService("shop/D_shelf_barrier_read", &WorldBoard::DshelfReadCB, this);
-
 }
 
 WorldBoard::~WorldBoard()
@@ -124,7 +123,7 @@ bool WorldBoard::TargetCoordinateWriteCB1(data::Coordinate::Request &req, data::
 {
     auto middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    coordinate_dir_ptr->Set(req.x, req.y);
+    coordinate_dir_ptr->Set(req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -141,7 +140,7 @@ bool WorldBoard::TargetCoordinateWriteCB2(data::Coordinate::Request &req, data::
 {
     auto middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    coordinate_dir_ptr->Set(req.x, req.y);
+    coordinate_dir_ptr->Set(req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -158,7 +157,7 @@ bool WorldBoard::TargetCoordinateWriteCB3(data::Coordinate::Request &req, data::
 {
     auto middle_dirbase_ptr = GetDirPtr("robot3_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    coordinate_dir_ptr->Set(req.x, req.y);
+    coordinate_dir_ptr->Set(req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -175,7 +174,7 @@ bool WorldBoard::TargetCoordinateWriteCB4(data::Coordinate::Request &req, data::
 {
     auto middle_dirbase_ptr = GetDirPtr("robot4_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    coordinate_dir_ptr->Set(req.x, req.y);
+    coordinate_dir_ptr->Set(req.x, req.y, res.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
