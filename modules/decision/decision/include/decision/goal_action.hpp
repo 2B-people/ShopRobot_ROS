@@ -22,7 +22,6 @@ typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 
-
 //行为树专用黑板,
 class PrivateBoard : public Blackboard
 {
@@ -36,8 +35,17 @@ public:
     AddDataIntoWorld("end_flag", end_game);
 
     //各类flag
-    auto bool_flag = std::make_shared<BoolDir>(false);
+    auto robot1_opeing_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot1_opeing_flag", robot1_opeing_flag_ptr);
 
+    auto robot2_opeing_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot2_opeing_flag", robot2_opeing_flag_ptr);
+
+    auto robot3_opeing_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot3_opeing_flag", robot3_opeing_flag_ptr);
+
+    auto robot4_opeing_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot4_opeing_flag", robot4_opeing_flag_ptr);
 
     //局部规划的flag
     auto robot1_local_plan_flag = std::make_shared<BoolDir>(false);
@@ -88,7 +96,6 @@ public:
 
 private:
 };
-
 
 //动作任务发布的对象
 class GoalAction
@@ -200,7 +207,6 @@ public:
     }
   }
 
-
   // @brief 发布发车命令
   // @note 无robot4,robot4为上位机控制
   //TODO 需要写一个回调函数来实现不同车的发出
@@ -232,7 +238,7 @@ public:
     }
   }
 
-  // @brief 紧急停车  
+  // @brief 紧急停车
   void CancelMoveGoal(int8_t robot_num)
   {
     switch (robot_num)

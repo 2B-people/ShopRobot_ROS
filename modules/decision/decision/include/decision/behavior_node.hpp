@@ -10,17 +10,19 @@
 #include <common/rrts.h>
 #include <blackboard/black_board.hpp>
 
-namespace shop {
-namespace decision {
+namespace shop
+{
+namespace decision
+{
 
 //节点的类型
 enum class BehaviorType
 {
-    PARALLEL,       //平行
-    SELECTOR,       //选择
-    SEQUENCE,       //序列
-    ACTION,         //动作
-    PRECONDITION,   //初始
+    PARALLEL,     //平行
+    SELECTOR,     //选择
+    SEQUENCE,     //序列
+    ACTION,       //动作
+    PRECONDITION, //初始
 };
 
 //节点运行状态
@@ -56,7 +58,8 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
                                                           blackboard_ptr_(blackboard_ptr),
                                                           behavior_state_(BehaviorState::IDLE),
                                                           parent_node_ptr_(nullptr)
-    {}
+    {
+    }
     virtual ~BehaviorNode() = default;
 
     //运行函数,封装统一接口
@@ -112,12 +115,12 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
     //父节点指针
     BehaviorNode::Ptr parent_node_ptr_;
 
-  //逻辑
-  virtual BehaviorState Update() = 0;
-  //获取数据和资源,初始化
-  virtual void OnInitialize() = 0;
-  //释放资源
-  virtual void OnTerminate(BehaviorState state) = 0;
+    //逻辑
+    virtual BehaviorState Update() = 0;
+    //获取数据和资源,初始化
+    virtual void OnInitialize() = 0;
+    //释放资源
+    virtual void OnTerminate(BehaviorState state) = 0;
 };
 
 //行为节点，最后的执行机制
@@ -125,9 +128,9 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 class ActionNode : public BehaviorNode
 {
   public:
-    ActionNode(std::string name, const Blackboard::Ptr &blackboard_ptr) :
-     BehaviorNode::BehaviorNode(name, BehaviorType::ACTION, blackboard_ptr)
-    {}
+    ActionNode(std::string name, const Blackboard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, BehaviorType::ACTION, blackboard_ptr)
+    {
+    }
     ~ActionNode() = default;
 
   protected:
@@ -172,7 +175,7 @@ class DecoratorNode : public BehaviorNode
 //   auto jud1_ptr = std::make_shared<shop::decision::PreconditionNode>
 //                       ("jud1_tests", blackboard_ptr,
 //                           action1_ptr,
-//                           [&]() 
+//                           [&]()
 //                           {
 //                              return false;
 //                           },
@@ -191,9 +194,10 @@ class PreconditionNode : public DecoratorNode
                      const BehaviorNode::Ptr &child_node_ptr = nullptr,
                      std::function<bool()> precondition_function = std::function<bool()>(),
                      AbortType abort_type = AbortType::NONE)
-                      : DecoratorNode::DecoratorNode(name, BehaviorType::PRECONDITION, blackboard_ptr, child_node_ptr),
-                            precondition_function_(precondition_function), abort_type_(abort_type)
-    {}
+        : DecoratorNode::DecoratorNode(name, BehaviorType::PRECONDITION, blackboard_ptr, child_node_ptr),
+          precondition_function_(precondition_function), abort_type_(abort_type)
+    {
+    }
     virtual ~PreconditionNode() = default;
     AbortType GetAbortType()
     {
@@ -264,10 +268,10 @@ class PreconditionNode : public DecoratorNode
 class CompositeNode : public BehaviorNode
 {
   public:
-    CompositeNode(std::string name, BehaviorType behavior_type, const Blackboard::Ptr &blackboard_ptr): 
-    BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
-        children_node_index_(0) 
-        {}
+    CompositeNode(std::string name, BehaviorType behavior_type, const Blackboard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
+                                                                                                         children_node_index_(0)
+    {
+    }
     virtual ~CompositeNode() = default;
     // @breif 加入一个子节点
     // @param child_node_ptr：节点指针
@@ -278,9 +282,10 @@ class CompositeNode : public BehaviorNode
     }
     // @breif 加入list节点
     // @param child_node_ptr_list：节点list
-    virtual void AddChildren(std::initializer_list<BehaviorNode::Ptr> child_node_ptr_list){
-        for (auto child_node_ptr = child_node_ptr_list.begin(); 
-                        child_node_ptr!=child_node_ptr_list.end();child_node_ptr++) 
+    virtual void AddChildren(std::initializer_list<BehaviorNode::Ptr> child_node_ptr_list)
+    {
+        for (auto child_node_ptr = child_node_ptr_list.begin();
+             child_node_ptr != child_node_ptr_list.end(); child_node_ptr++)
         {
             children_node_ptr_.push_back(*child_node_ptr);
             (*child_node_ptr)->SetParent(shared_from_this());
@@ -307,7 +312,6 @@ class CompositeNode : public BehaviorNode
     virtual BehaviorState Update() = 0;
     virtual void OnInitialize() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
-
 };
 
 // 选择节点
@@ -315,18 +319,16 @@ class CompositeNode : public BehaviorNode
 class SelectorNode : public CompositeNode
 {
   public:
-    SelectorNode(std::string name, const Blackboard::Ptr &blackboard_ptr) : 
-                CompositeNode::CompositeNode(name, BehaviorType::SELECTOR, blackboard_ptr) 
-    {}
+    SelectorNode(std::string name, const Blackboard::Ptr &blackboard_ptr) : CompositeNode::CompositeNode(name, BehaviorType::SELECTOR, blackboard_ptr)
+    {
+    }
     virtual ~SelectorNode() = default;
     // @breif 加入单个子节点
     // @param child_node_ptr：节点指针
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
         CompositeNode::AddChildren(child_node_ptr);
-        children_node_reevaluation_.push_back(child_node_ptr->GetBehaviorType() == BehaviorType::PRECONDITION
-                         && (std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY 
-                            || std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::BOTH));
+        children_node_reevaluation_.push_back(child_node_ptr->GetBehaviorType() == BehaviorType::PRECONDITION && (std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY || std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::BOTH));
     }
     // @breif 加入多个子节点
     // @param child_node_ptr_list：节点list
@@ -336,9 +338,7 @@ class SelectorNode : public CompositeNode
         //遍历
         for (auto child_node_ptr = child_node_ptr_list.begin(); child_node_ptr != child_node_ptr_list.end(); child_node_ptr++)
         {
-            children_node_reevaluation_.push_back((*child_node_ptr)->GetBehaviorType() == BehaviorType::PRECONDITION 
-            && (std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY 
-            || std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::BOTH));
+            children_node_reevaluation_.push_back((*child_node_ptr)->GetBehaviorType() == BehaviorType::PRECONDITION && (std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY || std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::BOTH));
         }
     }
     void SetChildrenIndex(unsigned int children_node_index)
@@ -348,7 +348,7 @@ class SelectorNode : public CompositeNode
 
   protected:
     std::vector<bool> children_node_reevaluation_;
-    
+
     virtual void OnInitialize()
     {
         children_node_index_ = 0;
@@ -360,7 +360,7 @@ class SelectorNode : public CompositeNode
         {
             return BehaviorState::SUCCESS;
         }
-        //Reevaluation 
+        //Reevaluation
         for (unsigned int index = 0; index < children_node_index_; index++)
         {
             ROS_INFO("Reevaluation");
@@ -420,9 +420,10 @@ class SelectorNode : public CompositeNode
 class SequenceNode : public CompositeNode
 {
   public:
-    SequenceNode(std::string name, const Blackboard::Ptr &blackboard_ptr) :
-                    CompositeNode::CompositeNode(name, BehaviorType::SEQUENCE, blackboard_ptr) 
-    {}
+    SequenceNode(std::string name, const Blackboard::Ptr &blackboard_ptr) 
+        : CompositeNode::CompositeNode(name, BehaviorType::SEQUENCE, blackboard_ptr)
+    {
+    }
     virtual ~SequenceNode() = default;
 
   protected:
@@ -431,7 +432,8 @@ class SequenceNode : public CompositeNode
         children_node_index_ = 0;
         ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
     }
-    virtual BehaviorState update()
+
+    virtual BehaviorState Update()
     {
         if (children_node_ptr_.size() == 0)
         {
@@ -459,7 +461,10 @@ class SequenceNode : public CompositeNode
         {
         case BehaviorState::IDLE:
             ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
-            children_node_ptr_.at(children_node_index_)->Reset();
+            if (children_node_ptr_.size() != 0)
+            {
+                children_node_ptr_.at(children_node_index_)->Reset();
+            }
             break;
         case BehaviorState::SUCCESS:
             ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
@@ -479,11 +484,12 @@ class SequenceNode : public CompositeNode
 class ParallelNode : public CompositeNode
 {
   public:
-    ParallelNode(std::string name, const Blackboard::Ptr &blackboard_ptr,unsigned int threshold) 
-                        : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, blackboard_ptr),
-                            threshold_(threshold),success_count_(0),
-                            failure_count_(0)
-                            {}
+    ParallelNode(std::string name, const Blackboard::Ptr &blackboard_ptr, unsigned int threshold)
+        : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, blackboard_ptr),
+          threshold_(threshold), success_count_(0),
+          failure_count_(0)
+    {
+    }
     virtual ~ParallelNode() = default;
 
   protected:
@@ -517,6 +523,8 @@ class ParallelNode : public CompositeNode
 
                 if (state == BehaviorState::SUCCESS)
                 {
+                    //当成功节点大于预设的节点数时
+                    //平行节点ruturn成功
                     children_node_done_.at(index) = true;
                     if (++success_count_ >= threshold_)
                     {
@@ -567,9 +575,7 @@ bool PreconditionNode::Reevaluation()
 
     // Back Reevaluation
     //检查父节点的存在，父节点的类型是否为选择节点，本身的是否为
-    if (parent_node_ptr_ != nullptr 
-            && parent_node_ptr_->GetBehaviorType() == BehaviorType::SELECTOR 
-                 && (abort_type_ == AbortType::LOW_PRIORITY || abort_type_ == AbortType::BOTH))
+    if (parent_node_ptr_ != nullptr && parent_node_ptr_->GetBehaviorType() == BehaviorType::SELECTOR && (abort_type_ == AbortType::LOW_PRIORITY || abort_type_ == AbortType::BOTH))
     {
         auto parent_selector_node_ptr = std::dynamic_pointer_cast<SelectorNode>(parent_node_ptr_);
 
@@ -577,7 +583,7 @@ bool PreconditionNode::Reevaluation()
         auto iter_in_parent = std::find(parent_children.begin(), parent_children.end(), shared_from_this());
         if (iter_in_parent == parent_children.end())
         {
-            ROS_ERROR_STREAM ("Can't find current node in parent!") ;
+            ROS_ERROR_STREAM("Can't find current node in parent!");
             return false;
         }
         unsigned int index_in_parent = iter_in_parent - parent_children.begin();
@@ -598,8 +604,7 @@ bool PreconditionNode::Reevaluation()
         }
     }
     // Self Reevaluation本身的评估
-    if (abort_type_ == AbortType::SELF || abort_type_ == AbortType::BOTH 
-            || child_node_ptr_->GetBehaviorState() != BehaviorState::RUNNING)
+    if (abort_type_ == AbortType::SELF || abort_type_ == AbortType::BOTH || child_node_ptr_->GetBehaviorState() != BehaviorState::RUNNING)
     {
         if (!Precondition())
         {
@@ -608,7 +613,6 @@ bool PreconditionNode::Reevaluation()
     }
     return true;
 }
-
 
 } // namespace decision
 } // namespace shop

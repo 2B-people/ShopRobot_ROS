@@ -22,6 +22,7 @@ public:
         robot_num_(robot_num),
         goalaction_ptr_(goalaction_ptr)
   {
+    coordinate_key_ = "robot" + std::to_string(robot_num_) + "/run_coordinate";
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~MoveAction() = default;
@@ -36,7 +37,6 @@ private:
     BehaviorState state = goalaction_ptr_->GetMoveBehaviorState(robot_num_);
     //key键的str
     std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
-    std::string coordinate_key = "robot" + std::to_string(robot_num_) + "/run_coordinate";
     if (state != BehaviorState::RUNNING)
     {
       // if (private_blackboard_ptr_->GetBoolValue(bool_key))
@@ -53,23 +53,33 @@ private:
       //   ROS_INFO("%d is wait for local plan", robot_num_);
       // }
 
-      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key);
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
       auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
       uint16_t target_x = dir_ptr->GetCoordinateX();
       uint16_t target_y = dir_ptr->GetCoordinateY();
       uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
-      goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
+      if (target_x != 0 && target_y != 0 && target_pose != 0)
+      {
+        goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
+      }
     }
     return goalaction_ptr_->GetMoveBehaviorState(robot_num_);
   }
 
+  //结束是把对应目标坐标清零
   virtual void OnTerminate(BehaviorState state)
   {
+    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
+    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+
+    dir_ptr->OpenLock();
+    dir_ptr->Set(0, 0, 0);
+
     switch (state)
     {
     case BehaviorState::IDLE:
       ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
-      goalaction_ptr_->CancelMoveGoal(robot_num_);
+      //goalaction_ptr_->CancelMoveGoal(robot_num_);
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
@@ -84,6 +94,7 @@ private:
   }
 
   int8_t robot_num_;
+  std::string coordinate_key_;
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
@@ -127,7 +138,7 @@ private:
     {
     case BehaviorState::IDLE:
       ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
-      goalaction_ptr_->CancelShopGoal(robot_num_);
+      // goalaction_ptr_->CancelShopGoal(robot_num_);
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
@@ -179,7 +190,7 @@ private:
     {
     case BehaviorState::IDLE:
       ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
-      goalaction_ptr_->CancelShopGoal(robot_num_);
+      // goalaction_ptr_->CancelShopGoal(robot_num_);
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
