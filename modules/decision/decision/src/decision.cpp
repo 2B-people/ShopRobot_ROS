@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     auto robot_ptr = std::make_shared<shop::decision::SequenceNode>("game", blackboard_ptr);
     robot_ptr->AddChildren(opening_ptr);
-    // robot_ptr->AddChildren(carry_ptr);
+    robot_ptr->AddChildren(carry_ptr);
 
     auto end_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("end_judge", blackboard_ptr,
                                                                             robot_ptr,

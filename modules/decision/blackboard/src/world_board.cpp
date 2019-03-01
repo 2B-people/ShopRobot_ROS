@@ -258,6 +258,7 @@ bool WorldBoard::AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
 {
     auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->OpenLock();        
     good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
     {
@@ -275,6 +276,7 @@ bool WorldBoard::BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
 {
     auto middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->OpenLock();
     good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
     {
@@ -292,6 +294,7 @@ bool WorldBoard::CshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
 {
     auto middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->OpenLock();    
     good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
     {
@@ -309,6 +312,7 @@ bool WorldBoard::DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
 {
     auto middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    good_shelf_dir_ptr->OpenLock();    
     good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
     {

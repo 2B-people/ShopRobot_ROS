@@ -107,6 +107,7 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
     //example:
     // bool GetBoolValue(std::string key)
     // {
+  ros::NodeHandle nh;
     //     auto dir_ptr = GetDirPtr(key);
     //     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
     //     return bool_dir_ptr->GetValue();
