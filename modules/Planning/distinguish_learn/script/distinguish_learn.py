@@ -15,14 +15,12 @@ from data.msg import
 from data.msg import 
 
 class DetectionNode(object):
-    def __init__(self)
+    def __init__(self):
+        self.detection = main_detection.Object_D()
+
 
 if __name__ == '__main__':
     rospy.init_node("detection_node")
 
     server = CameraNode(url,path,writ_time)
     rospy.spin()
-
-aa = main_detection.Object_D()
-
-box = aa.run_image(2)
