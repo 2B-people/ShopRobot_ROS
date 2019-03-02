@@ -1,10 +1,11 @@
 import cv2
-
+import os
+path = os.path.realpath(__file__)
+path = path[:-36] + '/planning/distinguish_learn/shopping_detection/shopping_images'
 
 class Camera(object):
-    def __init__(self, url,path,delay_time):
+    def __init__(self, url,delay_time):
         self.url = url
-        self.path = path
         self.delay_time = delay_time
 
     def open_camera(self):
@@ -30,9 +31,9 @@ class Camera(object):
             success, image = capture.read()
             cv2.imshow("photo", image)
             count = count + 1
-            if count == delay_time:
+            if count == self.delay_time:
                 name = str(num)
-                cv2.imwrite(path + name + '.jpg', image)
+                cv2.imwrite(path+'/image' + name + '.jpg', image)
                 break
             cv2.waitKey(1)
         capture.release()
@@ -41,5 +42,5 @@ class Camera(object):
 
 if __name__ == '__main__':
     url = "http://admin:admin@192.168.31.102:8081/"
-    aa = Camera(url)
+    aa = Camera(url, 10)
     aa.get_photo(1)

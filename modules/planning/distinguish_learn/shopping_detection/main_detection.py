@@ -6,11 +6,15 @@ import tensorflow as tf
 from PIL import Image
 from utils import ops as utils_ops
 import time
-
+import os
+import os
+path = os.path.realpath(__file__)
+path_model = path[:-17] + '/ssd'
+path_image = path[:-17] + '/shopping_images'
 
 class Object_D(object):
     def __init__(self):
-        self.MODEL_NAME = '/home/nqq09/Shop_robot_WS/src/ShopRobot_ROS/modules/Planning/distinguish_learn/shopping_detection/model'
+        self.MODEL_NAME = path_model
         self.PATH_TO_FROZEN_GRAPH = self.MODEL_NAME + '/frozen_inference_graph.pb'
 
         self.detection_graph = tf.Graph()
@@ -96,7 +100,7 @@ class Object_D(object):
     def run_image(self, num):
         name = str(num)
         boxes = []
-        image = Image.open('/home/nqq09/Shop_robot_WS/src/ShopRobot_ROS/modules/Planning/distinguish_learn/shopping_detection/shopping_images/image' + name + '.jpg')
+        image = Image.open(path_image + '/image' + name + '.jpg')
         # image = Image.open('shopping_images/image1.jpg')
         image_np = self.load_image_into_numpy_array(image)
         output_dict = self.run_inference_for_single_image(image_np, self.detection_graph)
