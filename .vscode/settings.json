@@ -27,5 +27,6 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp"
-    }
+    },
+    "python.pythonPath": "/usr/bin/python"
 }
