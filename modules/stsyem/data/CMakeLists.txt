@@ -36,8 +36,7 @@ add_action_files(FILES
                       Identify.action
                       TakePhoto.action
                       Opening.action
-
-
+                      Camera.action
 )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)

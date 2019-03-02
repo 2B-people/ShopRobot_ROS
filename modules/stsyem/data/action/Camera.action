@@ -1,0 +1,5 @@
+int8 number
+---
+bool success_flag
+---
+int8 progress

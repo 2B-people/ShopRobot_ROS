@@ -9,7 +9,7 @@ using namespace shop::decision;
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "decision");
-    auto blackboard_ptr = std::make_shared<PrivateBoard>();
+    auto blackboard_ptr = std::make_shared<PrivateBoard>(); 
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr);
 
     //decision
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     opening_ptr->AddChildren(robot1_opening_judge_ptr);
     opening_ptr->AddChildren(robot2_opening_judge_ptr);
     opening_ptr->AddChildren(robot3_opening_judge_ptr);
-    opening_ptr->AddChildren(robot4_opening_judge_ptr);
+    opening_ptr->AddChildren(robot4_opening_behavior_ptr);
     //TODO opening_ptr->AddChildren(distinguish_ptr);
 
     //TODO 抓取

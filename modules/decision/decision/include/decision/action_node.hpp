@@ -16,14 +16,15 @@ namespace decision
 class MoveAction : public ActionNode
 {
 public:
-  MoveAction(int8_t robot_num, std::string name, const Blackboard::Ptr &blackboard_ptr,
+  MoveAction(int8_t robot_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
              const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         robot_num_(robot_num),
-        goalaction_ptr_(goalaction_ptr)
+        goalaction_ptr_(goalaction_ptr),
+        private_blackboard_ptr_(blackboard_ptr)
   {
     coordinate_key_ = "robot" + std::to_string(robot_num_) + "/run_coordinate";
-    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
+    // auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~MoveAction() = default;
 
@@ -103,13 +104,13 @@ private:
 class ShopAction : public ActionNode
 {
 public:
-  ShopAction(uint8_t robot_num, std::string name, const Blackboard::Ptr &blackboard_ptr,
+  ShopAction(uint8_t robot_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
              const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         robot_num_(robot_num),
-        goalaction_ptr_(goalaction_ptr)
+        goalaction_ptr_(goalaction_ptr),
+        private_blackboard_ptr_(blackboard_ptr)
   {
-    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
   ~ShopAction() = default;
 
@@ -127,6 +128,10 @@ private:
       auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(name_key);
       auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
       std::string goal_name = dir_ptr->GetActionName();
+      if (goal_name != "") {
+        /* code */
+      }
+      
       goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
     }
     return goalaction_ptr_->GetShopBehaviorState(robot_num_);
