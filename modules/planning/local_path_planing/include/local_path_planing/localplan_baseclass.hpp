@@ -64,6 +64,11 @@ public:
     robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
     robot3_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
     robot4_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_write");
+
+    robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
+    robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
+    robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
+    robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
   }
 
   virtual ~LocalBase() = default;
@@ -71,9 +76,8 @@ public:
   virtual void PlanPlace(uint8_t robot_num) = 0;
   virtual void PlanCarry(uint8_t robot_num) = 0;
 
-
-// auto now = GetNowCoord(1);
-// x = now.x;
+  // auto now = GetNowCoord(1);
+  // x = now.x;
   data::Coord GetNowCoord(uint8_t robot_num)
   {
     switch (robot_num)
@@ -222,6 +226,30 @@ public:
     }
   }
 
+  void SetRobotTargetAction(int8_t robot_num, std::string action_name)
+  {
+    data::AcionName srv;
+    srv.request.action_name = action_name;
+    switch (robot_num)
+    {
+    case 1:
+      robot1_target_actionname_write_clt_.call(srv);
+      break;
+    case 2:
+      robot2_target_actionname_write_clt_.call(srv);
+      break;
+    case 3:
+      robot3_target_actionname_write_clt_.call(srv);
+      break;
+    case 4:
+      robot4_target_actionname_write_clt_.call(srv);
+      break;
+    default:
+      ROS_ERROR("%s no robot in %s ", name_.c_str(), __FUNCTION__);
+      break;
+    }
+  }
+
 protected:
   data::Coord robot1_coord_now_;
   data::Coord robot2_coord_now_;
@@ -233,18 +261,27 @@ protected:
   ros::Subscriber robot2_coordinate_now_;
   ros::Subscriber robot3_coordinate_now_;
   ros::Subscriber robot4_coordinate_now_;
+
   ros::ServiceClient goods_write_clt_;
   ros::ServiceClient goods_read_clt_;
   ros::ServiceClient roadblock_read_clt_;
+
   ros::ServiceClient target_coordinate_lock_clt_;
   ros::ServiceClient robot1_target_coordinate_write_clt_;
   ros::ServiceClient robot2_target_coordinate_write_clt_;
   ros::ServiceClient robot3_target_coordinate_write_clt_;
   ros::ServiceClient robot4_target_coordinate_write_clt_;
+
+  ros::ServiceClient robot1_target_actionname_write_clt_;
+  ros::ServiceClient robot2_target_actionname_write_clt_;
+  ros::ServiceClient robot3_target_actionname_write_clt_;
+  ros::ServiceClient robot4_target_actionname_write_clt_;
+
   ros::ServiceClient a_shelf_barrier_write_clt_;
   ros::ServiceClient b_shelf_barrier_write_clt_;
   ros::ServiceClient c_shelf_barrier_write_clt_;
   ros::ServiceClient d_shelf_barrier_write_clt_;
+
   ros::ServiceClient a_shelf_barrier_read_clt_;
   ros::ServiceClient b_shelf_barrier_read_clt_;
   ros::ServiceClient c_shelf_barrier_read_clt_;

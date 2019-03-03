@@ -89,6 +89,7 @@ private:
   bool TargetCoordinateReadCB3(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateReadCB4(data::Coordinate::Request &req, data::Coordinate::Response &res);
 
+  //目标动作
   bool TargetActionNameWriteCB1(data::ActionName::Request &req, data::ActionName::Response &res);
   bool TargetActionNameWriteCB2(data::ActionName::Request &req, data::ActionName::Response &res);
   bool TargetActionNameWriteCB3(data::ActionName::Request &req, data::ActionName::Response &res);

@@ -62,10 +62,10 @@ WorldBoard::WorldBoard(std::string name)
     robot2_target_actionname_write_srv_ = nh_.advertiseService("shop/robot2/target_actionname_write", &WorldBoard::TargetActionNameWriteCB2, this);
     robot3_target_actionname_write_srv_ = nh_.advertiseService("shop/robot3/target_actionname_write", &WorldBoard::TargetActionNameWriteCB3, this);
     robot4_target_actionname_write_srv_ = nh_.advertiseService("shop/robot4/target_actionname_write", &WorldBoard::TargetActionNameWriteCB4, this);
-    robot1_target_actionname_read_srv_ = nh_.advertiseService("shop/robot1/target_actionname_read", &WorldBoard::TargetActioinNameReadCB1, this);
-    robot2_target_actionname_read_srv_ = nh_.advertiseService("shop/robot2/target_actionname_read", &WorldBoard::TargetActioinNameReadCB2, this);
-    robot3_target_actionname_read_srv_ = nh_.advertiseService("shop/robot3/target_actionname_read", &WorldBoard::TargetActioinNameReadCB3, this);
-    robot4_target_actionname_read_srv_ = nh_.advertiseService("shop/robot4/target_actionname_read", &WorldBoard::TargetActioinNameReadCB4, this);
+    robot1_target_actionname_read_srv_ = nh_.advertiseService("shop/robot1/target_actionname_read", &WorldBoard::TargetActionNameReadCB1, this);
+    robot2_target_actionname_read_srv_ = nh_.advertiseService("shop/robot2/target_actionname_read", &WorldBoard::TargetActionNameReadCB2, this);
+    robot3_target_actionname_read_srv_ = nh_.advertiseService("shop/robot3/target_actionname_read", &WorldBoard::TargetActionNameReadCB3, this);
+    robot4_target_actionname_read_srv_ = nh_.advertiseService("shop/robot4/target_actionname_read", &WorldBoard::TargetActionNameReadCB4, this);
 
     // good shelf barrier
     AddDataIntoWorld("A_shelf_barrier", a_shelf_barrier_dir_ptr);
@@ -452,8 +452,34 @@ bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::
     res.success_flag;
     return true;
 }
-
-
+bool WorldBoard::TargetActionNameReadCB1(data::ActionName::Request &req, data::ActionName::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
+    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    res.action_name = action_dir_ptr->GetActionName();
+    return true;
+}
+bool WorldBoard::TargetActionNameReadCB2(data::ActionName::Request &req, data::ActionName::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
+    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    res.action_name = action_dir_ptr->GetActionName();
+    return true;
+}
+bool WorldBoard::TargetActionNameReadCB3(data::ActionName::Request &req, data::ActionName::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
+    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    res.action_name = action_dir_ptr->GetActionName();
+    return true;
+}
+bool WorldBoard::TargetActionNameReadCB4(data::ActionName::Request &req, data::ActionName::Response &res)
+{
+    auto middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
+    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    res.action_name = action_dir_ptr->GetActionName();
+    return true;
+}
 
 } // namespace decision
 } // namespace shop

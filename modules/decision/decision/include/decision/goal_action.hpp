@@ -22,6 +22,7 @@ typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 
+
 //行为树专用黑板,
 class PrivateBoard : public Blackboard
 {
@@ -67,15 +68,17 @@ public:
     AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
     AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
 
+
+    //@breif 写在全局黑板中了
     //目标动作
-    auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
-    AddDataIntoWorld("robot1/action_name", robot1_action_name);
-    AddDataIntoWorld("robot2/action_name", robot2_action_name);
-    AddDataIntoWorld("robot3/action_name", robot3_action_name);
-    AddDataIntoWorld("robot4/action_name", robot4_action_name);
+    // auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
+    // auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
+    // auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
+    // auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
+    // AddDataIntoWorld("robot1/action_name", robot1_action_name);
+    // AddDataIntoWorld("robot2/action_name", robot2_action_name);
+    // AddDataIntoWorld("robot3/action_name", robot3_action_name);
+    // AddDataIntoWorld("robot4/action_name", robot4_action_name);
   }
   ~PrivateBoard() = default;
 
