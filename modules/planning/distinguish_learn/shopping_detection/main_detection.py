@@ -9,7 +9,7 @@ import time
 import os
 import os
 path = os.path.realpath(__file__)
-path_model = path[:-17] + '/ssd'
+path_model = path[:-17] + '/model'
 path_image = path[:-17] + '/shopping_images'
 
 class Object_D(object):

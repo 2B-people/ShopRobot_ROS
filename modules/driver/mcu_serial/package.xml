@@ -1,4 +1,4 @@
-<!-- <?xml version="1.0"?>
+<?xml version="1.0"?>
 <package format="2">
   <name>mcu_serial</name>
   <version>0.0.0</version>
@@ -33,4 +33,4 @@
     <!-- Other tools can request additional information be placed here -->
 
   </export>
-</package> -->
+</package>

@@ -48,6 +48,7 @@ enum class AbortType
 };
 
 //行为节点，核心
+
 class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 {
   public:
