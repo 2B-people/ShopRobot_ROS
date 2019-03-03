@@ -23,6 +23,7 @@ add_message_files(DIRECTORY msg
 
 add_service_files(FILES
                       Goods.srv
+                      ActionName.srv
                       SetBool.srv                      
                       Roadblock.srv
                       Coordinate.srv
@@ -37,6 +38,7 @@ add_action_files(FILES
                       TakePhoto.action
                       Opening.action
                       Camera.action
+                      Detection.action
 )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)

@@ -8,15 +8,16 @@ from utils import ops as utils_ops
 import time
 import os
 import os
-path = os.path.realpath(__file__)
-path_model = path[:-17] + '/model'
-path_image = path[:-17] + '/shopping_images'
+
 
 class Object_D(object):
     def __init__(self):
+        path = os.path.realpath(__file__)
+        path_model = path[:-17] + '/model'
+        self.path_image = path[:-17] + '/shopping_images'
         self.MODEL_NAME = path_model
         self.PATH_TO_FROZEN_GRAPH = self.MODEL_NAME + '/frozen_inference_graph.pb'
-
+        
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
@@ -100,7 +101,7 @@ class Object_D(object):
     def run_image(self, num):
         name = str(num)
         boxes = []
-        image = Image.open(path_image + '/image' + name + '.jpg')
+        image = Image.open(self.path_image + '/image' + name + '.jpg')
         # image = Image.open('shopping_images/image1.jpg')
         image_np = self.load_image_into_numpy_array(image)
         output_dict = self.run_inference_for_single_image(image_np, self.detection_graph)
@@ -116,6 +117,9 @@ if __name__ == '__main__':
     a = Object_D()
     # image1 = Image.open('test_images/image1.jpg')
     box = a.run_image(1)
+    # print box[0]
+    # print box[1]
+    print box['classes'][1]
     print box
 
 

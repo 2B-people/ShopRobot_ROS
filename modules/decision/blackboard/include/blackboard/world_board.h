@@ -11,6 +11,7 @@
 #include <common/main_interface.h>
 #include <data/SetBool.h>
 #include <data/Goods.h>
+#include <data/ActionName.h>
 #include <data/Roadblock.h>
 #include <data/Coordinate.h>
 #include <data/ShelfBarrier.h>
@@ -33,8 +34,10 @@ private:
   //server 服务
   ros::ServiceServer goods_write_srv_;
   ros::ServiceServer goods_read_srv_;
+
   ros::ServiceServer roadblock_write_srv_;
   ros::ServiceServer roadblock_read_srv_;
+
   ros::ServiceServer target_coordinate_lock_srv_;
   ros::ServiceServer robot1_target_coordinate_write_srv_;
   ros::ServiceServer robot2_target_coordinate_write_srv_;
@@ -44,6 +47,16 @@ private:
   ros::ServiceServer robot2_target_coordinate_read_srv_;
   ros::ServiceServer robot3_target_coordinate_read_srv_;
   ros::ServiceServer robot4_target_coordinate_read_srv_;
+
+  ros::ServiceServer robot1_target_actionname_write_srv_;
+  ros::ServiceServer robot2_target_actionname_write_srv_;
+  ros::ServiceServer robot3_target_actionname_write_srv_;
+  ros::ServiceServer robot4_target_actionname_write_srv_;
+  ros::ServiceServer robot1_target_actionname_read_srv_;
+  ros::ServiceServer robot2_target_actionname_read_srv_;
+  ros::ServiceServer robot3_target_actionname_read_srv_;
+  ros::ServiceServer robot4_target_actionname_read_srv_;
+
   ros::ServiceServer a_shelf_barrier_write_srv_;
   ros::ServiceServer a_shelf_barrier_read_srv_;
   ros::ServiceServer b_shelf_barrier_write_srv_;
@@ -52,6 +65,8 @@ private:
   ros::ServiceServer c_shelf_barrier_read_srv_;
   ros::ServiceServer d_shelf_barrier_write_srv_;
   ros::ServiceServer d_shelf_barrier_read_srv_;
+
+  bool debug_;
 
   //货物读写服务
   bool GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &res);
@@ -73,6 +88,17 @@ private:
   bool TargetCoordinateReadCB2(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateReadCB3(data::Coordinate::Request &req, data::Coordinate::Response &res);
   bool TargetCoordinateReadCB4(data::Coordinate::Request &req, data::Coordinate::Response &res);
+
+  bool TargetActionNameWriteCB1(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameWriteCB2(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameWriteCB3(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameWriteCB4(data::ActionName::Request &req, data::ActionName::Response &res);
+ 
+  bool TargetActionNameReadCB1(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameReadCB2(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameReadCB3(data::ActionName::Request &req, data::ActionName::Response &res);
+  bool TargetActionNameReadCB4(data::ActionName::Request &req, data::ActionName::Response &res);
+  
 
   //货架障碍物读写服务
   bool AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);

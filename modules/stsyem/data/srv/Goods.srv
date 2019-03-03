@@ -1,5 +1,5 @@
 int8 location
-int32 grade
+float64 grade
 int8 name
 ---
 bool success_flag

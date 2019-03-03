@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 #coding=utf-8
 
-# from open_camera import *
 import rospy
 import actionlib
 
