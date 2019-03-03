@@ -68,6 +68,12 @@ public:
 
   virtual ~LocalBase() = default;
 
+  virtual void PlanPlace(uint8_t robot_num) = 0;
+  virtual void PlanCarry(uint8_t robot_num) = 0;
+
+
+// auto now = GetNowCoord(1);
+// x = now.x;
   data::Coord GetNowCoord(uint8_t robot_num)
   {
     switch (robot_num)
