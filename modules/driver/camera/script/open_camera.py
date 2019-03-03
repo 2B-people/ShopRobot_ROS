@@ -1,10 +1,10 @@
 import cv2
 import os
-path = os.path.realpath(__file__)
-path = path[:-36] + '/planning/distinguish_learn/shopping_detection/shopping_images'
 
 class Camera(object):
     def __init__(self, url,delay_time):
+        path = os.path.realpath(__file__)
+        self.path = path[:-36] + '/planning/distinguish_learn/shopping_detection/shopping_images'
         self.url = url
         self.delay_time = delay_time
 
@@ -33,7 +33,7 @@ class Camera(object):
             count = count + 1
             if count == self.delay_time:
                 name = str(num)
-                cv2.imwrite(path+'/image' + name + '.jpg', image)
+                cv2.imwrite(self.path+'/image' + name + '.jpg', image)
                 break
             cv2.waitKey(1)
         capture.release()

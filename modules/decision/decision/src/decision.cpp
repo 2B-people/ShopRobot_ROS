@@ -9,7 +9,7 @@ using namespace shop::decision;
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "decision");
-    auto blackboard_ptr = std::make_shared<PrivateBoard>(); 
+    auto blackboard_ptr = std::make_shared<PrivateBoard>();
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr);
 
     //decision
@@ -29,8 +29,8 @@ int main(int argc, char **argv)
     auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop", blackboard_ptr, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop", blackboard_ptr, goal_action_ptr);
 
-    // TODO auto photo_ptr = std::make_shared<shop::decision::>("photo ",blackboard_ptr,goal_action_ptr);
-    // TODO auto distinguish_ptr = std::make_shared<shop::decision::>("distinguish",blackboard_ptr,goal_action_ptr);
+    auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr, goal_action_ptr);
+    auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish",blackboard_ptr,goal_action_ptr);
 
     // TODO auto global_plan = std::make_shared<shop::decision::>("global plan",blackboard_ptr,goal_action_ptr);
     // TODO auto local_plan = std::make_shared<shop::decision::>("local plan",blackboard_ptr,goal_action_ptr);
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     //车4为识别车,由上位机直接控制,此时两种行为,移动和拍照
     auto robot4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 opening", blackboard_ptr);
     robot4_opening_behavior_ptr->AddChildren(robot4_move_ptr);
-    //TODO robot4_opening_behavior_ptr->AddChildren(photo_ptr);
+    robot4_opening_behavior_ptr->AddChildren(photo_ptr);
 
     auto robot1_opening_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 opeing judge", blackboard_ptr,
                                                                                        robot1_opening_ptr,
@@ -68,12 +68,19 @@ int main(int argc, char **argv)
                                                                                        },
                                                                                        shop::decision::AbortType::LOW_PRIORITY);
 
+    auto distinguish_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("distinguish judge",blackboard_ptr,
+                                                                                    distinguish_ptr,
+                                                                                    [&](){
+                                                                                        return blackboard_ptr->GetBoolValue("photo_is_ture_flag");
+                                                                                    },
+                                                                                    shop::decision::AbortType::LOW_PRIORITY);
+
     auto opening_ptr = std::make_shared<shop::decision::ParallelNode>("opening", blackboard_ptr, /*此决定了成功几个子节点此节点成功*/ 5);
     opening_ptr->AddChildren(robot1_opening_judge_ptr);
     opening_ptr->AddChildren(robot2_opening_judge_ptr);
     opening_ptr->AddChildren(robot3_opening_judge_ptr);
     opening_ptr->AddChildren(robot4_opening_behavior_ptr);
-    //TODO opening_ptr->AddChildren(distinguish_ptr);
+    opening_ptr->AddChildren(distinguish_judge_ptr);
 
     //TODO 抓取
     auto carry_ptr = std::make_shared<shop::decision::ParallelNode>("carrying", blackboard_ptr, 4);

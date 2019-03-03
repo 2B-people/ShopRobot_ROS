@@ -34,8 +34,6 @@ add_action_files(FILES
                       Test.action
                       ShopAction.action
                       Move.action
-                      Identify.action
-                      TakePhoto.action
                       Opening.action
                       Camera.action
                       Detection.action

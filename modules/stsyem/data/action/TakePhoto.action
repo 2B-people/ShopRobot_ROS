@@ -1,6 +1,0 @@
-bool start_flag
-int8 num
----
-bool success_flag
----
-int8 done_num
