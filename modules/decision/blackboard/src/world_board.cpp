@@ -427,7 +427,7 @@ bool WorldBoard::TargetActionNameWriteCB1(data::ActionName::Request &req, data::
 
 bool WorldBoard::TargetActionNameWriteCB2(data::ActionName::Request &req, data::ActionName::Response &res)
 {
-    auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
+    auto middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
@@ -436,7 +436,7 @@ bool WorldBoard::TargetActionNameWriteCB2(data::ActionName::Request &req, data::
 }
 bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::ActionName::Response &res)
 {
-    auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
+    auto middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
@@ -445,7 +445,7 @@ bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::
 }
 bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::ActionName::Response &res)
 {
-    auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
+    auto middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
