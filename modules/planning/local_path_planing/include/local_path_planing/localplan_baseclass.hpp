@@ -15,6 +15,7 @@
 #include <data/Roadblock.h>
 #include <data/Coordinate.h>
 #include <data/ShelfBarrier.h>
+#include <data/ActionName.h>
 
 namespace shop
 {
@@ -69,6 +70,11 @@ public:
     robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
     robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
     robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
+
+    robot1_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_read");
+    robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
+    robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
+    robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
   }
 
   virtual ~LocalBase() = default;
@@ -227,7 +233,7 @@ public:
 
   void SetRobotTargetAction(int8_t robot_num, std::string action_name)
   {
-    data::AcionName srv;
+    data::ActionName srv;
     srv.request.action_name = action_name;
     switch (robot_num)
     {
@@ -246,6 +252,49 @@ public:
     default:
       ROS_ERROR("%s no robot in %s ", name_.c_str(), __FUNCTION__);
       break;
+    }
+  }
+
+  int8_t GetNowToShelf(int8_t robot_num)
+  {
+    data::ActionName srv;
+    switch (robot_num)
+    {
+    case 1:
+      robot1_target_actionname_read_clt_.call(srv);
+      break;
+    case 2:
+      robot2_target_actionname_read_clt_.call(srv);
+      break;
+    case 3:
+      robot3_target_actionname_read_clt_.call(srv);
+      break;
+    case 4:
+      robot4_target_actionname_read_clt_.call(srv);
+      break;
+    default:
+      ROS_ERROR("%s no robot in %s ", name_.c_str(), __FUNCTION__);
+      break;
+    }
+    std::string action_name = srv.response.action_name;
+    //eg action_name is "catch-1"
+    std::string temp = action_name.erase(0, 6);
+    int num = stoi(temp);
+    if (num == 1 || num == 2 || num == 3)
+    {
+      return 1;//A
+    }
+    else if (num == 4 || num == 5 || num == 6)
+    {
+      return 2;//B
+    }
+    else if (num == 7 || num == 8 || num == 9)
+    {
+      return 3;//C
+    }
+    else if (num == 10 || num == 11 || num == 12)
+    {
+      return 4;//D
     }
   }
 
@@ -275,6 +324,11 @@ protected:
   ros::ServiceClient robot2_target_actionname_write_clt_;
   ros::ServiceClient robot3_target_actionname_write_clt_;
   ros::ServiceClient robot4_target_actionname_write_clt_;
+
+  ros::ServiceClient robot1_target_actionname_read_clt_;
+  ros::ServiceClient robot2_target_actionname_read_clt_;
+  ros::ServiceClient robot3_target_actionname_read_clt_;
+  ros::ServiceClient robot4_target_actionname_read_clt_;
 
   ros::ServiceClient a_shelf_barrier_write_clt_;
   ros::ServiceClient b_shelf_barrier_write_clt_;
