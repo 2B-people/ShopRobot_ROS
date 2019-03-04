@@ -32,30 +32,15 @@ public:
         vector<Coord> determined_location;
         vector<int> determined_action;
         int final_x, final_y;
-        int final_distance;
+        int final_distance, final_action;
 
-        int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-
-        int distance[num_x][num_y];
-        for(int i; i<num_x; i++)
-            for(int j; j<num_y; j++)
-                distance[i][j] = INF;
 
         auto goal_shelf = GetNowToShelf(robot_num);
         GetShelfBarrier(shelves, goal_shelf);
 
-        for(int i=0; i<12; i=i+2)
+        for(int i=1; i<12; i=i+2)
         {
-            if(shelves[i] == false || shelves[i+1] == false)
+            if(shelves[i-1] == false || shelves[i] == false)
             {
                 if(goal_shelf == 1)
                 {
@@ -63,42 +48,42 @@ public:
                     {
                         case 1:
                             determined_location.push_back(Coord(5, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
                             break;
                         case 3:
                             determined_location.push_back(Coord(4, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
                             break;
                         case 5:
                             determined_location.push_back(Coord(3, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
                             break;
                         case 7:
                             determined_location.push_back(Coord(2, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
                             break;
                         case 9:
                             determined_location.push_back(Coord(1, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
                             break;
                         case 11:
                             determined_location.push_back(Coord(0, 0));
-                            if(shelves[i] == false)
+                            if(shelves[i-1] == false)
                                 determined_action.push_back(1);
                             else
                                 determined_action.push_back(2);
@@ -114,21 +99,45 @@ public:
                     {
                         case 1:
                             determined_location.push_back(Coord(9, 5));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 3:
                             determined_location.push_back(Coord(9, 4));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 5:
                             determined_location.push_back(Coord(9, 3));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 7:
                             determined_location.push_back(Coord(9, 2));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 9:
                             determined_location.push_back(Coord(9, 1));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 11:
                             determined_location.push_back(Coord(9, 0));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         default:
                             break;
@@ -141,21 +150,45 @@ public:
                     {
                         case 1:
                             determined_location.push_back(Coord(4, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 3:
                             determined_location.push_back(Coord(5, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 5:
                             determined_location.push_back(Coord(6, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 7:
                             determined_location.push_back(Coord(7, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 9:
                             determined_location.push_back(Coord(8, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 11:
                             determined_location.push_back(Coord(9, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         default:
                             break;
@@ -168,21 +201,45 @@ public:
                     {
                         case 1:
                             determined_location.push_back(Coord(0, 4));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 3:
                             determined_location.push_back(Coord(0, 5));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 5:
                             determined_location.push_back(Coord(0, 6));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 7:
                             determined_location.push_back(Coord(0, 7));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 9:
                             determined_location.push_back(Coord(0, 8));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         case 11:
                             determined_location.push_back(Coord(0, 9));
+                            if(shelves[i-1] == false)
+                                determined_action.push_back(1);
+                            else
+                                determined_action.push_back(2);
                             break;
                         default:
                             break;
@@ -205,59 +262,115 @@ public:
             end_x = location.first;
             end_y = location.second;
             final_distance = 999;
-            int temp_map[num_x][num_y] = map;
-            int temp_distance[num_x][num_y] = distance;
+            
+            int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+            int distance[num_x][num_y];
+            for(int i; i<num_x; i++)
+                for(int j; j<num_y; j++)
+                    distance[i][j] = INF;
 
             while(que.size())
             {
                 Coord get_coord = que.front();
                 que.pop();
 
-                int i = 0;
-                for(i=0; i<4; i++)
+                int j = 0;
+                for(j=0; j<4; j++)
                 {
-                    int now_x = get_coord.first() + move_x[i];
-                    int now_y = get_coord.second() + move_y[i];
+                    int now_x = get_coord.first() + move_x[j];
+                    int now_y = get_coord.second() + move_y[j];
 
-                    if(0 <= now_x && now_x < num_x && 0 <= now_y && now_y < num_y && temp_map[now_x][now_y] != 1 && distance[now_x][now_y] == INF)
+                    if(0 <= now_x && now_x < num_x && 0 <= now_y && now_y < num_y && map[now_x][now_y] != 1 && distance[now_x][now_y] == INF)
                     {
                         que.push(Coord(now_x, now_y));
-                        temp_distance[now_x][now_y] = temp_distance[get_coord.first][get_coord.second] + 1;
+                        distance[now_x][now_y] = distance[get_coord.first][get_coord.second] + 1;
                         if(now_x == end_x && now_y == end_y)
                         {
-                            if(temp_distance[end_x][end_y] < final_distance)
+                            if(distance[end_x][end_y] < final_distance)
                             {
-                                final_distance = temp_distance[end_x][end_y];
+                                final_distance = distance[end_x][end_y];
                                 final_x = end_x;
                                 final_y = end_y;
+                                final_action = determined_action[i];
                             }
                             break;
                         }
                     }
                 }
-                if(i != 4)
+                if(j != 4)
                     break;
             }
         }
+
         if(goal_shelf == 1)
         {
             SetRobotTargetCoord(robot_num, final_x, final_y, 2);
-            SetRobotTargetAction(robot_num, "")
+            switch (final_action)
+            {
+                case 1:
+                    SetRobotTargetAction(robot_num, "UP")
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "DOWM")
+                    break;
+                default:
+                    break;
+            }
         }
         else if(goal_shelf == 2)
         {
             SetRobotTargetCoord(robot_num, final_x, final_y, 1);
-            SetRobotTargetAction(robot_num, "")
+            switch (final_action)
+            {
+                case 1:
+                    SetRobotTargetAction(robot_num, "UP")
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "DOWM")
+                    break;
+                default:
+                    break;
+            }
         }
         else if(goal_shelf == 3)
         {
             SetRobotTargetCoord(robot_num, final_x, final_y, 4);
-            SetRobotTargetAction(robot_num, "")
+            switch (final_action)
+            {
+                case 1:
+                    SetRobotTargetAction(robot_num, "UP")
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "DOWM")
+                    break;
+                default:
+                    break;
+            }
         }
         else if(goal_shelf == 4)
         {
             SetRobotTargetCoord(robot_num, final_x, final_y, 3);
-            SetRobotTargetAction(robot_num, "")
+            switch (final_action)
+            {
+                case 1:
+                    SetRobotTargetAction(robot_num, "UP")
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "DOWM")
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -269,22 +382,6 @@ public:
         int final_x, final_y;
         int final_distance, final_category, final_location;
         int category;
-
-        int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-
-        int distance[num_x][num_y];
-        for(int i=0; i<num_x; i++)
-            for(int j=0; j<num_y; j++)
-                distance[i][j] = INF;
 
 
         for(int i=0; i<12; i++)
@@ -376,8 +473,22 @@ public:
             end_x = location.first;
             end_y = location.second;
             final_distance = 999;
-            int temp_map[num_x][num_y] = map;
-            int temp_distance[num_x][num_y] = distance;
+            //
+            int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+            int distance[num_x][num_y];
+            for(int i=0; i<num_x; i++)
+                for(int j=0; j<num_y; j++)
+                    distance[i][j] = INF;
 
             while(que.size())
             {
@@ -390,15 +501,15 @@ public:
                     int now_x = get_coord.first() + move_x[j];
                     int now_y = get_coord.second() + move_y[j];
 
-                    if(0 <= now_x && now_x < num_x && 0 <= now_y && now_y < num_y && temp_map[now_x][now_y] != 1 && distance[now_x][now_y] == INF)
+                    if(0 <= now_x && now_x < num_x && 0 <= now_y && now_y < num_y && map[now_x][now_y] != 1 && distance[now_x][now_y] == INF)
                     {
                         que.push(Coord(now_x, now_y));
-                        temp_distance[now_x][now_y] = temp_distance[get_coord.first][get_coord.second] + 1;
+                        distance[now_x][now_y] = distance[get_coord.first][get_coord.second] + 1;
                         if(now_x == end_x && now_y == end_y)
                         {
-                            if(temp_distance[end_x][end_y] < final_distance)
+                            if(distance[end_x][end_y] < final_distance)
                             {
-                                final_distance = temp_distance[end_x][end_y];
+                                final_distance = distance[end_x][end_y];
                                 final_x = end_x;
                                 final_y = end_y;
                                 final_location = determined_location[i];
@@ -408,12 +519,205 @@ public:
                         }
                     }
                 }
-                if(i != 4)
+                if(j != 4)
                     break;
             }
         }
+        
+        switch (final_location)
+        {
+            case 1:
+            case 2:
+            case 3:
+                SetRobotTargetCoord(robot_num, final_x, final_y, 4);
+                switch (final_category)
+                {
+                    case 1:
+                        SetRobotTargetAction(robot_num, "RED");
+                        break;
+                    case 2:
+                        SetRobotTargetAction(robot_num, "BLUE");
+                        break;
+                    case 3:
+                        SetRobotTargetAction(robot_num, "GREEN");
+                        break;
+                    case 4:
+                        SetRobotTargetAction(robot_num, "SYY");
+                        break;
+                    case 5:
+                        SetRobotTargetAction(robot_num, "YLD");
+                        break;
+                    case 6:
+                        SetRobotTargetAction(robot_num, "ADG");
+                        break;
+                    case 7:
+                        SetRobotTargetAction(robot_num, "XH");
+                        break;
+                    case 8:
+                        SetRobotTargetAction(robot_num, "HN");
+                        break;
+                    case 9:
+                        SetRobotTargetAction(robot_num, "LH");
+                        break;
+                    case 10:
+                        SetRobotTargetAction(robot_num, "WQ");
+                        break;
+                    case 11:
+                        SetRobotTargetAction(robot_num, "MF");
+                        break;
+                    case 12:
+                        SetRobotTargetAction(robot_num, "TLS");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case 4:
+            case 5:
+            case 6:
+                SetRobotTargetCoord(robot_num, final_x, final_y, 3);
+                switch (final_category)
+                {
+                    case 1:
+                        SetRobotTargetAction(robot_num, "RED");
+                        break;
+                    case 2:
+                        SetRobotTargetAction(robot_num, "BLUE");
+                        break;
+                    case 3:
+                        SetRobotTargetAction(robot_num, "GREEN");
+                        break;
+                    case 4:
+                        SetRobotTargetAction(robot_num, "SYY");
+                        break;
+                    case 5:
+                        SetRobotTargetAction(robot_num, "YLD");
+                        break;
+                    case 6:
+                        SetRobotTargetAction(robot_num, "ADG");
+                        break;
+                    case 7:
+                        SetRobotTargetAction(robot_num, "XH");
+                        break;
+                    case 8:
+                        SetRobotTargetAction(robot_num, "HN");
+                        break;
+                    case 9:
+                        SetRobotTargetAction(robot_num, "LH");
+                        break;
+                    case 10:
+                        SetRobotTargetAction(robot_num, "WQ");
+                        break;
+                    case 11:
+                        SetRobotTargetAction(robot_num, "MF");
+                        break;
+                    case 12:
+                        SetRobotTargetAction(robot_num, "TLS");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case 7:
+            case 8:
+            case 9:
+                SetRobotTargetCoord(robot_num, final_x, final_y, 2);
+                switch (final_category)
+                {
+                    case 1:
+                        SetRobotTargetAction(robot_num, "RED");
+                        break;
+                    case 2:
+                        SetRobotTargetAction(robot_num, "BLUE");
+                        break;
+                    case 3:
+                        SetRobotTargetAction(robot_num, "GREEN");
+                        break;
+                    case 4:
+                        SetRobotTargetAction(robot_num, "SYY");
+                        break;
+                    case 5:
+                        SetRobotTargetAction(robot_num, "YLD");
+                        break;
+                    case 6:
+                        SetRobotTargetAction(robot_num, "ADG");
+                        break;
+                    case 7:
+                        SetRobotTargetAction(robot_num, "XH");
+                        break;
+                    case 8:
+                        SetRobotTargetAction(robot_num, "HN");
+                        break;
+                    case 9:
+                        SetRobotTargetAction(robot_num, "LH");
+                        break;
+                    case 10:
+                        SetRobotTargetAction(robot_num, "WQ");
+                        break;
+                    case 11:
+                        SetRobotTargetAction(robot_num, "MF");
+                        break;
+                    case 12:
+                        SetRobotTargetAction(robot_num, "TLS");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case 10:
+            case 11:
+            case 12:
+                SetRobotTargetCoord(robot_num, final_x, final_y, 1);
+                switch (final_category)
+                {
+                    case 1:
+                        SetRobotTargetAction(robot_num, "RED");
+                        break;
+                    case 2:
+                        SetRobotTargetAction(robot_num, "BLUE");
+                        break;
+                    case 3:
+                        SetRobotTargetAction(robot_num, "GREEN");
+                        break;
+                    case 4:
+                        SetRobotTargetAction(robot_num, "SYY");
+                        break;
+                    case 5:
+                        SetRobotTargetAction(robot_num, "YLD");
+                        break;
+                    case 6:
+                        SetRobotTargetAction(robot_num, "ADG");
+                        break;
+                    case 7:
+                        SetRobotTargetAction(robot_num, "XH");
+                        break;
+                    case 8:
+                        SetRobotTargetAction(robot_num, "HN");
+                        break;
+                    case 9:
+                        SetRobotTargetAction(robot_num, "LH");
+                        break;
+                    case 10:
+                        SetRobotTargetAction(robot_num, "WQ");
+                        break;
+                    case 11:
+                        SetRobotTargetAction(robot_num, "MF");
+                        break;
+                    case 12:
+                        SetRobotTargetAction(robot_num, "TLS");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        
+            default:
+                break;
+        }
         SetGoodsNONE(final_location);
-        SetRobotTargetAction(robot_num, )
     }
     
 }
