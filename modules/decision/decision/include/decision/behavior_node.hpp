@@ -23,6 +23,7 @@ enum class BehaviorType
     SEQUENCE,     //序列
     ACTION,       //动作
     PRECONDITION, //初始
+    CYCLE         //循环
 };
 
 //节点运行状态
@@ -169,6 +170,74 @@ class DecoratorNode : public BehaviorNode
     virtual void OnInitialize() = 0;
     virtual BehaviorState Update() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
+};
+
+class CycleNode : public DecoratorNode
+{
+  public:
+    CycleNode(uint8_t cycle_num, std::string name, const Blackboard::Ptr &blackboard_ptr,
+              const BehaviorNode::Ptr &child_node_ptr = nullptr)
+        : DecoratorNode(name, BehaviorType::CYCLE, blackboard_ptr, child_node_ptr),
+          cycle_num_(cycle_num), count_(0)
+    {
+    }
+    virtual ~CycleNode() = default;
+
+  protected:
+    uint8_t cycle_num_;
+    uint8_t count_;
+    virtual void OnInitialize()
+    {
+        count_ = 0;
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
+    }
+    virtual BehaviorState Update()
+    {
+        while (true)
+        {
+            BehaviorState state = child_node_ptr_->Run();
+            if (state != BehaviorState::SUCCESS)
+            {
+                return state;
+            }
+            else
+            {
+                count_++;
+                if (count_ == cycle_num_)
+                {
+                    return BehaviorState::SUCCESS;
+                }
+                else
+                {
+                    child_node_ptr_->Reset();
+                    return BehaviorState::RUNNING;
+                }
+            }
+        }
+    }
+    virtual void OnTerminate(BehaviorState state)
+    {
+
+        switch (state)
+        {
+        case BehaviorState::IDLE:
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
+            child_node_ptr_->Reset();
+            break;
+        case BehaviorState::SUCCESS:
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
+            break;
+        case BehaviorState::FAILURE:
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
+            child_node_ptr_->Reset();
+            break;
+        default:
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
+            return;
+        }
+    }
+
+  private:
 };
 
 // @brief 构造器
@@ -421,7 +490,7 @@ class SelectorNode : public CompositeNode
 class SequenceNode : public CompositeNode
 {
   public:
-    SequenceNode(std::string name, const Blackboard::Ptr &blackboard_ptr) 
+    SequenceNode(std::string name, const Blackboard::Ptr &blackboard_ptr)
         : CompositeNode::CompositeNode(name, BehaviorType::SEQUENCE, blackboard_ptr)
     {
     }

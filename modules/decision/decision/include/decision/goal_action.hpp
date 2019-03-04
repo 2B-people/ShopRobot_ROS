@@ -9,6 +9,8 @@
 #include <data/MoveAction.h>
 #include <data/OpeningAction.h>
 #include <data/ShopActionAction.h>
+#include <data/CameraAction.h>
+#include <data/DetectionAction.h>
 
 #include <decision/behavior_node.hpp>
 #include <blackboard/black_board.hpp>
@@ -21,7 +23,8 @@ namespace decision
 typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
-
+typedef actionlib::SimpleActionClient<data::CameraAction> CAMERAACTION;
+typedef actionlib::SimpleActionClient<data::DetectionAction> DETECTION;
 
 //行为树专用黑板,
 class PrivateBoard : public Blackboard
@@ -68,7 +71,6 @@ public:
     AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
     AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
 
-
     //@breif 写在全局黑板中了
     //目标动作
     // auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
@@ -106,7 +108,9 @@ class GoalAction
 public:
   typedef std::shared_ptr<GoalAction> Ptr;
 
-  GoalAction(const Blackboard::Ptr &blackboard_ptr) : robot1_move_action_clint_("robot1_web/move_action", true),
+  GoalAction(const Blackboard::Ptr &blackboard_ptr) : camera_action_clint_("camera_server", true),
+                                                      detection_clint_("detection_action_server", true),
+                                                      robot1_move_action_clint_("robot1_web/move_action", true),
                                                       robot1_open_action_clint_("robot1_web/opening_action", true),
                                                       robot1_shop_action_clint_("robot1_web/shop_action", true),
                                                       robot2_move_action_clint_("robot2_web/move_action", true),
@@ -120,6 +124,8 @@ public:
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
+    camera_action_clint_.waitForServer();
+    detection_clint_.waitForServer();
     robot1_move_action_clint_.waitForServer();
     robot1_open_action_clint_.waitForServer();
     robot1_shop_action_clint_.waitForServer();
@@ -134,6 +140,27 @@ public:
     ROS_INFO(" ALL Action server is started");
   }
   ~GoalAction() = default;
+
+  void SendCameraGoal(int8_t image_num)
+  {
+    data::CameraGoal goal;
+    goal.number = image_num;
+    camera_action_clint_.sendGoal(goal,
+                                  CAMERAACTION::SimpleDoneCallback(),
+                                  CAMERAACTION::SimpleActiveCallback(),
+                                  CAMERAACTION::SimpleFeedbackCallback());
+  }
+
+  void SendDectionGoal(int8_t image_num)
+  {
+    data::DetectionGoal goal;
+    goal.image_num = image_num;
+    detection_clint_.sendGoal(goal,
+                              DETECTION::SimpleDoneCallback(),
+                              DETECTION::SimpleActiveCallback(),
+                              DETECTION::SimpleFeedbackCallback());
+  }
+
   // @brief 发布车移动目标
   void SendMoveGoal(int8_t robot_num, int16_t x, int16_t y, int8_t pose)
   {
@@ -427,10 +454,64 @@ public:
     }
   }
 
+  BehaviorState GetCameraState()
+  {
+    auto state = camera_action_clint_.getState();
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
+  BehaviorState GetDetectionState()
+  {
+    auto state = detection_clint_.getState();
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
 private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 
   ros::NodeHandle nh_;
+
+  CAMERAACTION camera_action_clint_;
+  DETECTION detection_clint_;
+
   //robot1
   MOVEACTIONCLINT robot1_move_action_clint_;
   OPENINGCLINT robot1_open_action_clint_;

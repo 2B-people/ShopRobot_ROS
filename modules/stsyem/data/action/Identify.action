@@ -1,5 +1,0 @@
-int8 image_num
----
-bool success_flag
----
-int8 progress
