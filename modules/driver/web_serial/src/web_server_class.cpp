@@ -261,7 +261,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     action_as_.setSucceeded(result);
 }
 
-//开局初始化函数
+//开局函数
 void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 {
     data::OpeningFeedback feedback;
@@ -400,9 +400,15 @@ std::string WebServer::CoordToData(data::Coord temp)
 }
 
 
-//TODO
+// @breif data到货框障碍物
+// @pargm 坐标类型
+// @return string要用send写入的
+// @breif 格式:"1 2 1",
+// - "x y pose"
 data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 {
+    data::ShelfBarrier ruselt;
+    ruselt.location = temp[]
 }
 
 } // namespace webserver
