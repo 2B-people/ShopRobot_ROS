@@ -62,7 +62,7 @@ private:
       uint16_t target_x = dir_ptr->GetCoordinateX();
       uint16_t target_y = dir_ptr->GetCoordinateY();
       uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
-      if (target_x != 0 && target_y != 0 && target_pose != 0)
+      if (target_x != 10 && target_y != 10 && target_pose != 10)
       {
         goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
         goal_flag_ = true;
@@ -78,7 +78,7 @@ private:
     auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
 
     dir_ptr->OpenLock();
-    dir_ptr->Set(0, 0, 0);
+    dir_ptr->Set(10, 10, 10);
 
     switch (state)
     {
@@ -108,7 +108,6 @@ private:
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
-
 
 //动作节点
 class ShopAction : public ActionNode
@@ -180,7 +179,6 @@ private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
-
 class OpenAction : public ActionNode
 {
 public:
@@ -241,7 +239,6 @@ private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
-
 class CameraAction : public ActionNode
 {
 public:
@@ -278,9 +275,33 @@ private:
       ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
       break;
     case BehaviorState::SUCCESS:
+    {
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
+      private_blackboard_ptr_->SetBoolValue(true, "photo_done_flag");
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("robot4/run_coordinate");
+      auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+      dir_ptr->OpenLock();
+      switch (num_count_)
+      {
+      case 1:
+        dir_ptr->Set(4, 2, 1);
+        break;
+      case 2:
+        dir_ptr->Set(7, 4, 4);
+        break;
+      case 3:
+        dir_ptr->Set(5, 7, 3);
+        break;
+      case 4:
+        dir_ptr->Set(2, 4, 2);
+        break;
+      default:
+        ROS_ERROR("photo  number is %d !!err!", num_count_);
+        break;
+      }
       num_count_++;
-      break;
+    }
+    break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
       break;
@@ -294,7 +315,6 @@ private:
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
-
 
 class DetectionAction : public ActionNode
 {
@@ -334,6 +354,8 @@ private:
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       num_count_++;
+      ROS_INFO("%d disticion is done",num_count_);
+      private_blackboard_ptr_->Set(false,"photo_done_flag");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);

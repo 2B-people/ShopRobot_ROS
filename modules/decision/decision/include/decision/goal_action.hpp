@@ -45,11 +45,16 @@ public:
     auto robot2_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot2_opeing_flag", robot2_opeing_flag_ptr);
 
+
     auto robot3_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot3_opeing_flag", robot3_opeing_flag_ptr);
 
     auto robot4_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot4_opeing_flag", robot4_opeing_flag_ptr);
+    
+    //拍照成功flag
+    auto photo_done_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("photo_done_flag", photo_done_flag_ptr);
 
     //局部规划的flag
     auto robot1_local_plan_flag = std::make_shared<BoolDir>(false);
@@ -62,10 +67,10 @@ public:
     AddDataIntoWorld("robot4/local_plan/flag", robot4_local_plan_flag);
 
     //可以在任何地方写的目标坐标
-    auto robot1_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot2_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot3_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot4_run_coordinate = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot1_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
+    auto robot2_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
+    auto robot3_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
+    auto robot4_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
     AddDataIntoWorld("robot1/run_coordinate", robot1_run_coordinate);
     AddDataIntoWorld("robot2/run_coordinate", robot2_run_coordinate);
     AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);

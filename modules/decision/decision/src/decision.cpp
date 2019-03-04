@@ -41,6 +41,8 @@ int main(int argc, char **argv)
     robot4_opening_behavior_ptr->AddChildren(robot4_move_ptr);
     robot4_opening_behavior_ptr->AddChildren(photo_ptr);
 
+    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",blackboard_ptr,robot4_opening_behavior_ptr);
+
     auto robot1_opening_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 opeing judge", blackboard_ptr,
                                                                                        robot1_opening_ptr,
                                                                                        [&]() {
@@ -62,7 +64,7 @@ int main(int argc, char **argv)
                                                                                        },
                                                                                        shop::decision::AbortType::LOW_PRIORITY);
     auto robot4_opening_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 opeing judge", blackboard_ptr,
-                                                                                       robot4_opening_behavior_ptr,
+                                                                                       robot4_cycle_ptr,
                                                                                        [&]() {
                                                                                            return blackboard_ptr->GetBoolValue("robot4_opeing_flag");
                                                                                        },
@@ -71,7 +73,7 @@ int main(int argc, char **argv)
     auto distinguish_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("distinguish judge",blackboard_ptr,
                                                                                     distinguish_ptr,
                                                                                     [&](){
-                                                                                        return blackboard_ptr->GetBoolValue("photo_is_ture_flag");
+                                                                                        return blackboard_ptr->GetBoolValue("photo_done_flag");
                                                                                     },
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
@@ -79,11 +81,13 @@ int main(int argc, char **argv)
     opening_ptr->AddChildren(robot1_opening_judge_ptr);
     opening_ptr->AddChildren(robot2_opening_judge_ptr);
     opening_ptr->AddChildren(robot3_opening_judge_ptr);
-    opening_ptr->AddChildren(robot4_opening_behavior_ptr);
+    opening_ptr->AddChildren(robot4_opening_judge_ptr);
     opening_ptr->AddChildren(distinguish_judge_ptr);
 
     //TODO 抓取
     auto carry_ptr = std::make_shared<shop::decision::ParallelNode>("carrying", blackboard_ptr, 4);
+
+
 
     auto robot_ptr = std::make_shared<shop::decision::SequenceNode>("game", blackboard_ptr);
     robot_ptr->AddChildren(opening_ptr);

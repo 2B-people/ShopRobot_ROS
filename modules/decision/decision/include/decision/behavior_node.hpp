@@ -223,6 +223,7 @@ class CycleNode : public DecoratorNode
         case BehaviorState::IDLE:
             ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
             child_node_ptr_->Reset();
+            
             break;
         case BehaviorState::SUCCESS:
             ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);

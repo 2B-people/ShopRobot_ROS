@@ -10,10 +10,10 @@ WorldBoard::WorldBoard(std::string name)
     auto goods_dir_ptr = std::make_shared<GoodsDir>();
     auto roadblock_dir_ptr = std::make_shared<RoadblockDir>(0);
     //目标坐标
-    auto robot1_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot3_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
-    auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(0, 0, 0);
+    auto robot1_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
+    auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
+    auto robot3_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
+    auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
 
     //目标动作
     auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE");
@@ -357,18 +357,32 @@ bool WorldBoard::DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     }
 }
 
+//fixed !!!!err ,is dufferent in read function
 bool WorldBoard::AshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
 {
     auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
-    for (size_t x = 0; x < 6; x++)
+    // for (size_t x = 0; x < 6; x++)
+    // {
+    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+    // }
+    // for (size_t x = 6; x < 12; x++)
+    // {
+    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
+    // }
+    for (size_t i = 1; i <= 12; i++)
     {
-        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
+        if (i % 2 == 0)
+        {
+            res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
+        }
+        else
+        {
+            res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);            
+        }
+        
     }
-    for (size_t x = 6; x < 12; x++)
-    {
-        res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
-    }
+
     return true;
 }
 

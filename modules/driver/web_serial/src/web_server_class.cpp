@@ -19,9 +19,9 @@ WebServer::WebServer(std::string name)
     move_stop_ = false;
     shop_stop_ = false;
 
-    now_coord_.x = 0;
-    now_coord_.y = 0;
-    now_coord_.pose = 0;
+    now_coord_.x = 10;
+    now_coord_.y = 10;
+    now_coord_.pose = 10;
 
     memset(&my_addr_, 0, sizeof(my_addr_)); //数据初始化--清零
 
@@ -399,6 +399,8 @@ std::string WebServer::CoordToData(data::Coord temp)
     return temp_str;
 }
 
+
+//TODO
 data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 {
 }

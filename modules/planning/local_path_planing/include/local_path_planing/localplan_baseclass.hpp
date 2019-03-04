@@ -26,17 +26,17 @@ class LocalBase : public shop::common::RRTS
 public:
   LocalBase(std::string name) : shop::common::RRTS(name)
   {
-    robot1_coord_now_.x = 0;
-    robot1_coord_now_.y = 0;
+    robot1_coord_now_.x = 10;
+    robot1_coord_now_.y = 10;
     robot1_coord_now_.pose = 0;
-    robot2_coord_now_.x = 0;
-    robot2_coord_now_.y = 0;
+    robot2_coord_now_.x = 10;
+    robot2_coord_now_.y = 10;
     robot2_coord_now_.pose = 0;
-    robot3_coord_now_.x = 0;
-    robot3_coord_now_.y = 0;
+    robot3_coord_now_.x = 10;
+    robot3_coord_now_.y = 10;
     robot3_coord_now_.pose = 0;
-    robot4_coord_now_.x = 0;
-    robot4_coord_now_.y = 0;
+    robot4_coord_now_.x = 10;
+    robot4_coord_now_.y = 10;
     robot4_coord_now_.pose = 0;
 
     robot1_coordinate_now_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&LocalBase::Robo1CoordNowCB, this, _1));
@@ -200,11 +200,10 @@ public:
   }
 
   // @breif 使得目标位置为false
-  void SetShelfToFalse(int8_t shelf_num, int8_t x, int8_t y)
+  void SetShelfToFalse(int8_t shelf_num, int_8 location)
   {
     data::ShelfBarrier srv;
-    srv.request.x = x;
-    srv.request.y = y;
+    srv.request.location = location;
     srv.request.shelf_barrier = false;
     switch (shelf_num)
     {
