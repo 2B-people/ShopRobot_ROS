@@ -182,7 +182,7 @@ enum class GoodsName : int8_t
     TLS,
 };
 
-//TODO 用一个基类来包装goods类型,可以储存数据分数,可以容错
+// 用一个基类来包装goods类型,可以储存数据分数,可以容错
 // class GoodsKey
 // {
 //   public:
@@ -364,7 +364,7 @@ class GoodShelfDir : public DirBase
         }
         else
         {
-            ROS_WARN("goods shelf [%d,%d] is lock", x, y);
+            ROS_WARN("goods shelf [%d] is lock", loction);
         }
     }
     void RepeatInit()

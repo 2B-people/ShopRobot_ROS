@@ -355,7 +355,7 @@ private:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       num_count_++;
       ROS_INFO("%d disticion is done",num_count_);
-      private_blackboard_ptr_->Set(false,"photo_done_flag");
+      private_blackboard_ptr_->SetBoolValue(false,"photo_done_flag");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);

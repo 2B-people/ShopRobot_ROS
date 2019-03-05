@@ -13,8 +13,10 @@ import os
 class Object_D(object):
     def __init__(self):
         path = os.path.realpath(__file__)
-        path_model = path[:-17] + '/model'
-        self.path_image = path[:-17] + '/shopping_images'
+        # print path
+        # bug 因为py生成了pyc文件,在实际调用时为pyc文件,影响到了字符串的索引
+        path_model = path[:-18] + '/model'
+        self.path_image = path[:-18] + '/shopping_images'
         self.MODEL_NAME = path_model
         self.PATH_TO_FROZEN_GRAPH = self.MODEL_NAME + '/frozen_inference_graph.pb'
         

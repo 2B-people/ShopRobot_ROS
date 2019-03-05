@@ -206,7 +206,9 @@ public:
   }
 
   // @breif 使得目标位置为false
-  void SetShelfToFalse(int8_t shelf_num, int_8 location)
+  // @param location:0~11,0 is 1,1 is 2
+  // @param shelf_num =a:1,b:2,c:3,d:4
+  void SetShelfToFalse(int8_t shelf_num, int8_t location)
   {
     data::ShelfBarrier srv;
     srv.request.location = location;

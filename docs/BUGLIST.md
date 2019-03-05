@@ -169,3 +169,7 @@ include<blackboard/data_structure.hpp>
 
 `bug018`
 ros的param服务器有namespace的限制,使用时需要注意全局或者局部的get方法不一样.
+
+`bug019`
+我们在python找文件的时候需要索引目录,引用了绝对路径,然而,
+因为py生成了pyc文件,在实际调用时为pyc文件,影响到了字符串的索引

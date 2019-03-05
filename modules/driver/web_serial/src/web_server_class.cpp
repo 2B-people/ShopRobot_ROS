@@ -408,7 +408,7 @@ std::string WebServer::CoordToData(data::Coord temp)
 data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 {
     data::ShelfBarrier ruselt;
-    ruselt.location = temp[]
+    // ruselt.location = temp[]
 }
 
 } // namespace webserver
