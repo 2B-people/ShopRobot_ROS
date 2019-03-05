@@ -251,6 +251,7 @@ class LocalPlan : public LocalBase
         }
 
         auto now_coord = GetNowCoord(robot_num);
+        //fixed ??? 这不就是一维的?
         distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
         for (int i = 0; i < determined_location.size(); i++)
