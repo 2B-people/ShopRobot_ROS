@@ -23,10 +23,32 @@ class LocalPlan : public LocalBase
     LocalPlan(std::string name)
         : LocalBase(name), INF(999)
     {
-        // INF = 999;
-        move_x_ = {1, 0, -1, 0};
-        move_y_ = {0, 1, 0, -1};
+        INF = 999;
+        for(int i=0; i<4; i++)
+        {
+            switch (i)
+            {
+                case 0:
+                    move_x_[i] = 1;
+                    move_y_[i] = 0;
+                    break;
+                case 0:
+                    move_x_[i] = 0;
+                    move_y_[i] = 1;
+                    break;
+                case 0:
+                    move_x_[i] = -1;
+                    move_y_[i] = 0;
+                    break;
+                case 0:
+                    move_x_[i] = 0;
+                    move_y_[i] = -1;
+                    break;
 
+                default:
+                    break;
+            }
+        }
     }
 
     void PlanPlace(uint8_t robot_num)
@@ -34,8 +56,9 @@ class LocalPlan : public LocalBase
         bool shelves[12];
         vector<Coord> determined_location;
         vector<int> determined_action;
+        vector<int> determined_shelf_location;
         int final_x, final_y;
-        int final_distance, final_action;
+        int final_action, final_shelf_location;
 
         auto goal_shelf = GetNowToShelf(robot_num);
         GetShelfBarrier(shelves, goal_shelf);
@@ -48,50 +71,86 @@ class LocalPlan : public LocalBase
                 {
                     switch (i)
                     {
-                    case 1:
-                        determined_location.push_back(Coord(5, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 3:
-                        determined_location.push_back(Coord(4, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 5:
-                        determined_location.push_back(Coord(3, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 7:
-                        determined_location.push_back(Coord(2, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 9:
-                        determined_location.push_back(Coord(1, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 11:
-                        determined_location.push_back(Coord(0, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    default:
-                        break;
+                        case 1:
+                            determined_location.push_back(Coord(5, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(1);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(2);
+                            }
+                            break;
+                        case 3:
+                            determined_location.push_back(Coord(4, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(3);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(4);
+                            }
+                            break;
+                        case 5:
+                            determined_location.push_back(Coord(3, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(5);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(6);
+                            }
+                            break;
+                        case 7:
+                            determined_location.push_back(Coord(2, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(7);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(8);
+                            }
+                            break;
+                        case 9:
+                            determined_location.push_back(Coord(1, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(9);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(10);
+                            }
+                            break;
+                        case 11:
+                            determined_location.push_back(Coord(0, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(11);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(12);
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -99,50 +158,86 @@ class LocalPlan : public LocalBase
                 {
                     switch (i)
                     {
-                    case 1:
-                        determined_location.push_back(Coord(9, 5));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 3:
-                        determined_location.push_back(Coord(9, 4));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 5:
-                        determined_location.push_back(Coord(9, 3));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 7:
-                        determined_location.push_back(Coord(9, 2));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 9:
-                        determined_location.push_back(Coord(9, 1));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 11:
-                        determined_location.push_back(Coord(9, 0));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    default:
-                        break;
+                        case 1:
+                            determined_location.push_back(Coord(5, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(1);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(2);
+                            }
+                            break;
+                        case 3:
+                            determined_location.push_back(Coord(4, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(3);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(4);
+                            }
+                            break;
+                        case 5:
+                            determined_location.push_back(Coord(3, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(5);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(6);
+                            }
+                            break;
+                        case 7:
+                            determined_location.push_back(Coord(2, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(7);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(8);
+                            }
+                            break;
+                        case 9:
+                            determined_location.push_back(Coord(1, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(9);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(10);
+                            }
+                            break;
+                        case 11:
+                            determined_location.push_back(Coord(0, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(11);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(12);
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -150,50 +245,86 @@ class LocalPlan : public LocalBase
                 {
                     switch (i)
                     {
-                    case 1:
-                        determined_location.push_back(Coord(4, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 3:
-                        determined_location.push_back(Coord(5, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 5:
-                        determined_location.push_back(Coord(6, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 7:
-                        determined_location.push_back(Coord(7, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 9:
-                        determined_location.push_back(Coord(8, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 11:
-                        determined_location.push_back(Coord(9, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    default:
-                        break;
+                        case 1:
+                            determined_location.push_back(Coord(5, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(1);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(2);
+                            }
+                            break;
+                        case 3:
+                            determined_location.push_back(Coord(4, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(3);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(4);
+                            }
+                            break;
+                        case 5:
+                            determined_location.push_back(Coord(3, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(5);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(6);
+                            }
+                            break;
+                        case 7:
+                            determined_location.push_back(Coord(2, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(7);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(8);
+                            }
+                            break;
+                        case 9:
+                            determined_location.push_back(Coord(1, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(9);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(10);
+                            }
+                            break;
+                        case 11:
+                            determined_location.push_back(Coord(0, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(11);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(12);
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -201,68 +332,102 @@ class LocalPlan : public LocalBase
                 {
                     switch (i)
                     {
-                    case 1:
-                        determined_location.push_back(Coord(0, 4));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 3:
-                        determined_location.push_back(Coord(0, 5));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 5:
-                        determined_location.push_back(Coord(0, 6));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 7:
-                        determined_location.push_back(Coord(0, 7));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 9:
-                        determined_location.push_back(Coord(0, 8));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    case 11:
-                        determined_location.push_back(Coord(0, 9));
-                        if (shelves[i - 1] == false)
-                            determined_action.push_back(1);
-                        else
-                            determined_action.push_back(2);
-                        break;
-                    default:
-                        break;
+                        case 1:
+                            determined_location.push_back(Coord(5, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(1);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(2);
+                            }
+                            break;
+                        case 3:
+                            determined_location.push_back(Coord(4, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(3);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(4);
+                            }
+                            break;
+                        case 5:
+                            determined_location.push_back(Coord(3, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(5);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(6);
+                            }
+                            break;
+                        case 7:
+                            determined_location.push_back(Coord(2, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(7);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(8);
+                            }
+                            break;
+                        case 9:
+                            determined_location.push_back(Coord(1, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(9);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(10);
+                            }
+                            break;
+                        case 11:
+                            determined_location.push_back(Coord(0, 0));
+                            if (shelves[i - 1] == false)
+                            {
+                                determined_action.push_back(1);
+                                determined_shelf_location.push_back(11);
+                            }
+                            else
+                            {
+                                determined_action.push_back(2);
+                                determined_shelf_location.push_back(12);
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
         }
 
         auto now_coord = GetNowCoord(robot_num);
-        //fixed ??? 这不就是一维的?
-        distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
         for (int i = 0; i < determined_location.size(); i++)
         {
             queue<Coord> que;
-            que.push(Coord(now_coord.x, now_coord.y));
+            que.push(Coord((int)now_coord.x, (int)now_coord.y));
 
             Coord location = determined_location[i];
-            auto end_x = location.first;
-            auto end_y = location.second;
-            final_distance = 999;
+            int end_x = location.first;
+            int end_y = location.second;
+            int final_distance = 999;
 
             int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -279,6 +444,8 @@ class LocalPlan : public LocalBase
             for (int i; i < num_x; i++)
                 for (int j; j < num_y; j++)
                     distance[i][j] = INF;
+
+            distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
             while (que.size())
             {
@@ -303,77 +470,20 @@ class LocalPlan : public LocalBase
                                 final_x = end_x;
                                 final_y = end_y;
                                 final_action = determined_action[i];
+                                final_shelf_location = determined_shelf_location[i];
                             }
                             break;
                         }
                     }
                 }
-                if (j != 4)
-                    break;
-            }
-        }
-
-        if (goal_shelf == 1)
-        {
-            SetRobotTargetCoord(robot_num, final_x, final_y, 2);
-            switch (final_action)
-            {
-            case 1:
-                SetRobotTargetAction(robot_num, "UP");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "DOWM");
-                break;
-            default:
                 break;
             }
         }
-        else if (goal_shelf == 2)
-        {
-            SetRobotTargetCoord(robot_num, final_x, final_y, 1);
-            switch (final_action)
-            {
-            case 1:
-                SetRobotTargetAction(robot_num, "UP");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "DOWM");
-                break;
-            default:
-                break;
-            }
-        }
-        else if (goal_shelf == 3)
-        {
-            SetRobotTargetCoord(robot_num, final_x, final_y, 4);
-            switch (final_action)
-            {
-            case 1:
-                SetRobotTargetAction(robot_num, "UP");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "DOWM");
-                break;
-            default:
-                break;
-            }
-        }
-        else if (goal_shelf == 4)
-        {
-            SetRobotTargetCoord(robot_num, final_x, final_y, 3);
-            switch (final_action)
-            {
-            case 1:
-                SetRobotTargetAction(robot_num, "UP");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "DOWM");
-                break;
-            default:
-                break;
-            }
-        }
+        TransmissonMessageToRobot(1, robot_num, int16_t(final_x), int16_t(final_y), goal_shelf=goal_shelf, 
+                                  final_action=final_action)
+        SetShelfToFalse(goal_shelf, int8_t(final_shelf_location));
     }
+
 
     void PlanCarry(uint8_t robot_num)
     {
@@ -381,75 +491,75 @@ class LocalPlan : public LocalBase
         vector<int> determined_location;
         vector<int> determined_category;
         int final_x, final_y;
-        int final_distance, final_category, final_location;
-        int category;
+        int final_category, final_location;
+        int temp_category;
 
         for (int i = 0; i < 12; i++)
         {
-            category = GetGoods(i + 1);
-            if (category != 0)
+            temp_category = GetGoods(int8_t(i+1));
+            if (temp_category != 0)
             {
                 switch (i + 1)
                 {
                 case 1:
                     determined_coord.push_back(Coord(3, 2));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 2:
                     determined_coord.push_back(Coord(4, 2));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 3:
                     determined_coord.push_back(Coord(5, 2));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 4:
                     determined_coord.push_back(Coord(7, 3));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 5:
                     determined_coord.push_back(Coord(7, 4));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 6:
                     determined_coord.push_back(Coord(7, 5));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 7:
                     determined_coord.push_back(Coord(6, 7));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 8:
                     determined_coord.push_back(Coord(5, 7));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 9:
                     determined_coord.push_back(Coord(4, 7));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 10:
                     determined_coord.push_back(Coord(2, 6));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 11:
                     determined_coord.push_back(Coord(2, 5));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
                 case 12:
                     determined_coord.push_back(Coord(2, 4));
                     determined_location.push_back(i + 1);
-                    determined_category.push_back(category);
+                    determined_category.push_back(temp_category);
                     break;
 
                 default:
@@ -459,19 +569,17 @@ class LocalPlan : public LocalBase
         }
 
         auto now_coord = GetNowCoord(robot_num);
-        distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
-        for (int i = 0; i < determined_location.size(); i++)
+        for (int i = 0; i < determined_coord.size(); i++)
         {
             queue<Coord> que;
-            que.push(Coord(now_coord.x, now_coord.y));
+            que.push(Coord(int(now_coord.x), int(now_coord.y));
 
-            //fixed ???用法有问题
-            Coord location = determined_location[i];
-            auto end_x = location.first;
-            auto end_y = location.second;
-            final_distance = 999;
-            //
+            Coord location = determined_coord[i];
+            int end_x = location.first;
+            int end_y = location.second;
+            int final_distance = 999;
+
             int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -487,6 +595,8 @@ class LocalPlan : public LocalBase
             for (int i = 0; i < num_x; i++)
                 for (int j = 0; j < num_y; j++)
                     distance[i][j] = INF;
+
+            distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
             while (que.size())
             {
@@ -521,207 +631,280 @@ class LocalPlan : public LocalBase
                     break;
             }
         }
+        TransmissonMessageToRobot(2, robot_num, int16_t(final_x), int16_t(final_y), 
+                                  final_location=final_location, final_category=final_category)
+        SetGoodsNONE(int8_t(final_location));
+    }
 
-        switch (final_location)
+    void TransmissonMessageToRobot(int flag, int8_t robot_num, int16_t final_x, int16_t final_y, int8_t goal_shelf=0, 
+                                   int final_loaction=0, int final_action=0, int final_category=0)
+    {
+        if(flag == 1)
         {
-        case 1:
-        case 2:
-        case 3:
-            SetRobotTargetCoord(robot_num, final_x, final_y, 4);
-            switch (final_category)
+            if (goal_shelf == 1)
             {
-            case 1:
-                SetRobotTargetAction(robot_num, "RED");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "BLUE");
-                break;
-            case 3:
-                SetRobotTargetAction(robot_num, "GREEN");
-                break;
-            case 4:
-                SetRobotTargetAction(robot_num, "SYY");
-                break;
-            case 5:
-                SetRobotTargetAction(robot_num, "YLD");
-                break;
-            case 6:
-                SetRobotTargetAction(robot_num, "ADG");
-                break;
-            case 7:
-                SetRobotTargetAction(robot_num, "XH");
-                break;
-            case 8:
-                SetRobotTargetAction(robot_num, "HN");
-                break;
-            case 9:
-                SetRobotTargetAction(robot_num, "LH");
-                break;
-            case 10:
-                SetRobotTargetAction(robot_num, "WQ");
-                break;
-            case 11:
-                SetRobotTargetAction(robot_num, "MF");
-                break;
-            case 12:
-                SetRobotTargetAction(robot_num, "TLS");
-                break;
-            default:
-                break;
+                SetRobotTargetCoord(robot_num, final_x, final_y, 2);
+                switch (final_action)
+                {
+                case 1:
+                    SetRobotTargetAction(robot_num, "place-1");
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "place-2");
+                    break;
+                default:
+                    break;
+                }
             }
-            break;
-
-        case 4:
-        case 5:
-        case 6:
-            SetRobotTargetCoord(robot_num, final_x, final_y, 3);
-            switch (final_category)
+            else if (goal_shelf == 2)
             {
-            case 1:
-                SetRobotTargetAction(robot_num, "RED");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "BLUE");
-                break;
-            case 3:
-                SetRobotTargetAction(robot_num, "GREEN");
-                break;
-            case 4:
-                SetRobotTargetAction(robot_num, "SYY");
-                break;
-            case 5:
-                SetRobotTargetAction(robot_num, "YLD");
-                break;
-            case 6:
-                SetRobotTargetAction(robot_num, "ADG");
-                break;
-            case 7:
-                SetRobotTargetAction(robot_num, "XH");
-                break;
-            case 8:
-                SetRobotTargetAction(robot_num, "HN");
-                break;
-            case 9:
-                SetRobotTargetAction(robot_num, "LH");
-                break;
-            case 10:
-                SetRobotTargetAction(robot_num, "WQ");
-                break;
-            case 11:
-                SetRobotTargetAction(robot_num, "MF");
-                break;
-            case 12:
-                SetRobotTargetAction(robot_num, "TLS");
-                break;
-            default:
-                break;
+                SetRobotTargetCoord(robot_num, final_x, final_y, 1);
+                switch (final_action)
+                {
+                case 1:
+                    SetRobotTargetAction(robot_num, "place-1");
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "place-2");
+                    break;
+                default:
+                    break;
+                }
             }
-            break;
-
-        case 7:
-        case 8:
-        case 9:
-            SetRobotTargetCoord(robot_num, final_x, final_y, 2);
-            switch (final_category)
+            else if (goal_shelf == 3)
             {
-            case 1:
-                SetRobotTargetAction(robot_num, "RED");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "BLUE");
-                break;
-            case 3:
-                SetRobotTargetAction(robot_num, "GREEN");
-                break;
-            case 4:
-                SetRobotTargetAction(robot_num, "SYY");
-                break;
-            case 5:
-                SetRobotTargetAction(robot_num, "YLD");
-                break;
-            case 6:
-                SetRobotTargetAction(robot_num, "ADG");
-                break;
-            case 7:
-                SetRobotTargetAction(robot_num, "XH");
-                break;
-            case 8:
-                SetRobotTargetAction(robot_num, "HN");
-                break;
-            case 9:
-                SetRobotTargetAction(robot_num, "LH");
-                break;
-            case 10:
-                SetRobotTargetAction(robot_num, "WQ");
-                break;
-            case 11:
-                SetRobotTargetAction(robot_num, "MF");
-                break;
-            case 12:
-                SetRobotTargetAction(robot_num, "TLS");
-                break;
-            default:
-                break;
+                SetRobotTargetCoord(robot_num, final_x, final_y, 4);
+                switch (final_action)
+                {
+                case 1:
+                    SetRobotTargetAction(robot_num, "place-1");
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "place-2");
+                    break;
+                default:
+                    break;
+                }
             }
-            break;
-
-        case 10:
-        case 11:
-        case 12:
-            SetRobotTargetCoord(robot_num, final_x, final_y, 1);
-            switch (final_category)
+            else if (goal_shelf == 4)
             {
-            case 1:
-                SetRobotTargetAction(robot_num, "RED");
-                break;
-            case 2:
-                SetRobotTargetAction(robot_num, "BLUE");
-                break;
-            case 3:
-                SetRobotTargetAction(robot_num, "GREEN");
-                break;
-            case 4:
-                SetRobotTargetAction(robot_num, "SYY");
-                break;
-            case 5:
-                SetRobotTargetAction(robot_num, "YLD");
-                break;
-            case 6:
-                SetRobotTargetAction(robot_num, "ADG");
-                break;
-            case 7:
-                SetRobotTargetAction(robot_num, "XH");
-                break;
-            case 8:
-                SetRobotTargetAction(robot_num, "HN");
-                break;
-            case 9:
-                SetRobotTargetAction(robot_num, "LH");
-                break;
-            case 10:
-                SetRobotTargetAction(robot_num, "WQ");
-                break;
-            case 11:
-                SetRobotTargetAction(robot_num, "MF");
-                break;
-            case 12:
-                SetRobotTargetAction(robot_num, "TLS");
-                break;
-            default:
-                break;
+                SetRobotTargetCoord(robot_num, final_x, final_y, 3);
+                switch (final_action)
+                {
+                case 1:
+                    SetRobotTargetAction(robot_num, "place-1");
+                    break;
+                case 2:
+                    SetRobotTargetAction(robot_num, "place-2");
+                    break;
+                default:
+                    break;
+                }
             }
-            break;
-
-        default:
-            break;
         }
-        SetGoodsNONE(final_location);
+        else if(flag == 2)
+        {
+            switch (final_location)
+            {
+                case 1:
+                case 2:
+                case 3:
+                    SetRobotTargetCoord(robot_num, final_x, final_y, 4);
+                    switch (final_category)
+                    {
+                        case 1:
+                            SetRobotTargetAction(robot_num, "catch-1");
+                            break;
+                        case 2:
+                            SetRobotTargetAction(robot_num, "catch-2");
+                            break;
+                        case 3:
+                            SetRobotTargetAction(robot_num, "catch-3");
+                            break;
+                        case 4:
+                            SetRobotTargetAction(robot_num, "catch-4");
+                            break;
+                        case 5:
+                            SetRobotTargetAction(robot_num, "catch-5");
+                            break;
+                        case 6:
+                            SetRobotTargetAction(robot_num, "catch-6");
+                            break;
+                        case 7:
+                            SetRobotTargetAction(robot_num, "catch-7");
+                            break;
+                        case 8:
+                            SetRobotTargetAction(robot_num, "catch-8");
+                            break;
+                        case 9:
+                            SetRobotTargetAction(robot_num, "catch-9");
+                            break;
+                        case 10:
+                            SetRobotTargetAction(robot_num, "catch-10");
+                            break;
+                        case 11:
+                            SetRobotTargetAction(robot_num, "catch-11");
+                            break;
+                        case 12:
+                            SetRobotTargetAction(robot_num, "catch-12");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case 4:
+                case 5:
+                case 6:
+                    SetRobotTargetCoord(robot_num, final_x, final_y, 3);
+                    switch (final_category)
+                    {
+                        case 1:
+                            SetRobotTargetAction(robot_num, "catch-1");
+                            break;
+                        case 2:
+                            SetRobotTargetAction(robot_num, "catch-2");
+                            break;
+                        case 3:
+                            SetRobotTargetAction(robot_num, "catch-3");
+                            break;
+                        case 4:
+                            SetRobotTargetAction(robot_num, "catch-4");
+                            break;
+                        case 5:
+                            SetRobotTargetAction(robot_num, "catch-5");
+                            break;
+                        case 6:
+                            SetRobotTargetAction(robot_num, "catch-6");
+                            break;
+                        case 7:
+                            SetRobotTargetAction(robot_num, "catch-7");
+                            break;
+                        case 8:
+                            SetRobotTargetAction(robot_num, "catch-8");
+                            break;
+                        case 9:
+                            SetRobotTargetAction(robot_num, "catch-9");
+                            break;
+                        case 10:
+                            SetRobotTargetAction(robot_num, "catch-10");
+                            break;
+                        case 11:
+                            SetRobotTargetAction(robot_num, "catch-11");
+                            break;
+                        case 12:
+                            SetRobotTargetAction(robot_num, "catch-12");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case 7:
+                case 8:
+                case 9:
+                    SetRobotTargetCoord(robot_num, final_x, final_y, 2);
+                    switch (final_category)
+                    {
+                        case 1:
+                            SetRobotTargetAction(robot_num, "catch-1");
+                            break;
+                        case 2:
+                            SetRobotTargetAction(robot_num, "catch-2");
+                            break;
+                        case 3:
+                            SetRobotTargetAction(robot_num, "catch-3");
+                            break;
+                        case 4:
+                            SetRobotTargetAction(robot_num, "catch-4");
+                            break;
+                        case 5:
+                            SetRobotTargetAction(robot_num, "catch-5");
+                            break;
+                        case 6:
+                            SetRobotTargetAction(robot_num, "catch-6");
+                            break;
+                        case 7:
+                            SetRobotTargetAction(robot_num, "catch-7");
+                            break;
+                        case 8:
+                            SetRobotTargetAction(robot_num, "catch-8");
+                            break;
+                        case 9:
+                            SetRobotTargetAction(robot_num, "catch-9");
+                            break;
+                        case 10:
+                            SetRobotTargetAction(robot_num, "catch-10");
+                            break;
+                        case 11:
+                            SetRobotTargetAction(robot_num, "catch-11");
+                            break;
+                        case 12:
+                            SetRobotTargetAction(robot_num, "catch-12");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case 10:
+                case 11:
+                case 12:
+                    SetRobotTargetCoord(robot_num, final_x, final_y, 1);
+                    switch (final_category)
+                    {
+                        case 1:
+                            SetRobotTargetAction(robot_num, "catch-1");
+                            break;
+                        case 2:
+                            SetRobotTargetAction(robot_num, "catch-2");
+                            break;
+                        case 3:
+                            SetRobotTargetAction(robot_num, "catch-3");
+                            break;
+                        case 4:
+                            SetRobotTargetAction(robot_num, "catch-4");
+                            break;
+                        case 5:
+                            SetRobotTargetAction(robot_num, "catch-5");
+                            break;
+                        case 6:
+                            SetRobotTargetAction(robot_num, "catch-6");
+                            break;
+                        case 7:
+                            SetRobotTargetAction(robot_num, "catch-7");
+                            break;
+                        case 8:
+                            SetRobotTargetAction(robot_num, "catch-8");
+                            break;
+                        case 9:
+                            SetRobotTargetAction(robot_num, "catch-9");
+                            break;
+                        case 10:
+                            SetRobotTargetAction(robot_num, "catch-10");
+                            break;
+                        case 11:
+                            SetRobotTargetAction(robot_num, "catch-11");
+                            break;
+                        case 12:
+                            SetRobotTargetAction(robot_num, "catch-12");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
   private:
     const int INF;
-    vector<int> move_x_, move_y_;
+    int move_x_[4], move_y_[4];
 };
+
 
 } // namespace pathplan
 } // namespace shop
