@@ -23,7 +23,6 @@ class LocalPlan : public LocalBase
     LocalPlan(std::string name)
         : LocalBase(name), INF(999)
     {
-        INF = 999;
         for(int i=0; i<4; i++)
         {
             switch (i)
@@ -32,15 +31,15 @@ class LocalPlan : public LocalBase
                     move_x_[i] = 1;
                     move_y_[i] = 0;
                     break;
-                case 0:
+                case 1:
                     move_x_[i] = 0;
                     move_y_[i] = 1;
                     break;
-                case 0:
+                case 2:
                     move_x_[i] = -1;
                     move_y_[i] = 0;
                     break;
-                case 0:
+                case 3:
                     move_x_[i] = 0;
                     move_y_[i] = -1;
                     break;
@@ -480,7 +479,7 @@ class LocalPlan : public LocalBase
             }
         }
         TransmissonMessageToRobot(1, robot_num, int16_t(final_x), int16_t(final_y), goal_shelf=goal_shelf, 
-                                  final_action=final_action)
+                                  final_action=final_action);
         SetShelfToFalse(goal_shelf, int8_t(final_shelf_location));
     }
 
@@ -573,7 +572,8 @@ class LocalPlan : public LocalBase
         for (int i = 0; i < determined_coord.size(); i++)
         {
             queue<Coord> que;
-            que.push(Coord(int(now_coord.x), int(now_coord.y));
+
+            que.push(Coord(int(now_coord.x), int(now_coord.y)));
 
             Coord location = determined_coord[i];
             int end_x = location.first;
@@ -632,12 +632,12 @@ class LocalPlan : public LocalBase
             }
         }
         TransmissonMessageToRobot(2, robot_num, int16_t(final_x), int16_t(final_y), 
-                                  final_location=final_location, final_category=final_category)
+                                  final_location=final_location, final_category=final_category);
         SetGoodsNONE(int8_t(final_location));
     }
 
     void TransmissonMessageToRobot(int flag, int8_t robot_num, int16_t final_x, int16_t final_y, int8_t goal_shelf=0, 
-                                   int final_loaction=0, int final_action=0, int final_category=0)
+                                   int final_location=0, int final_action=0, int final_category=0)
     {
         if(flag == 1)
         {
