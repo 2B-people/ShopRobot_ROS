@@ -438,6 +438,7 @@ class LocalPlan : public LocalBase
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+            PositionOfObstacles(map);
 
             int distance[num_x][num_y];
             for (int i; i < num_x; i++)
@@ -590,6 +591,8 @@ class LocalPlan : public LocalBase
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+            PositionOfObstacles(map);
 
             int distance[num_x][num_y];
             for (int i = 0; i < num_x; i++)
@@ -897,6 +900,34 @@ class LocalPlan : public LocalBase
                 default:
                     break;
             }
+        }
+    }
+
+    void PositionOfObstacles(int map[num_x][num_y])
+    {
+        auto location = GetRoadblock();
+        switch (location)
+        {
+            case 1:
+                map[8][1] = 1;
+                break;
+            case 2:
+                map[8][4] = 1;
+                break;
+            case 3:
+                map[8][8] = 11;
+                break;
+            case 4:
+                map[5][7] = 1;
+                break;
+            case 5:
+                map[1][8] = 1;
+                break;
+            case 6:
+                map[1][5] = 1;
+                break;
+            default:
+                break;
         }
     }
 
