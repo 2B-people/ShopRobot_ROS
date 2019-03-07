@@ -129,19 +129,19 @@ public:
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
-    camera_action_clint_.waitForServer();
-    detection_clint_.waitForServer();
+    // camera_action_clint_.waitForServer();
+    // detection_clint_.waitForServer();
     robot1_move_action_clint_.waitForServer();
     robot1_open_action_clint_.waitForServer();
     robot1_shop_action_clint_.waitForServer();
-    robot2_move_action_clint_.waitForServer();
-    robot2_open_action_clint_.waitForServer();
-    robot2_shop_action_clint_.waitForServer();
-    robot3_move_action_clint_.waitForServer();
-    robot3_open_action_clint_.waitForServer();
-    robot3_shop_action_clint_.waitForServer();
-    robot4_move_action_clint_.waitForServer();
-    robot4_shop_action_clint_.waitForServer();
+    // robot2_move_action_clint_.waitForServer();
+    // robot2_open_action_clint_.waitForServer();
+    // robot2_shop_action_clint_.waitForServer();
+    // robot3_move_action_clint_.waitForServer();
+    // robot3_open_action_clint_.waitForServer();
+    // robot3_shop_action_clint_.waitForServer();
+    // robot4_move_action_clint_.waitForServer();
+    // robot4_shop_action_clint_.waitForServer();
     ROS_INFO(" ALL Action server is started");
   }
   ~GoalAction() = default;
@@ -203,6 +203,8 @@ public:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
       break;
     }
+    ROS_INFO("is here %s",__FUNCTION__);
+
   }
 
   // @brief 发布车动作目标
@@ -331,7 +333,6 @@ public:
   BehaviorState GetMoveBehaviorState(int8_t robot_num)
   {
     auto state = robot1_move_action_clint_.getState();
-
     switch (robot_num)
     {
     case 1:
@@ -420,7 +421,7 @@ public:
   // @brief 得到open action的状态
   BehaviorState GetOpenBehaviorState(int8_t robot_num)
   {
-    auto state = robot1_open_action_clint_.getState();
+    auto state = robot1_open_action_clint_.getState();    
 
     switch (robot_num)
     {

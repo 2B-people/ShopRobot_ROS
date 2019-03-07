@@ -1,3 +1,10 @@
+/*
+ * @Description: In User Settings Edit
+ * @Author: your name
+ * @LastEditors: Please set LastEditors
+ * @Date: 2019-03-07 21:11:54
+ * @LastEditTime: 2019-03-07 21:14:00
+ */
 #ifndef ACTION_NODE_H
 #define ACTION_NODE_H
 
@@ -9,6 +16,7 @@
 
 #include <data/ActionName.h>
 
+//fixed
 namespace shop
 {
 namespace decision
@@ -34,40 +42,23 @@ public:
 private:
   virtual void OnInitialize()
   {
+    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
+    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+    uint16_t target_x = dir_ptr->GetCoordinateX();
+    uint16_t target_y = dir_ptr->GetCoordinateY();
+    uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
+    std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
+    if (target_x != 10 && target_y != 10 && target_pose != 10)
+    {
+      goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
+      goal_flag_ = true;
+    }
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
+
+  //fixed!!!
   virtual BehaviorState Update()
   {
-    BehaviorState state = goalaction_ptr_->GetMoveBehaviorState(robot_num_);
-    //key键的str
-    std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
-    if (state != BehaviorState::RUNNING)
-    {
-      // if (private_blackboard_ptr_->GetBoolValue(bool_key))
-      // {
-      //   auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key);
-      //   auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-      //   uint16_t target_x = dir_ptr->GetCoordinateX();
-      //   uint16_t target_y = dir_ptr->GetCoordinateY();
-      //   uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
-      //   goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
-      // }
-      // else
-      // {
-      //   ROS_INFO("%d is wait for local plan", robot_num_);
-      // }
-
-      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
-      auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-      uint16_t target_x = dir_ptr->GetCoordinateX();
-      uint16_t target_y = dir_ptr->GetCoordinateY();
-      uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
-      if (target_x != 10 && target_y != 10 && target_pose != 10)
-      {
-        goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
-        goal_flag_ = true;
-      }
-    }
     return goalaction_ptr_->GetMoveBehaviorState(robot_num_);
   }
 
@@ -76,7 +67,6 @@ private:
   {
     auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
     auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-
     dir_ptr->OpenLock();
     dir_ptr->Set(10, 10, 10);
 
@@ -129,22 +119,18 @@ public:
 private:
   virtual void OnInitialize()
   {
+    data::ActionName srv;
+    client_.call(srv);
+    std::string goal_name = srv.response.action_name;
+    if (goal_name != "NONE")
+    {
+      goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
+      goal_flag_ = true;
+    }
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
   virtual BehaviorState Update()
   {
-    data::ActionName srv;
-    BehaviorState state = goalaction_ptr_->GetShopBehaviorState(robot_num_);
-    client_.call(srv);
-    if (state != BehaviorState::RUNNING)
-    {
-      std::string goal_name = srv.response.action_name;
-      if (goal_name != "NONE")
-      {
-        goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
-        goal_flag_ = true;
-      }
-    }
     return goalaction_ptr_->GetShopBehaviorState(robot_num_);
   }
 
@@ -196,16 +182,12 @@ public:
 private:
   virtual void OnInitialize()
   {
+    goalaction_ptr_->SendOpenGoal(robot_num_, "go");
+    goal_flag_ = true;
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
   virtual BehaviorState Update()
   {
-    BehaviorState state = goalaction_ptr_->GetOpenBehaviorState(robot_num_);
-    if (state != BehaviorState::RUNNING)
-    {
-      goalaction_ptr_->SendOpenGoal(robot_num_, "go");
-      goal_flag_ = true;
-    }
     return goalaction_ptr_->GetOpenBehaviorState(robot_num_);
   }
 
@@ -256,14 +238,10 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    goalaction_ptr_->SendCameraGoal(num_count_);
   }
   virtual BehaviorState Update()
   {
-    BehaviorState state = goalaction_ptr_->GetCameraState();
-    if (state != BehaviorState::RUNNING)
-    {
-      goalaction_ptr_->SendCameraGoal(num_count_);
-    }
     return goalaction_ptr_->GetCameraState();
   }
 
@@ -333,14 +311,10 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    goalaction_ptr_->SendDectionGoal(num_count_);
   }
   virtual BehaviorState Update()
   {
-    BehaviorState state = goalaction_ptr_->GetDetectionState();
-    if (state != BehaviorState::RUNNING)
-    {
-      goalaction_ptr_->SendDectionGoal(num_count_);
-    }
     return goalaction_ptr_->GetDetectionState();
   }
 
@@ -354,8 +328,8 @@ private:
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       num_count_++;
-      ROS_INFO("%d disticion is done",num_count_);
-      private_blackboard_ptr_->SetBoolValue(false,"photo_done_flag");
+      ROS_INFO("%d disticion is done", num_count_);
+      private_blackboard_ptr_->SetBoolValue(false, "photo_done_flag");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);

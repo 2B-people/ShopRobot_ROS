@@ -173,3 +173,10 @@ ros的param服务器有namespace的限制,使用时需要注意全局或者局�
 `bug019`
 我们在python找文件的时候需要索引目录,引用了绝对路径,然而,
 因为py生成了pyc文件,在实际调用时为pyc文件,影响到了字符串的索引
+
+`bug020`
+简单记录下action_node.hpp中move的bug,这个在所有的动作节点都普遍存在,原因在与两次调用getstate,
+第一次得到成功但是在接下来的代码里,从新发送了action的goal,使得状态变为running,
+所以程序到不了成功结束调用的地方
+解决:
+在OnInitialize发送目标任务,update只用于更新节点状态,应该无问题,在

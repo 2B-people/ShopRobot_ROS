@@ -41,7 +41,8 @@ int main(int argc, char **argv)
     robot4_opening_behavior_ptr->AddChildren(robot4_move_ptr);
     robot4_opening_behavior_ptr->AddChildren(photo_ptr);
 
-    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",blackboard_ptr,robot4_opening_behavior_ptr);
+    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",
+                                                                        blackboard_ptr,robot4_opening_behavior_ptr);
 
     auto robot1_opening_judge_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 opeing judge", blackboard_ptr,
                                                                                        robot1_opening_ptr,
@@ -86,7 +87,7 @@ int main(int argc, char **argv)
 
     //TODO 抓取
     auto carry_ptr = std::make_shared<shop::decision::ParallelNode>("carrying", blackboard_ptr, 4);
-
+    // carry_ptr->AddChildren()
 
 
     auto robot_ptr = std::make_shared<shop::decision::SequenceNode>("game", blackboard_ptr);

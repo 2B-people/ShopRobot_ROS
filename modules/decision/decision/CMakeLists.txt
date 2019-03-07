@@ -29,3 +29,7 @@ add_executable(decision src/decision.cpp)
 add_dependencies(decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(decision PRIVATE  ${catkin_LIBRARIES})
 
+add_executable(debug_decision src/debug_decision.cpp)
+add_dependencies(debug_decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(debug_decision PRIVATE  ${catkin_LIBRARIES})
+

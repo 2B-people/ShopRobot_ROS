@@ -1,21 +1,10 @@
 <launch>
   <param name="debug" value="true" type="bool"/>
-  <node name="decision" pkg="decision" type="decision" output="screen"></node>
+  <node name="debug_decision" pkg="decision" type="debug_decision" output="screen"></node>
   <node name="robot1_web" pkg="web_serial" type="robot1_web_server" output="screen">
     <param name="addr" value="127.0.0.1" type="str"/>
     <param name="port" value="1111" type="int"/>
   </node>
-  <node name="robot2_web" pkg="web_serial" type="robot2_web_server" output="screen">
-    <param name="addr" value="127.0.0.1" type="str"/>
-    <param name="port" value="1112" type="int"/>
-  </node>
-  <node name="robot3_web" pkg="web_serial" type="robot3_web_server" output="screen">
-    <param name="addr" value="127.0.0.1" type="str" />
-    <param name="port" value="1113" type="int"/>
-  </node>
-  <node name="robot4_web" pkg="web_serial" type="robot4_web_server" output="screen">
-    <param name="addr" value="127.0.0.1" type="str" />
-    <param name="port" value="1114" type="int"/>
-  </node>
+
 
 </launch>

@@ -71,6 +71,10 @@ WebServer::WebServer(std::string name)
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
     }
+    if(InitWeb() == false)
+    {
+        exit(-1);
+    }
 
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
@@ -83,6 +87,7 @@ WebServer::WebServer(std::string name)
         opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
         opening_as_.start();
     }
+    ROS_INFO("%s is run",name.c_str());
 }
 
 WebServer::~WebServer()
@@ -158,7 +163,6 @@ bool WebServer::InitWeb()
 void WebServer::Run()
 {
     ros::AsyncSpinner async_spinner(thread_num_);
-    InitWeb();
     async_spinner.start();
     ros::waitForShutdown();
 }
@@ -179,7 +183,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     coord_goal.y = goal->y;
     coord_goal.pose = goal->pose;
     std::string coord_goal_str = CoordToData(coord_goal);
-
+    //bug send函数
     send(client_sockfd_, (char *)coord_goal_str.c_str(), BUFF_MAX, 0);
 
     //得到一次现在的坐标,得到进度计算的分母
@@ -195,7 +199,9 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 char re_buf[BUFF_MAX];
+                ROS_INFO("test");
                 recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+                ROS_INFO("RE_BUf is %s",re_buf);
                 data::Coord now_coord = DataToCoord(re_buf);
                 now_coord_ = DataToCoord(re_buf);
                 //判断目标坐标
@@ -218,6 +224,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             }
         }
     }
+    ROS_INFO("FININSH");
     result.success_flag = true;
     move_as_.setSucceeded(result);
 }
@@ -379,9 +386,9 @@ data::Coord WebServer::DataToCoord(const char *buf)
 {
     std::string string_buf(buf);
     data::Coord rul_coord;
-    rul_coord.x = string_buf[0];
-    rul_coord.y = string_buf[2];
-    rul_coord.pose = string_buf[4];
+    rul_coord.x = buf[0]-'0';
+    rul_coord.y = buf[2]-'0';
+    rul_coord.pose = buf[4]-'0';
     return rul_coord;
 }
 
@@ -400,11 +407,11 @@ std::string WebServer::CoordToData(data::Coord temp)
 }
 
 
+// TODO
 // @breif data到货框障碍物
 // @pargm 坐标类型
-// @return string要用send写入的
-// @breif 格式:"1 2 1",
-// - "x y pose"
+// @return 货框
+
 data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 {
     data::ShelfBarrier ruselt;
