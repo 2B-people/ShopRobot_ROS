@@ -7,7 +7,7 @@ namespace webserver
 
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),is_debug_(false),
-      client_sockfd_(0), server_sockfd_(0), server_addr_("127.0.0.1"), bind_port_(1234),
+      client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.158"), bind_port_(1111),
       //atcion初始化
       move_as_(nh_, (name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
       opening_as_(nh_, (name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),

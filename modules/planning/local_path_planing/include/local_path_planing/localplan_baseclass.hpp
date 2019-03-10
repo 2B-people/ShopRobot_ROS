@@ -25,7 +25,7 @@ namespace pathplan
 class LocalBase : public shop::common::RRTS
 {
 public:
-  LocalBase(std::string name) : shop::common::RRTS(name)
+  LocalBase(std::string name) : shop::common::RRTS(name,10)
   {
     robot1_coord_now_.x = 10;
     robot1_coord_now_.y = 10;

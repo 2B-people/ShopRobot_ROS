@@ -15,6 +15,8 @@ class Object_D(object):
         path = os.path.realpath(__file__)
         # print path
         # bug 因为py生成了pyc文件,在实际调用时为pyc文件,影响到了字符串的索引
+        # path_model = path[:-17] + '/model'
+        # self.path_image = path[:-17] + '/shopping_images'
         path_model = path[:-18] + '/model'
         self.path_image = path[:-18] + '/shopping_images'
         self.MODEL_NAME = path_model
@@ -121,7 +123,7 @@ if __name__ == '__main__':
     box = a.run_image(1)
     # print box[0]
     # print box[1]
-    print box['classes'][1]
+    # print box['classes']
     print box
 
 

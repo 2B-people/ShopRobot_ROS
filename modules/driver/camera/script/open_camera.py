@@ -4,6 +4,7 @@ import os
 class Camera(object):
     def __init__(self, url,delay_time):
         path = os.path.realpath(__file__)
+        # self.path = path[:-36] + '/planning/distinguish_learn/shopping_detection/shopping_images'
         self.path = path[:-37] + '/planning/distinguish_learn/shopping_detection/shopping_images'
         self.url = url
         self.delay_time = delay_time
