@@ -7,7 +7,7 @@ namespace webserver
 
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),is_debug_(false),
-      client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.158"), bind_port_(1111),
+      client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.66"), bind_port_(1111),
       //atcion初始化
       move_as_(nh_, (name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
       opening_as_(nh_, (name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
@@ -155,7 +155,7 @@ bool WebServer::InitWeb()
         return false;
     }
     ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
-    send(client_sockfd_, "Welcome to shop ros server!!", 21, 0); //发送欢迎信息
+    send(client_sockfd_, "server", 21, 0); //发送欢迎信息
     return true;
 }
 
@@ -185,6 +185,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     std::string coord_goal_str = CoordToData(coord_goal);
     //bug send函数
     send(client_sockfd_, (char *)coord_goal_str.c_str(), BUFF_MAX, 0);
+    ROS_INFO("move is write %s",coord_goal_str.c_str());
 
     //得到一次现在的坐标,得到进度计算的分母
     char re_frist_buf[BUFF_MAX];
@@ -281,12 +282,12 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
     {
         if (is_open_)
         {
-            if (open_stop_)
-            {
+
                 char re_buf[BUFF_MAX];
                 recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+                ROS_INFO("%s",re_buf);
                 std::string re_buf_str = re_buf;
-                if (re_buf_str == "finish")
+                if (re_buf_str == "finishnmdwifibufmax")
                 {
                     break;
                 }
@@ -309,11 +310,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
                     feedback.progress = re_buf_str;
                     opening_as_.publishFeedback(feedback);
                 }
-            }
-            else
-            {
-                ROS_WARN("shop flag is stop!!!");
-            }
+
         }
     }
 

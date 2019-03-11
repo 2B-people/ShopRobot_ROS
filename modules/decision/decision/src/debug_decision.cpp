@@ -34,6 +34,10 @@ int main(int argc, char **argv)
     // auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr, goal_action_ptr);
     // auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish", blackboard_ptr, goal_action_ptr);
 
+    auto robot4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("test", blackboard_ptr);
+    robot4_opening_behavior_ptr->AddChildren(robot1_opening_ptr);
+    robot4_opening_behavior_ptr->AddChildren(robot1_move_ptr);
+
     while (ros::ok)
     {
         ros::spinOnce();
@@ -41,14 +45,13 @@ int main(int argc, char **argv)
         auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
         
         dir_ptr->OpenLock();
-        dir_ptr->Set(1,1,1);
-        robot1_move_ptr->Run();
-        auto state = robot1_move_ptr->GetBehaviorState();
+        dir_ptr->Set(4,2,1);
+        robot4_opening_behavior_ptr->Run();
+        auto state = robot4_opening_behavior_ptr->GetBehaviorState();
         if (state == BehaviorState::SUCCESS) {
             while(1){}   
         }
         
         index++;
-        ROS_INFO("tree is run %d",index);
     }
 }

@@ -2,8 +2,8 @@
   <param name="debug" value="true" type="bool"/>
   <node name="debug_decision" pkg="decision" type="debug_decision" output="screen"></node>
   <node name="robot1_web" pkg="web_serial" type="robot1_web_server" output="screen">
-    <param name="addr" value="127.0.0.1" type="str"/>
-    <param name="port" value="1111" type="int"/>
+    <param name="addr" value="192.168.31.66" type="str"/>
+    <param name="port" value="34567" type="int"/>
   </node>
 
 
