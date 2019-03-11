@@ -91,6 +91,9 @@ private:
   data::Coord DataToCoord(const char *buf);
   data::ShelfBarrier DataToBarrier(std::string temp);
   std::string CoordToData(data::Coord temp);
+
+  bool Send(std::string temp);
+  std::string Recv();
 };
 
 } // namespace webserver

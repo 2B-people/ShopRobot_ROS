@@ -651,10 +651,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "place-1");
+                    SetRobotTargetAction(robot_num, "P-1");
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "place-2");
+                    SetRobotTargetAction(robot_num, "P-2");
                     break;
                 default:
                     break;
@@ -666,10 +666,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "place-1");
+                    SetRobotTargetAction(robot_num, "P-1");
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "place-2");
+                    SetRobotTargetAction(robot_num, "P-2");
                     break;
                 default:
                     break;
@@ -681,10 +681,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "place-1");
+                    SetRobotTargetAction(robot_num, "P-1");
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "place-2");
+                    SetRobotTargetAction(robot_num, "P-2");
                     break;
                 default:
                     break;
@@ -696,10 +696,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "place-1");
+                    SetRobotTargetAction(robot_num, "P-1");
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "place-2");
+                    SetRobotTargetAction(robot_num, "P-2");
                     break;
                 default:
                     break;
@@ -717,40 +717,40 @@ class LocalPlan : public LocalBase
                     switch (final_category)
                     {
                         case 1:
-                            SetRobotTargetAction(robot_num, "catch-1");
+                            SetRobotTargetAction(robot_num, "C-1");
                             break;
                         case 2:
-                            SetRobotTargetAction(robot_num, "catch-2");
+                            SetRobotTargetAction(robot_num, "C-2");
                             break;
                         case 3:
-                            SetRobotTargetAction(robot_num, "catch-3");
+                            SetRobotTargetAction(robot_num, "C-3");
                             break;
                         case 4:
-                            SetRobotTargetAction(robot_num, "catch-4");
+                            SetRobotTargetAction(robot_num, "C-4");
                             break;
                         case 5:
-                            SetRobotTargetAction(robot_num, "catch-5");
+                            SetRobotTargetAction(robot_num, "C-5");
                             break;
                         case 6:
-                            SetRobotTargetAction(robot_num, "catch-6");
+                            SetRobotTargetAction(robot_num, "C-6");
                             break;
                         case 7:
-                            SetRobotTargetAction(robot_num, "catch-7");
+                            SetRobotTargetAction(robot_num, "C-7");
                             break;
                         case 8:
-                            SetRobotTargetAction(robot_num, "catch-8");
+                            SetRobotTargetAction(robot_num, "C-8");
                             break;
                         case 9:
-                            SetRobotTargetAction(robot_num, "catch-9");
+                            SetRobotTargetAction(robot_num, "C-9");
                             break;
                         case 10:
-                            SetRobotTargetAction(robot_num, "catch-10");
+                            SetRobotTargetAction(robot_num, "C-10");
                             break;
                         case 11:
-                            SetRobotTargetAction(robot_num, "catch-11");
+                            SetRobotTargetAction(robot_num, "C-11");
                             break;
                         case 12:
-                            SetRobotTargetAction(robot_num, "catch-12");
+                            SetRobotTargetAction(robot_num, "C-12");
                             break;
                         default:
                             break;
@@ -764,40 +764,40 @@ class LocalPlan : public LocalBase
                     switch (final_category)
                     {
                         case 1:
-                            SetRobotTargetAction(robot_num, "catch-1");
+                            SetRobotTargetAction(robot_num, "C-1");
                             break;
                         case 2:
-                            SetRobotTargetAction(robot_num, "catch-2");
+                            SetRobotTargetAction(robot_num, "C-2");
                             break;
                         case 3:
-                            SetRobotTargetAction(robot_num, "catch-3");
+                            SetRobotTargetAction(robot_num, "C-3");
                             break;
                         case 4:
-                            SetRobotTargetAction(robot_num, "catch-4");
+                            SetRobotTargetAction(robot_num, "C-4");
                             break;
                         case 5:
-                            SetRobotTargetAction(robot_num, "catch-5");
+                            SetRobotTargetAction(robot_num, "C-5");
                             break;
                         case 6:
-                            SetRobotTargetAction(robot_num, "catch-6");
+                            SetRobotTargetAction(robot_num, "C-6");
                             break;
                         case 7:
-                            SetRobotTargetAction(robot_num, "catch-7");
+                            SetRobotTargetAction(robot_num, "C-7");
                             break;
                         case 8:
-                            SetRobotTargetAction(robot_num, "catch-8");
+                            SetRobotTargetAction(robot_num, "C-8");
                             break;
                         case 9:
-                            SetRobotTargetAction(robot_num, "catch-9");
+                            SetRobotTargetAction(robot_num, "C-9");
                             break;
                         case 10:
-                            SetRobotTargetAction(robot_num, "catch-10");
+                            SetRobotTargetAction(robot_num, "C-10");
                             break;
                         case 11:
-                            SetRobotTargetAction(robot_num, "catch-11");
+                            SetRobotTargetAction(robot_num, "C-11");
                             break;
                         case 12:
-                            SetRobotTargetAction(robot_num, "catch-12");
+                            SetRobotTargetAction(robot_num, "C-12");
                             break;
                         default:
                             break;
@@ -811,40 +811,40 @@ class LocalPlan : public LocalBase
                     switch (final_category)
                     {
                         case 1:
-                            SetRobotTargetAction(robot_num, "catch-1");
+                            SetRobotTargetAction(robot_num, "C-1");
                             break;
                         case 2:
-                            SetRobotTargetAction(robot_num, "catch-2");
+                            SetRobotTargetAction(robot_num, "C-2");
                             break;
                         case 3:
-                            SetRobotTargetAction(robot_num, "catch-3");
+                            SetRobotTargetAction(robot_num, "C-3");
                             break;
                         case 4:
-                            SetRobotTargetAction(robot_num, "catch-4");
+                            SetRobotTargetAction(robot_num, "C-4");
                             break;
                         case 5:
-                            SetRobotTargetAction(robot_num, "catch-5");
+                            SetRobotTargetAction(robot_num, "C-5");
                             break;
                         case 6:
-                            SetRobotTargetAction(robot_num, "catch-6");
+                            SetRobotTargetAction(robot_num, "C-6");
                             break;
                         case 7:
-                            SetRobotTargetAction(robot_num, "catch-7");
+                            SetRobotTargetAction(robot_num, "C-7");
                             break;
                         case 8:
-                            SetRobotTargetAction(robot_num, "catch-8");
+                            SetRobotTargetAction(robot_num, "C-8");
                             break;
                         case 9:
-                            SetRobotTargetAction(robot_num, "catch-9");
+                            SetRobotTargetAction(robot_num, "C-9");
                             break;
                         case 10:
-                            SetRobotTargetAction(robot_num, "catch-10");
+                            SetRobotTargetAction(robot_num, "C-10");
                             break;
                         case 11:
-                            SetRobotTargetAction(robot_num, "catch-11");
+                            SetRobotTargetAction(robot_num, "C-11");
                             break;
                         case 12:
-                            SetRobotTargetAction(robot_num, "catch-12");
+                            SetRobotTargetAction(robot_num, "C-12");
                             break;
                         default:
                             break;
@@ -858,40 +858,40 @@ class LocalPlan : public LocalBase
                     switch (final_category)
                     {
                         case 1:
-                            SetRobotTargetAction(robot_num, "catch-1");
+                            SetRobotTargetAction(robot_num, "C-1");
                             break;
                         case 2:
-                            SetRobotTargetAction(robot_num, "catch-2");
+                            SetRobotTargetAction(robot_num, "C-2");
                             break;
                         case 3:
-                            SetRobotTargetAction(robot_num, "catch-3");
+                            SetRobotTargetAction(robot_num, "C-3");
                             break;
                         case 4:
-                            SetRobotTargetAction(robot_num, "catch-4");
+                            SetRobotTargetAction(robot_num, "C-4");
                             break;
                         case 5:
-                            SetRobotTargetAction(robot_num, "catch-5");
+                            SetRobotTargetAction(robot_num, "C-5");
                             break;
                         case 6:
-                            SetRobotTargetAction(robot_num, "catch-6");
+                            SetRobotTargetAction(robot_num, "C-6");
                             break;
                         case 7:
-                            SetRobotTargetAction(robot_num, "catch-7");
+                            SetRobotTargetAction(robot_num, "C-7");
                             break;
                         case 8:
-                            SetRobotTargetAction(robot_num, "catch-8");
+                            SetRobotTargetAction(robot_num, "C-8");
                             break;
                         case 9:
-                            SetRobotTargetAction(robot_num, "catch-9");
+                            SetRobotTargetAction(robot_num, "C-9");
                             break;
                         case 10:
-                            SetRobotTargetAction(robot_num, "catch-10");
+                            SetRobotTargetAction(robot_num, "C-10");
                             break;
                         case 11:
-                            SetRobotTargetAction(robot_num, "catch-11");
+                            SetRobotTargetAction(robot_num, "C-11");
                             break;
                         case 12:
-                            SetRobotTargetAction(robot_num, "catch-12");
+                            SetRobotTargetAction(robot_num, "C-12");
                             break;
                         default:
                             break;
