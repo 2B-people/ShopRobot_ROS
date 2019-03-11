@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <iostream>
+#include <string>
 
 #include <common/main_interface.h>
 #include <local_path_planing/localplan_baseclass.hpp>
