@@ -42,6 +42,6 @@ class Camera(object):
 
 
 if __name__ == '__main__':
-    url = "http://admin:admin@192.168.31.102:8081/"
+    url = "http://admin:admin@192.168.31.10:8081/"
     aa = Camera(url, 10)
     aa.get_photo(1)
