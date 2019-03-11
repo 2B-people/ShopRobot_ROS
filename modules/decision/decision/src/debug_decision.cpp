@@ -10,6 +10,10 @@ using namespace shop::decision;
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "decision");
+    ros::NodeHandle nh;
+    bool is_debug_;
+    nh.param("debug", is_debug_, false);
+    
     auto blackboard_ptr = std::make_shared<PrivateBoard>();
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr);
     int index = 0;

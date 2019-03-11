@@ -1,3 +1,10 @@
+/*
+ * @Description: In User Settings Edit
+ * @Author: your name
+ * @LastEditors: Please set LastEditors
+ * @Date: 2019-03-11 21:48:43
+ * @LastEditTime: 2019-03-11 21:50:58
+ */
 #include <web_serial/web_server_class.h>
 
 namespace shop
@@ -6,7 +13,7 @@ namespace webserver
 {
 
 WebServer::WebServer(std::string name)
-    : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true),is_debug_(false),
+    : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true), is_debug_(false),
       client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.66"), bind_port_(1111),
       //atcion初始化
       move_as_(nh_, (name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
@@ -28,7 +35,7 @@ WebServer::WebServer(std::string name)
     ROS_INFO("%s is begin", name_.c_str());
 
     //param init
-    nh_.param("debug",is_debug_,false);
+    nh_.param("debug", is_debug_, false);
     bool is_get_addr = nh_private_.getParam("addr", server_addr_);
     bool is_get_port = nh_private_.getParam("port", bind_port_);
     if (is_debug_)
@@ -71,7 +78,7 @@ WebServer::WebServer(std::string name)
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
     }
-    if(InitWeb() == false)
+    if (InitWeb() == false)
     {
         exit(-1);
     }
@@ -87,7 +94,7 @@ WebServer::WebServer(std::string name)
         opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
         opening_as_.start();
     }
-    ROS_INFO("%s is run",name.c_str());
+    ROS_INFO("%s is run", name.c_str());
 }
 
 WebServer::~WebServer()
@@ -124,21 +131,24 @@ bool WebServer::InitWeb()
     my_addr_.sin_addr.s_addr = inet_addr(server_addr_.c_str()); //服务器IP地址--允许连接到所有本地地址上
     my_addr_.sin_port = htons(bind_port_);                      //服务器端口号
 
-	/*创建客户端套接字--IPv4协议，面向连接通信，TCP协议*/
-	if ((client_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		perror("socket error");
-		return 1;
-	}
+    /*创建客户端套接字--IPv4协议，面向连接通信，TCP协议*/
+    if ((client_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+    {
 
-	/*将套接字绑定到服务器的网络地址上*/
-	if (connect(client_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
-	{
-		perror("connect error");
-		return 1;
-	}
-	ROS_INFO("connected to server/n");
+        ROS_ERROR("%s socket error", name_.c_str());
+        return false;
+    }
 
+    /*将套接字绑定到服务器的网络地址上*/
+    if (connect(client_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
+    {
+        ROS_ERROR("%s connect error", name_.c_str());
+        return false;
+    }
+    ROS_INFO("is to server/n");
+    return true;
+
+    //使用服务器的sockot存在问题
     // /*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
     // if ((server_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
     // {
@@ -171,7 +181,6 @@ bool WebServer::InitWeb()
     // }
     // ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
     // send(client_sockfd_, "server", 21, 0); //发送欢迎信息
-    return true;
 }
 
 //RUN MAIN里调用实际运行
@@ -200,7 +209,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     std::string coord_goal_str = CoordToData(coord_goal);
     //bug send函数
     send(client_sockfd_, (char *)coord_goal_str.c_str(), BUFF_MAX, 0);
-    ROS_INFO("move is write %s",coord_goal_str.c_str());
+    ROS_INFO("move is write %s", coord_goal_str.c_str());
 
     //得到一次现在的坐标,得到进度计算的分母
     char re_frist_buf[BUFF_MAX];
@@ -217,7 +226,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 char re_buf[BUFF_MAX];
                 ROS_INFO("test");
                 recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
-                ROS_INFO("RE_BUf is %s",re_buf);
+                if (is_debug_)
+                {
+                    ROS_INFO("RE_BUf is %s", re_buf);
+                }
+
                 data::Coord now_coord = DataToCoord(re_buf);
                 now_coord_ = DataToCoord(re_buf);
                 //判断目标坐标
@@ -298,34 +311,33 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
         if (is_open_)
         {
 
-                char re_buf[BUFF_MAX];
-                recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
-                ROS_INFO("%s",re_buf);
-                std::string re_buf_str = re_buf;
-                if (re_buf_str == "finishnmdwifibufmax")
+            char re_buf[BUFF_MAX];
+            recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+            ROS_INFO("%s", re_buf);
+            std::string re_buf_str = re_buf;
+            if (re_buf_str == "finishnmdwifibufmax")
+            {
+                break;
+            }
+            else if (re_buf_str[0] == 'S')
+            {
+                data::ShelfBarrier srv = DataToBarrier(re_buf_str);
+                if (shelf_barrier_client_.call(srv))
                 {
-                    break;
-                }
-                else if (re_buf_str[0] == 'S')
-                {
-                    data::ShelfBarrier srv = DataToBarrier(re_buf_str);
-                    if (shelf_barrier_client_.call(srv))
-                    {
-                        ROS_INFO("shop barrier is wirte!");
-                    }
-                    else
-                    {
-                        ROS_ERROR("failed to call shop barrier board!");
-                    }
-                    feedback.progress = "Is set barrier";
-                    opening_as_.publishFeedback(feedback);
+                    ROS_INFO("shop barrier is wirte!");
                 }
                 else
                 {
-                    feedback.progress = re_buf_str;
-                    opening_as_.publishFeedback(feedback);
+                    ROS_ERROR("failed to call shop barrier board!");
                 }
-
+                feedback.progress = "Is set barrier";
+                opening_as_.publishFeedback(feedback);
+            }
+            else
+            {
+                feedback.progress = re_buf_str;
+                opening_as_.publishFeedback(feedback);
+            }
         }
     }
 
@@ -396,12 +408,15 @@ void WebServer::OpenPreemptCB()
 // @return 坐标类型
 data::Coord WebServer::DataToCoord(const char *buf)
 {
-    std::string string_buf(buf);
-    data::Coord rul_coord;
-    rul_coord.x = buf[0]-'0';
-    rul_coord.y = buf[2]-'0';
-    rul_coord.pose = buf[4]-'0';
-    return rul_coord;
+    if (buf[0] == 'R')
+    {
+        std::string string_buf(buf);
+        data::Coord rul_coord;
+        rul_coord.x = buf[1] - '0';
+        rul_coord.y = buf[3] - '0';
+        rul_coord.pose = buf[5] - '0';
+        return rul_coord;
+    }
 }
 
 // @breif 坐标到数据
@@ -412,12 +427,11 @@ data::Coord WebServer::DataToCoord(const char *buf)
 std::string WebServer::CoordToData(data::Coord temp)
 {
     std::string temp_str;
-    temp_str = std::to_string(temp.x) + " " +
+    temp_str = "R" + std::to_string(temp.x) + " " +
                std::to_string(temp.y) + " " +
                std::to_string(temp.pose);
     return temp_str;
 }
-
 
 // TODO
 // @breif data到货框障碍物

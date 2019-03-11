@@ -1,0 +1,18 @@
+<launch>
+  <param name="debug" value="true" type="bool"/>
+
+  <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen"></node>
+
+  <node name="camera_node" pkg="camera" type="camera_node.py" output="screen">
+    <!-- <param name="url/address" value="192.168.31.157" type="str"/> -->
+    <param name="url/address" value="192.168.31.10" type="str"/>
+    <param name="camera/wirt_time" value="20" type="int"/>
+  </node>
+
+  <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
+  <!-- 使用此launch文件,可以测试识别的ros节点 -->
+  <node name="cv_debug_decision" pkg="decision" type="cv_debug_decision" output="screen"></node>
+
+  <!-- 测试时可用 -->
+
+</launch>
