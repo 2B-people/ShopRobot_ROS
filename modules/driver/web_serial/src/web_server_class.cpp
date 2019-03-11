@@ -124,38 +124,53 @@ bool WebServer::InitWeb()
     my_addr_.sin_addr.s_addr = inet_addr(server_addr_.c_str()); //服务器IP地址--允许连接到所有本地地址上
     my_addr_.sin_port = htons(bind_port_);                      //服务器端口号
 
-    /*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
-    if ((server_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        ROS_ERROR("%s socket error", name_.c_str());
-        return false;
-    }
+	/*创建客户端套接字--IPv4协议，面向连接通信，TCP协议*/
+	if ((client_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		perror("socket error");
+		return 1;
+	}
 
-    /*将套接字绑定到服务器的网络地址上*/
-    if (bind(server_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
-    {
-        ROS_ERROR("%s bind error", name_.c_str());
-        return false;
-    }
+	/*将套接字绑定到服务器的网络地址上*/
+	if (connect(client_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
+	{
+		perror("connect error");
+		return 1;
+	}
+	ROS_INFO("connected to server/n");
 
-    /*监听连接请求--监听队列长度为10*/
-    if (listen(server_sockfd_, 10) < 0)
-    {
-        ROS_ERROR("%s listen error", name_.c_str());
-        return false;
-    };
+    // /*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
+    // if ((server_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+    // {
+    //     ROS_ERROR("%s socket error", name_.c_str());
+    //     return false;
+    // }
 
-    sin_size = sizeof(struct sockaddr_in);
+    // /*将套接字绑定到服务器的网络地址上*/
+    // if (bind(server_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
+    // {
+    //     ROS_ERROR("%s bind error", name_.c_str());
+    //     return false;
+    // }
 
-    /*等待客户端连接请求到达*/
-    //@breif accept为,要一直等待阻塞型
-    if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size)) < 0)
-    {
-        ROS_ERROR("%s accept error", name_.c_str());
-        return false;
-    }
-    ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
-    send(client_sockfd_, "server", 21, 0); //发送欢迎信息
+    // /*监听连接请求--监听队列长度为10*/
+    // if (listen(server_sockfd_, 10) < 0)
+    // {
+    //     ROS_ERROR("%s listen error", name_.c_str());
+    //     return false;
+    // };
+
+    // sin_size = sizeof(struct sockaddr_in);
+
+    // /*等待客户端连接请求到达*/
+    // //@breif accept为,要一直等待阻塞型
+    // if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size)) < 0)
+    // {
+    //     ROS_ERROR("%s accept error", name_.c_str());
+    //     return false;
+    // }
+    // ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+    // send(client_sockfd_, "server", 21, 0); //发送欢迎信息
     return true;
 }
 
