@@ -312,7 +312,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 
             std::string re_buf = Recv();
             ROS_INFO("%s", re_buf.c_str());
-            if (re_buf == "finishnmdwifibufmax")
+            if (re_buf == "finish")
             {
                 break;
             }

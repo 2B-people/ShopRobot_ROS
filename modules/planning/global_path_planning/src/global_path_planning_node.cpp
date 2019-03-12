@@ -144,7 +144,7 @@ public:
                 }
                 else
                 {
-                    map_4[local_4.first][local_4.second] += 1;
+                    map_4[local_4.fi rst][local_4.second] += 1;
                     stop_coord_4.push(last_coord);
                     if(counter == 0)
                     {
@@ -153,10 +153,17 @@ public:
                     }
                 }
                 last_coord = local_4;
+
+                flag += 1;
             }
             else
             {
-                
+                int obstacles = 1;
+
+                while(obstacles)
+                {
+                    
+                }
             }
         }
 

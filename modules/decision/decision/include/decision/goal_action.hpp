@@ -129,11 +129,11 @@ public:
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
-    camera_action_clint_.waitForServer();
-    detection_clint_.waitForServer();
-    // robot1_move_action_clint_.waitForServer();
-    // robot1_open_action_clint_.waitForServer();
-    // robot1_shop_action_clint_.waitForServer();
+    // camera_action_clint_.waitForServer();
+    // detection_clint_.waitForServer();
+    robot1_move_action_clint_.waitForServer();
+    robot1_open_action_clint_.waitForServer();
+    robot1_shop_action_clint_.waitForServer();
     // robot2_move_action_clint_.waitForServer();
     // robot2_open_action_clint_.waitForServer();
     // robot2_shop_action_clint_.waitForServer();
