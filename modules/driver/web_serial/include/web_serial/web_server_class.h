@@ -10,7 +10,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string>
+#include <cstring>
 #include <stdint.h>
+#include <stdlib.h>
+#include <memory>
 #include <thread>
 #include <unistd.h>
 
@@ -88,12 +91,12 @@ private:
   void ShopPreemptCB();
   void OpenPreemptCB();
 
-  data::Coord DataToCoord(const char *buf);
+  data::Coord DataToCoord(std::string buf);
   data::ShelfBarrier DataToBarrier(std::string temp);
   std::string CoordToData(data::Coord temp);
 
   bool Send(std::string temp);
-  std::string Recv();
+  std::string Recv(void);
 };
 
 } // namespace webserver

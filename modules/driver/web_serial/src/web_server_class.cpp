@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-11 21:50:58
+ * @LastEditTime: 2019-03-12 13:12:17
  */
 #include <web_serial/web_server_class.h>
 
@@ -208,12 +208,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     coord_goal.pose = goal->pose;
     std::string coord_goal_str = CoordToData(coord_goal);
     //bug send函数
-    send(client_sockfd_, (char *)coord_goal_str.c_str(), BUFF_MAX, 0);
+    Send(coord_goal_str);
     ROS_INFO("move is write %s", coord_goal_str.c_str());
 
     //得到一次现在的坐标,得到进度计算的分母
-    char re_frist_buf[BUFF_MAX];
-    recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
+    std::string re_frist_buf = Recv();
     data::Coord begin_coord = DataToCoord(re_frist_buf);
     float progress_overall = float((goal->x + goal->y) - (begin_coord.x + begin_coord.y));
     //等待结束,移动到目标坐标
@@ -223,16 +222,18 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         {
             if (move_stop_ == false)
             {
-                char re_buf[BUFF_MAX];
-                ROS_INFO("test");
-                recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+                std::string re_buf = Recv();
                 if (is_debug_)
                 {
-                    ROS_INFO("RE_BUf is %s", re_buf);
+                    ROS_INFO("RE_BUf is %s", re_buf.c_str());
                 }
 
                 data::Coord now_coord = DataToCoord(re_buf);
-                now_coord_ = DataToCoord(re_buf);
+                if (now_coord.x == 10 && now_coord.y == 10 && now_coord.pose == 10)
+                {
+                    ROS_WARN("move err");
+                }
+
                 //判断目标坐标
                 if (now_coord.x == goal->x && now_coord.y == goal->y && now_coord.pose == goal->pose)
                 {
@@ -265,7 +266,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     data::ShopActionResult result;
     ROS_INFO("%s is write action", name_.c_str());
     //发送指令
-    send(client_sockfd_, goal->action_name.c_str(), BUFF_MAX, 0);
+    Send(goal->action_name);
     //等待结束
     while (ros::ok())
     {
@@ -273,9 +274,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         {
             if (move_stop_ == false)
             {
-                char re_buf[BUFF_MAX];
-                recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
-                std::string re_buf_string = re_buf;
+                std::string re_buf_string = Recv();
                 if (re_buf_string == "finish")
                 {
                     ROS_INFO("%s is finish", goal->action_name.c_str());
@@ -304,24 +303,22 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
     data::OpeningResult result;
     ROS_INFO("%s is write Open", name_.c_str());
 
-    send(client_sockfd_, goal->car_begin.c_str(), BUFF_MAX, 0);
+    Send(goal->car_begin);
 
     while (ros::ok())
     {
         if (is_open_)
         {
 
-            char re_buf[BUFF_MAX];
-            recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
-            ROS_INFO("%s", re_buf);
-            std::string re_buf_str = re_buf;
-            if (re_buf_str == "finishnmdwifibufmax")
+            std::string re_buf = Recv();
+            ROS_INFO("%s", re_buf.c_str());
+            if (re_buf == "finishnmdwifibufmax")
             {
                 break;
             }
-            else if (re_buf_str[0] == 'S')
+            else if (re_buf[0] == 'S')
             {
-                data::ShelfBarrier srv = DataToBarrier(re_buf_str);
+                data::ShelfBarrier srv = DataToBarrier(re_buf);
                 if (shelf_barrier_client_.call(srv))
                 {
                     ROS_INFO("shop barrier is wirte!");
@@ -335,7 +332,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
             }
             else
             {
-                feedback.progress = re_buf_str;
+                feedback.progress = re_buf;
                 opening_as_.publishFeedback(feedback);
             }
         }
@@ -351,11 +348,10 @@ void WebServer::MovePreemptCB()
 
     if (move_as_.isActive())
     {
-        send(client_sockfd_, "stop", BUFF_MAX, 0);
+        Send("S");
         while (ros::ok)
         {
-            char re_buf[BUFF_MAX];
-            recv(client_sockfd_, &re_buf, BUFF_MAX, 0);
+            std::string re_buf = Recv();
             data::Coord stop_now_coord = DataToCoord(re_buf);
             if (now_coord_.pose == 1 && stop_now_coord.x == now_coord_.x + 1 && stop_now_coord.y == now_coord_.y)
             {
@@ -385,7 +381,7 @@ void WebServer::ShopPreemptCB()
     std::string stop_buf("shop now");
     if (action_as_.isActive())
     {
-        send(client_sockfd_, stop_buf.c_str(), BUFF_MAX, 0);
+        Send(stop_buf);
         action_as_.setPreempted();
     }
 }
@@ -396,7 +392,7 @@ void WebServer::OpenPreemptCB()
     std::string stop_buf("shop now");
     if (opening_as_.isActive())
     {
-        send(client_sockfd_, stop_buf.c_str(), BUFF_MAX, 0);
+        Send(stop_buf);
         opening_as_.setPreempted();
     }
 }
@@ -406,15 +402,22 @@ void WebServer::OpenPreemptCB()
 // @breif 数据到坐标
 // @pargm buf,recv读到的数据
 // @return 坐标类型
-data::Coord WebServer::DataToCoord(const char *buf)
+data::Coord WebServer::DataToCoord(std::string buf)
 {
+    data::Coord rul_coord;
     if (buf[0] == 'R')
     {
-        std::string string_buf(buf);
-        data::Coord rul_coord;
         rul_coord.x = buf[1] - '0';
         rul_coord.y = buf[3] - '0';
         rul_coord.pose = buf[5] - '0';
+        return rul_coord;
+    }
+    else
+    {
+        ROS_WARN("data err!is %s", buf.c_str());
+        rul_coord.x = 10;
+        rul_coord.y = 10;
+        rul_coord.pose = 10;
         return rul_coord;
     }
 }
@@ -442,6 +445,31 @@ data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 {
     data::ShelfBarrier ruselt;
     // ruselt.location = temp[]
+}
+
+bool WebServer::Send(std::string temp)
+{
+    std::string str_ = "HDU" + temp;
+    send(client_sockfd_, (char *)str_.c_str(), BUFF_MAX, 0);
+}
+
+std::string WebServer::Recv(void)
+{
+    std::string temp;
+    char re_frist_buf[BUFF_MAX];
+    while (1)
+    {
+        memset(re_frist_buf, 0, BUFF_MAX);
+        recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
+        temp = re_frist_buf;
+        std::string jud = temp.substr(0, 3);
+        temp = temp.substr(3, temp.size() - 2);
+        if (jud == "HDU")
+        {
+            break;
+        }
+    }
+    return temp;
 }
 
 } // namespace webserver
