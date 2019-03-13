@@ -256,22 +256,22 @@ private:
     {
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       private_blackboard_ptr_->SetBoolValue(true, "photo_done_flag");
-      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("robot4/run_coordinate");
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("robot1/run_coordinate");
       auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
       dir_ptr->OpenLock();
       switch (num_count_)
       {
       case 1:
-        dir_ptr->Set(4, 2, 1);
+        // dir_ptr->Set(4, 2, 0);
+        dir_ptr->Set(7, 4, 3);
         break;
       case 2:
-        dir_ptr->Set(7, 4, 4);
+        dir_ptr->Set(5, 7, 2);
         break;
       case 3:
-        dir_ptr->Set(5, 7, 3);
+        dir_ptr->Set(2, 4, 1);
         break;
       case 4:
-        dir_ptr->Set(2, 4, 2);
         break;
       default:
         ROS_ERROR("photo  number is %d !!err!", num_count_);

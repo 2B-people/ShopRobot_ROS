@@ -11,7 +11,7 @@
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
   <!-- 使用此launch文件,可以测试识别的ros节点 -->
-  <node name="cv_debug_decision" pkg="decision" type="cv_debug_decision" output="screen"></node>
+  <!-- <node name="cv_debug_decision" pkg="decision" type="cv_debug_decision" output="screen"></node> -->
 
   <!-- 测试时可用 -->
 

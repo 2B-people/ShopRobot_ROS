@@ -120,8 +120,14 @@ int main(int argc, char **argv)
     auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop", blackboard_ptr, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop", blackboard_ptr, goal_action_ptr);
 
-    // auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr, goal_action_ptr);
-    // auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish", blackboard_ptr, goal_action_ptr);
+    auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr, goal_action_ptr);
+    auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish", blackboard_ptr, goal_action_ptr);
+
+    auto behavior_ptr = std::make_shared<shop::decision::SequenceNode>("test1", blackboard_ptr);
+    behavior_ptr->AddChildren(robot1_move_ptr);
+    behavior_ptr->AddChildren(photo_ptr);
+    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",
+                                                                        blackboard_ptr,behavior_ptr); 
 
     auto robot4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("test", blackboard_ptr);
     robot4_opening_behavior_ptr->AddChildren(robot1_opening_ptr);
