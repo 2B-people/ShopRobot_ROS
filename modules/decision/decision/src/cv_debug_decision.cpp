@@ -41,18 +41,18 @@ int main(int argc, char **argv)
     behavior_ptr->AddChildren(photo_ptr);
     behavior_ptr->AddChildren(distinguish_ptr);
 
-    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",
-                                                                        blackboard_ptr,behavior_ptr);                                                              
+    // auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>((4-1),"robot cycle",
+    //                                                                     blackboard_ptr,behavior_ptr);                                                              
 
     while (ros::ok)
     {
         ros::spinOnce();
         auto temp_dir_ptr = blackboard_ptr->GetDirPtr("robot1/run_coordinate");
-        auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+        // auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
         
-        dir_ptr->OpenLock();
-        dir_ptr->Set(4,2,1);
-        robot4_cycle_ptr->Run();
+        // dir_ptr->OpenLock();
+        // dir_ptr->Set(4,2,1);
+        behavior_ptr->Run();
         auto state = behavior_ptr->GetBehaviorState();
         if (state == BehaviorState::SUCCESS) {
             while(1){}   

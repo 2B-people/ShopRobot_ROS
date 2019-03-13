@@ -3,9 +3,90 @@
 #include <blackboard/black_board.hpp>
 #include <decision/action_node.hpp>
 #include <decision/goal_action.hpp>
+#include <data/Coord.h>
 
 //此文件用于debug,
+namespace shop
+{
+namespace decision
+{
+class ShopActiontest : public ActionNode
+{
+  public:
+    ShopActiontest(uint8_t robot_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
+                   const GoalAction::Ptr &goalaction_ptr)
+        : ActionNode(name, blackboard_ptr),
+          robot_num_(robot_num),
+          goalaction_ptr_(goalaction_ptr),
+          private_blackboard_ptr_(blackboard_ptr),
+          goal_flag_(false)
+    {
+        std::string name_key = "shop/robot" + std::to_string(robot_num_) + "/target_actionname_write";
+        client_ = nh_.serviceClient<data::ActionName>(name_key);
+    }
+    ~ShopActiontest() = default;
+
+  private:
+    virtual void OnInitialize()
+    {
+
+        std::string goal_name = "P-1";
+        if (goal_name != "NONE")
+        {
+            goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
+            goal_flag_ = true;
+        }
+        ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    }
+    virtual BehaviorState Update()
+    {
+        return goalaction_ptr_->GetShopBehaviorState(robot_num_);
+    }
+
+    virtual void OnTerminate(BehaviorState state)
+    {
+        switch (state)
+        {
+        case BehaviorState::IDLE:
+            ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
+            if (goal_flag_)
+            {
+                goalaction_ptr_->CancelShopGoal(robot_num_);
+                goal_flag_ = false;
+            }
+            break;
+        case BehaviorState::SUCCESS:
+            ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
+            break;
+        case BehaviorState::FAILURE:
+            ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
+            break;
+        default:
+            ROS_ERROR("%s is err", name_.c_str());
+            return;
+        }
+    }
+    uint8_t robot_num_;
+    ros::NodeHandle nh_;
+    ros::ServiceClient client_;
+    bool goal_flag_;
+    GoalAction::Ptr goalaction_ptr_;
+    PrivateBoard::Ptr private_blackboard_ptr_;
+};
+
+} // namespace decision
+
+} // namespace shop
+
 using namespace shop::decision;
+data::Coord robot1_coord_now_;
+
+void Robo1CoordNowCB(const data::Coord::ConstPtr &msg)
+{
+    robot1_coord_now_.x = msg->x;
+    robot1_coord_now_.y = msg->y;
+    robot1_coord_now_.pose = msg->pose;
+}
 
 int main(int argc, char **argv)
 {
@@ -13,7 +94,11 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     bool is_debug_;
     nh.param("debug", is_debug_, false);
-    
+    robot1_coord_now_.x = 0;
+    robot1_coord_now_.y = 0;
+    robot1_coord_now_.pose = 0;
+    ros::Subscriber robot1_coordinate_now_ = nh.subscribe("robot1_web/coord_now", 10, Robo1CoordNowCB);
+
     auto blackboard_ptr = std::make_shared<PrivateBoard>();
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr);
     int index = 0;
@@ -30,7 +115,7 @@ int main(int argc, char **argv)
     auto robot3_move_ptr = std::make_shared<shop::decision::MoveAction>(3, "robot3 move", blackboard_ptr, goal_action_ptr);
     auto robot4_move_ptr = std::make_shared<shop::decision::MoveAction>(4, "robot4 move", blackboard_ptr, goal_action_ptr);
 
-    auto robot1_action_ptr = std::make_shared<shop::decision::ShopAction>(1, "robot1 shop", blackboard_ptr, goal_action_ptr);
+    auto robot1_action_ptr = std::make_shared<shop::decision::ShopActiontest>(1, "robot1 shop", blackboard_ptr, goal_action_ptr);
     auto robot2_action_ptr = std::make_shared<shop::decision::ShopAction>(2, "robot2 shop", blackboard_ptr, goal_action_ptr);
     auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop", blackboard_ptr, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop", blackboard_ptr, goal_action_ptr);
@@ -41,21 +126,37 @@ int main(int argc, char **argv)
     auto robot4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("test", blackboard_ptr);
     robot4_opening_behavior_ptr->AddChildren(robot1_opening_ptr);
     robot4_opening_behavior_ptr->AddChildren(robot1_move_ptr);
+    robot4_opening_behavior_ptr->AddChildren(robot1_action_ptr);
 
+    auto temp_dir_ptr = blackboard_ptr->GetDirPtr("robot1/run_coordinate");
+    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+
+    dir_ptr->OpenLock();
+    dir_ptr->Set(0, 7, 2);
     while (ros::ok)
     {
         ros::spinOnce();
-        auto temp_dir_ptr = blackboard_ptr->GetDirPtr("robot1/run_coordinate");
-        auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-        
-        dir_ptr->OpenLock();
-        dir_ptr->Set(4,2,1);
         robot4_opening_behavior_ptr->Run();
-        auto state = robot4_opening_behavior_ptr->GetBehaviorState();
-        if (state == BehaviorState::SUCCESS) {
-            while(1){}   
+        if (robot1_coord_now_.x == 4 && robot1_coord_now_.y == 2)
+        {
+            goal_action_ptr->CancelMoveGoal(1);
+            ROS_INFO("in this");
+            while (1)
+            {
+            }
         }
-        
+        auto state = robot4_opening_behavior_ptr->GetBehaviorState();
+        if (state == BehaviorState::SUCCESS)
+        {
+            auto temp_dir_ptr = blackboard_ptr->GetDirPtr("robot1/run_coordinate");
+            auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+
+            dir_ptr->OpenLock();
+            dir_ptr->Set(7, 4, 4);
+            robot4_opening_behavior_ptr->Reset();
+        }
+
         index++;
+        // ROS_INFO("tree is run %d",index);
     }
 }
