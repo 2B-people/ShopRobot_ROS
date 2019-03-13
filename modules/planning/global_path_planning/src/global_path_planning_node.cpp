@@ -21,10 +21,8 @@ public:
     GlobalPlan(std::string name): GlobalBase(name), INF(999)
     {
         flag = 1;
-        robor_1_level = 1;
-        robot_2_level = 2;
-        robot_3_level = 3;
-        robot_4_level = 4;
+        for(int i=0; i<4; i++)
+            robot_level.push_back(i+1);
 
         int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -156,19 +154,408 @@ public:
 
                 flag += 1;
             }
-            else
-            {
-                int obstacles = 1;
+        }
+        else
+        {
 
-                while(obstacles)
+            for(int i=0; i<4; i++)
+            {
+                if(robot_level[i] == 2)
                 {
-                    
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_1.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_1.front();
+                            path_1.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_1 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_2.size() == 0)
+                            {
+                                final_coord_2 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_2.front();
+                            path_2.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_2 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_3.size() == 0)
+                            {
+                                final_coord_3 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_3.front();
+                            path_3.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_3 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_4.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_4.front();
+                            path_4.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_2[stop_coord.first][stop_coord.second] -= 1;
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_4 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
                 }
             }
-        }
 
+            for(int i=0; i<4; i++)
+            {
+                if(robot_level[i] == 3)
+                {
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_1.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
 
-        
+                            Coord last_coord;
+                            Coord stop_coord = path_1.front();
+                            path_1.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_1 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_2.size() == 0)
+                            {
+                                final_coord_2 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_2.front();
+                            path_2.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_2 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_3.size() == 0)
+                            {
+                                final_coord_3 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_3.front();
+                            path_3.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_3 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_4.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_4.front();
+                            path_4.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_3[stop_coord.first][stop_coord.second] -= 1;
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_4 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+                }
+            }
+
+            for(int i=0; i<4; i++)
+            {
+                if(robot_level[i] == 4)
+                {
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_1.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_1.front();
+                            path_1.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_1 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_2.size() == 0)
+                            {
+                                final_coord_2 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_2.front();
+                            path_2.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_2 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_3.size() == 0)
+                            {
+                                final_coord_3 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_3.front();
+                            path_3.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_3 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        int arrive_flag = 1
+                        while(arrive_flag)
+                        {
+                            if(path_4.size() == 0)
+                            {
+                                final_coord_1 = last_coord;
+                                break;
+                            }
+
+                            Coord last_coord;
+                            Coord stop_coord = path_4.front();
+                            path_4.pop();
+
+                            if(map_2[stop_coord.first][stop_coord.second] == 1)
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                            }
+                            else
+                            {
+                                map_4[stop_coord.first][stop_coord.second] -= 1;
+                                final_coord_4 = last_coord;
+                                arrive_flag = 0;
+                            }
+                            last_coord = stop_coord;
+                        }
+                    }
+                }
+            }
+
+            
+        }     
     }
 
     void PositionOfObstacles(int map[num_x][num_y])
@@ -286,7 +673,7 @@ private:
     int map_3[num_x][num_y];
     int map_4[num_x][num_y];
 
-    int robot_1_level, robot_2_level, robot_3_level, robot_4_level;
+    vector<int> robot_level;
 
     Coord final_coord_1, final_coord_2, final_coord_3, final_coord_4;
 
