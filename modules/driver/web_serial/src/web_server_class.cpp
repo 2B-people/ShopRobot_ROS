@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-12 13:12:17
+ * @LastEditTime: 2019-03-13 18:59:00
  */
 #include <web_serial/web_server_class.h>
 
@@ -275,7 +275,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 std::string re_buf_string = Recv();
-                if (re_buf_string == "finish")
+                if (re_buf_string.substr(0,6) == "finish")
                 {
                     ROS_INFO("%s is finish", goal->action_name.c_str());
                     break;
@@ -312,7 +312,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 
             std::string re_buf = Recv();
             ROS_INFO("%s", re_buf.c_str());
-            if (re_buf == "finish")
+            if (re_buf.substr(0,6) == "finish")
             {
                 break;
             }
@@ -459,7 +459,7 @@ std::string WebServer::Recv(void)
     char re_frist_buf[BUFF_MAX];
     while (1)
     {
-        memset(re_frist_buf, 0, BUFF_MAX);
+        memset(re_frist_buf, '\0', BUFF_MAX);
         recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
         temp = re_frist_buf;
         std::string jud = temp.substr(0, 3);

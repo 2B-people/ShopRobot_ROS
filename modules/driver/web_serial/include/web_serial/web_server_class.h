@@ -37,7 +37,7 @@ namespace shop
 {
 namespace webserver
 {
-#define BUFF_MAX 100
+#define BUFF_MAX 9
 
 typedef actionlib::SimpleActionServer<data::MoveAction> MOVEACTIONSERVER;
 typedef actionlib::SimpleActionServer<data::ShopActionAction> SHOPACTIONSERVER;
