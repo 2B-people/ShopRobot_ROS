@@ -21,10 +21,8 @@ public:
     GlobalPlan(std::string name): GlobalBase(name), INF(999)
     {
         flag = 1;
-        plan_flag_1 = 0;
-        plan_flag_2 = 0;
-        plan_flag_3 = 0;
-        plan_flag_4 = 0;
+        plan_flag_1 = plan_flag_2 = plan_flag_3 = plan_flag_4 = 0;
+        arrive_flag_1 = arrive_flag_2 = arrive_flag_3 = arrive_flag_4 = 1;
 
         for(int i=0; i<4; i++)
             robot_level.push_back(i+1);
@@ -111,10 +109,15 @@ public:
                 map_4[local_4.fi rst][local_4.second] += 1;
                     
             }
-            flag += 1;
+            flag = 0;
         }
         else
-        {
+        {   
+            temp_path_1 = path_1；
+            temp_path_2 = path_2；
+            temp_path_3 = path_3；
+            temp_path_4 = path_4;
+
 
             for(int i=0; i<4; i++) //计算优先级为2的机器人所停位置
             {
@@ -123,18 +126,17 @@ public:
                     vehicle_num = i+1;
                     if(vehicle_num == 1)
                     {
-                        int arrive_flag = 1
-                        while(arrive_flag)
+                        while(arrive_flag_1)
                         {
-                            if(path_1.size() == 0)
+                            if(temp_path_1.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_1.front();
-                            path_1.pop();
+                            Coord stop_coord = temp_path_1.front();
+                            temp_path_1.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -148,7 +150,7 @@ public:
                                 map_3[stop_coord.first][stop_coord.second] -= 1;
                                 map_4[stop_coord.first][stop_coord.second] -= 1;
                                 final_coord_1 = last_coord;
-                                arrive_flag = 0;
+                                arrive_flag_1 = 0;
                             }
                             last_coord = stop_coord;
                             
@@ -157,18 +159,17 @@ public:
 
                     if(vehicle_num == 2)
                     {
-                        int arrive_flag = 1
-                        while(arrive_flag)
+                        while(arrive_flag_2)
                         {
-                            if(path_2.size() == 0)
+                            if(temp_path_2.size() == 0)
                             {
                                 final_coord_2 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_2.front();
-                            path_2.pop();
+                            Coord stop_coord = temp_path_2.front();
+                            temp_path_2.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -182,7 +183,7 @@ public:
                                 map_3[stop_coord.first][stop_coord.second] -= 1;
                                 map_4[stop_coord.first][stop_coord.second] -= 1;
                                 final_coord_2 = last_coord;
-                                arrive_flag = 0;
+                                arrive_flag_2 = 0;
                             }
                             last_coord = stop_coord;
                         }
@@ -190,18 +191,17 @@ public:
 
                     if(vehicle_num == 3)
                     {
-                        int arrive_flag = 1
-                        while(arrive_flag)
+                        while(arrive_flag_3)
                         {
-                            if(path_3.size() == 0)
+                            if(temp_path_3.size() == 0)
                             {
                                 final_coord_3 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_3.front();
-                            path_3.pop();
+                            Coord stop_coord = temp_path_3.front();
+                            temp_path_3.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -215,7 +215,7 @@ public:
                                 map_3[stop_coord.first][stop_coord.second] -= 1;
                                 map_4[stop_coord.first][stop_coord.second] -= 1;
                                 final_coord_3 = last_coord;
-                                arrive_flag = 0;
+                                arrive_flag_3 = 0;
                             }
                             last_coord = stop_coord;
                         }
@@ -223,18 +223,17 @@ public:
 
                     if(vehicle_num == 4)
                     {
-                        int arrive_flag = 1
-                        while(arrive_flag)
+                        while(arrive_flag_4)
                         {
-                            if(path_4.size() == 0)
+                            if(temp_path_4.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_4.front();
-                            path_4.pop();
+                            Coord stop_coord = temp_path_4.front();
+                            temp_path_4.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -248,7 +247,7 @@ public:
                                 map_3[stop_coord.first][stop_coord.second] -= 1;
                                 map_4[stop_coord.first][stop_coord.second] -= 1;
                                 final_coord_4 = last_coord;
-                                arrive_flag = 0;
+                                arrive_flag_4 = 0;
                             }
                             last_coord = stop_coord;
                         }
@@ -266,15 +265,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_1.size() == 0)
+                            if(temp_path_1.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_1.front();
-                            path_1.pop();
+                            Coord stop_coord = temp_path_1.front();
+                            temp_path_1.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -298,15 +297,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_2.size() == 0)
+                            if(temp_path_2.size() == 0)
                             {
                                 final_coord_2 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_2.front();
-                            path_2.pop();
+                            Coord stop_coord = temp_path_2.front();
+                            temp_path_2.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -329,15 +328,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_3.size() == 0)
+                            if(temp_path_3.size() == 0)
                             {
                                 final_coord_3 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_3.front();
-                            path_3.pop();
+                            Coord stop_coord = temp_path_3.front();
+                            temp_path_3.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -360,15 +359,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_4.size() == 0)
+                            if(temp_path_4.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_4.front();
-                            path_4.pop();
+                            Coord stop_coord = temp_path_4.front();
+                            temp_path_4.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -398,15 +397,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_1.size() == 0)
+                            if(temp_path_1.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_1.front();
-                            path_1.pop();
+                            Coord stop_coord = temp_path_1.front();
+                            temp_path_1.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -428,15 +427,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_2.size() == 0)
+                            if(temp_path_2.size() == 0)
                             {
                                 final_coord_2 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_2.front();
-                            path_2.pop();
+                            Coord stop_coord = temp_path_2.front();
+                            temp_path_2.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -457,15 +456,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_3.size() == 0)
+                            if(temp_path_3.size() == 0)
                             {
                                 final_coord_3 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_3.front();
-                            path_3.pop();
+                            Coord stop_coord = temp_path_3.front();
+                            temp_path_3.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -486,15 +485,15 @@ public:
                         int arrive_flag = 1
                         while(arrive_flag)
                         {
-                            if(path_4.size() == 0)
+                            if(temp_path_4.size() == 0)
                             {
                                 final_coord_1 = last_coord;
                                 break;
                             }
 
                             Coord last_coord;
-                            Coord stop_coord = path_4.front();
-                            path_4.pop();
+                            Coord stop_coord = temp_path_4.front();
+                            temp_path_4.pop();
 
                             if(map_2[stop_coord.first][stop_coord.second] == 1)
                             {
@@ -512,7 +511,7 @@ public:
                 }
             }
 
-            for(int i=0; i<4; i++) //计算优先级为1的机器人已走过的路径
+            for(int i=0; i<4; i++) //得到优先级为1的机器人所走过的路径并更新地图
             {
                 if(robot_level[i] == 1)
                 {
@@ -534,11 +533,17 @@ public:
                             {
                                 path_1.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                             }
                             else
                             {
                                 path_1.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                                 no_arrive = 0;
                             }
 
@@ -563,11 +568,17 @@ public:
                             {
                                 path_2.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                             }
                             else
                             {
                                 path_2.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                                 no_arrive = 0;
                             }
 
@@ -592,11 +603,17 @@ public:
                             {
                                 path_3.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                             }
                             else
                             {
                                 path_3.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                                 no_arrive = 0;
                             }
 
@@ -621,11 +638,17 @@ public:
                             {
                                 path_4.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                             }
                             else
                             {
                                 path_4.pop();
                                 map_1[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_2[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_3[arrive_coord.first][arrive_coord.second] -= 1;
+                                map_4[arrive_coord.first][arrive_coord.second] -= 1;
                                 no_arrive = 0;
                             }
 
@@ -633,6 +656,314 @@ public:
                     }
                 }
             }
+
+            for(int i=0; i<4; i++) //为优先级为2的机器人定义剩下路径
+            {
+                if(robot_level[i] == 2)
+                {
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        auto now_1 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_1.front();
+                            
+                            if(prepare_arrive.first == now_1.x && prepare_arrive.second == now_1.y)
+                            {
+                                if(final_coord_1.first == now_1.x && final_coord_1.second == now1.y)
+                                    arrive_flag_1 = 1
+                                path_1.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_1.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        auto now_2 = GetNowCoord(2);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_2.front();
+                            
+                            if(prepare_arrive.first == now_2.x && prepare_arrive.second == now_2.y)
+                            {
+                                if(final_coord_2.first == now_2.x && final_coord_2.second == now_2.y)
+                                    arrive_flag_2 = 1
+                                path_2.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_2.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        auto now_3 = GetNowCoord(3);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_3.front();
+                            
+                            if(prepare_arrive.first == now_3.x && prepare_arrive.second == now_3.y)
+                            {
+                                if(final_coord_3.first == now_3.x && final_coord_3.second == now_3.y)
+                                    arrive_flag_3 = 1
+                                path_3.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_3.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        auto now_4 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_4.front();
+                            
+                            if(prepare_arrive.first == now_4.x && prepare_arrive.second == now_4.y)
+                            {
+                                if(final_coord_4.first == now_4.x && final_coord_4.second == now_4.y)
+                                    arrive_flag_4 = 1
+                                path_4.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_4.pop();
+                            }
+                            
+                        }
+                    }
+                    
+                }
+                
+        
+            }
+
+            for(int i=0; i<4; i++) //为优先级为3的机器人定义剩下路径
+            {
+                if(robot_level[i] == 3)
+                {
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        auto now_1 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_1.front();
+                            
+                            if(prepare_arrive.first == now_1.x && prepare_arrive.second == now_1.y)
+                            {
+                                if(final_coord_1.first == now_1.x && final_coord_1.second == now1.y)
+                                    arrive_flag_1 = 1
+                                path_1.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_1.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        auto now_2 = GetNowCoord(2);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_2.front();
+                            
+                            if(prepare_arrive.first == now_2.x && prepare_arrive.second == now_2.y)
+                            {
+                                if(final_coord_2.first == now_2.x && final_coord_2.second == now_2.y)
+                                    arrive_flag_2 = 1
+                                path_2.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_2.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        auto now_3 = GetNowCoord(3);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_3.front();
+                            
+                            if(prepare_arrive.first == now_3.x && prepare_arrive.second == now_3.y)
+                            {
+                                if(final_coord_3.first == now_3.x && final_coord_3.second == now_3.y)
+                                    arrive_flag_3 = 1
+                                path_3.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_3.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        auto now_4 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_4.front();
+                            
+                            if(prepare_arrive.first == now_4.x && prepare_arrive.second == now_4.y)
+                            {
+                                if(final_coord_4.first == now_4.x && final_coord_4.second == now_4.y)
+                                    arrive_flag_4 = 1
+                                path_4.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_4.pop();
+                            }
+                            
+                        }
+                    }
+                    
+                }
+                
+        
+            }
+
+            for(int i=0; i<4; i++) //为优先级为4的机器人定义剩下路径
+            {
+                if(robot_level[i] == 4)
+                {
+                    vehicle_num = i+1;
+                    if(vehicle_num == 1)
+                    {
+                        auto now_1 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_1.front();
+                            
+                            if(prepare_arrive.first == now_1.x && prepare_arrive.second == now_1.y)
+                            {
+                                if(final_coord_1.first == now_1.x && final_coord_1.second == now1.y)
+                                    arrive_flag_1 = 1
+                                path_1.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_1.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 2)
+                    {
+                        auto now_2 = GetNowCoord(2);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_2.front();
+                            
+                            if(prepare_arrive.first == now_2.x && prepare_arrive.second == now_2.y)
+                            {
+                                if(final_coord_2.first == now_2.x && final_coord_2.second == now_2.y)
+                                    arrive_flag_2 = 1
+                                path_2.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_2.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 3)
+                    {
+                        auto now_3 = GetNowCoord(3);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_3.front();
+                            
+                            if(prepare_arrive.first == now_3.x && prepare_arrive.second == now_3.y)
+                            {
+                                if(final_coord_3.first == now_3.x && final_coord_3.second == now_3.y)
+                                    arrive_flag_3 = 1
+                                path_3.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_3.pop();
+                            }
+                            
+                        }
+                    }
+
+                    if(vehicle_num == 4)
+                    {
+                        auto now_4 = GetNowCoord(1);
+                        
+                        while(1)
+                        {
+                            Coord prepare_arrive = path_4.front();
+                            
+                            if(prepare_arrive.first == now_4.x && prepare_arrive.second == now_4.y)
+                            {
+                                if(final_coord_4.first == now_4.x && final_coord_4.second == now_4.y)
+                                    arrive_flag_4 = 1
+                                path_4.pop();
+                                break;
+                            }
+                            else
+                            {
+                                path_4.pop();
+                            }
+                            
+                        }
+                    }
+                    
+                }
+                
+        
+            }
+
+
             
             auto now_1 = GetNowCoord(1);
             auto end_1 = GetTargetCoord(1);
@@ -1236,6 +1567,7 @@ private:
     const int INF;
 
     int flag, plan_flag_1, plan_flag_2, plan_flag_3, plan_flag_4;
+    int arrive_flag_1, arrive_flag_2, arrive_flag_3, arrive_flag_4;
 
     int map_1[num_x][num_y];
     int map_2[num_x][num_y];
