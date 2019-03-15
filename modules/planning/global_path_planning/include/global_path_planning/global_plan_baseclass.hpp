@@ -3,7 +3,19 @@
 
 #include <ros/ros.h>
 #include <ros/time.h>
+
 #include <common/rrts.h>
+#include <common/main_interface.h>
+
+#include <string>
+
+#include <data/Coord.h>
+#include <data/SetBool.h>
+#include <data/Goods.h>
+#include <data/Roadblock.h>
+#include <data/Coordinate.h>
+#include <data/ShelfBarrier.h>
+#include <data/ActionName.h>
 
 namespace shop
 {
@@ -94,9 +106,9 @@ public:
       ROS_ERROR("no robot num in %s in %s", __FUNCTION__, name_.c_str());
       break;
     }
-    result.x = srv.x;
-    result.y = srv.y;
-    result.pose = result.pose;
+    result.x = srv.response.x;
+    result.y = srv.response.y;
+    result.pose = srv.response.pose;
     return result;
   }
 

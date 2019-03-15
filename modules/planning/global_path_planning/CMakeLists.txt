@@ -21,6 +21,6 @@ catkin_package()
 include_directories(include)
 include_directories( ${catkin_INCLUDE_DIRS})
 
-add_executable(global_path_planing src/global_path_planing.cpp)
+add_executable(global_path_planing src/global_path_planning_node.cpp)
 add_dependencies(global_path_planing rrts  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(global_path_planing rrts  ${catkin_LIBRARIES} )

@@ -4,7 +4,7 @@
 #include <cstring>
 #include <vector>
 
-#include <global_path_planning_node.h>
+#include <global_path_planning/global_plan_baseclass.hpp>
 
 #define num_x 10
 #define num_y 10
