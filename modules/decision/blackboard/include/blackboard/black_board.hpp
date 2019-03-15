@@ -23,7 +23,8 @@ enum class DictionaryType
     ACTIONNAME, //动作名字
     GOODS,      //货物
     ROADBLOCK,   //路障
-    GOODSHELF   //货架
+    GOODSHELF,   //货架
+    PHOTONEMBER  //照片次数
 };
 
 //字典基类,提供接口

@@ -1248,9 +1248,5 @@ private:
 
 }
 
-
-
-
-
 } // namespace pathplan
 } // namespace shop

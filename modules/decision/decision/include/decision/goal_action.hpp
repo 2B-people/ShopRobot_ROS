@@ -45,13 +45,12 @@ public:
     auto robot2_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot2_opeing_flag", robot2_opeing_flag_ptr);
 
-
     auto robot3_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot3_opeing_flag", robot3_opeing_flag_ptr);
 
     auto robot4_opeing_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("robot4_opeing_flag", robot4_opeing_flag_ptr);
-    
+
     //拍照成功flag
     auto photo_done_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("photo_done_flag", photo_done_flag_ptr);
@@ -76,16 +75,21 @@ public:
     AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
     AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
 
-    //@breif 写在全局黑板中了
+
+    //初始值为number1
+    auto photo_number = std::make_shared<PhotoNemberDir>(0);
+    AddDataIntoWorld("photo_number", photo_number);
+
+    //@breif 
     //目标动作
-    // auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
-    // auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
-    // auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
-    // auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
-    // AddDataIntoWorld("robot1/action_name", robot1_action_name);
-    // AddDataIntoWorld("robot2/action_name", robot2_action_name);
-    // AddDataIntoWorld("robot3/action_name", robot3_action_name);
-    // AddDataIntoWorld("robot4/action_name", robot4_action_name);
+    auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
+    auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
+    AddDataIntoWorld("robot1/action_name", robot1_action_name);
+    AddDataIntoWorld("robot2/action_name", robot2_action_name);
+    AddDataIntoWorld("robot3/action_name", robot3_action_name);
+    AddDataIntoWorld("robot4/action_name", robot4_action_name);
   }
   ~PrivateBoard() = default;
 
@@ -102,6 +106,24 @@ public:
     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
     bool_dir_ptr->OpenLock();
     bool_dir_ptr->Set(set_bool);
+  }
+
+  void SetCoordValue(uint8_t robot_num, uint16_t set_x, uint16_t set_y, uint8_t set_pose)
+  {
+    std::string coordinate_key = "robot" + std::to_string(robot_num) + "/run_coordinate";
+    auto temp_dir_ptr = GetDirPtr(coordinate_key);
+    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+    dir_ptr->OpenLock();
+    dir_ptr->Set(set_x, set_y, set_pose);
+  }
+
+  void SetActionName(uint8_t robot_num,std::string name)
+  {
+    std::string action_key = "robot" + std::to_string(robot_num) + "/action_name";
+    auto temp_dir_ptr = GetDirPtr(action_key);
+    auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
+    dir_ptr->OpenLock();
+    dir_ptr->Set(name); 
   }
 
 private:
@@ -125,25 +147,28 @@ public:
                                                       robot3_open_action_clint_("robot3_web/opening_action", true),
                                                       robot3_shop_action_clint_("robot3_web/shop_action", true),
                                                       robot4_move_action_clint_("robot4_web/move_action", true),
-                                                      robot4_shop_action_clint_("robot4_web/shop_action", true)
+                                                      robot4_shop_action_clint_("robot4_web/shop_action", true),
+                                                      robot4_open_action_clint_("robot4_web/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
     camera_action_clint_.waitForServer();
     // detection_clint_.waitForServer();
-    robot1_move_action_clint_.waitForServer();
-    robot1_open_action_clint_.waitForServer();
-    robot1_shop_action_clint_.waitForServer();
+    // robot1_move_action_clint_.waitForServer();
+    // robot1_open_action_clint_.waitForServer();
+    // robot1_shop_action_clint_.waitForServer();
     // robot2_move_action_clint_.waitForServer();
     // robot2_open_action_clint_.waitForServer();
     // robot2_shop_action_clint_.waitForServer();
-    // robot3_move_action_clint_.waitForServer();
-    // robot3_open_action_clint_.waitForServer();
-    // robot3_shop_action_clint_.waitForServer();
+    robot3_move_action_clint_.waitForServer();
+    robot3_open_action_clint_.waitForServer();
+    robot3_shop_action_clint_.waitForServer();
     // robot4_move_action_clint_.waitForServer();
+    // robot4_open_action_clint_.waitForServer();
     // robot4_shop_action_clint_.waitForServer();
     ROS_INFO(" ALL Action server is started");
   }
+
   ~GoalAction() = default;
 
   void SendCameraGoal(int8_t image_num)
@@ -203,8 +228,7 @@ public:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
       break;
     }
-    ROS_INFO("is here %s",__FUNCTION__);
-
+    ROS_INFO("is here %s", __FUNCTION__);
   }
 
   // @brief 发布车动作目标
@@ -265,7 +289,12 @@ public:
                                          OPENINGCLINT::SimpleFeedbackCallback());
       break;
     case 3:
-      robot2_open_action_clint_.sendGoal(goal,
+      robot3_open_action_clint_.sendGoal(goal,
+                                         OPENINGCLINT::SimpleDoneCallback(),
+                                         OPENINGCLINT::SimpleActiveCallback(),
+                                         OPENINGCLINT::SimpleFeedbackCallback());
+    case 4:
+      robot4_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
                                          OPENINGCLINT::SimpleFeedbackCallback());
@@ -293,7 +322,7 @@ public:
       ROS_INFO("robot3 is cancel!");
       break;
     case 4:
-      robot3_move_action_clint_.cancelGoal();
+      robot4_move_action_clint_.cancelGoal();
       ROS_INFO("robot3 is cancel!");
       break;
     default:
@@ -312,15 +341,15 @@ public:
       ROS_INFO("robot1 is cancel!");
       break;
     case 2:
-      robot1_shop_action_clint_.cancelGoal();
+      robot2_shop_action_clint_.cancelGoal();
       ROS_INFO("robot2 is cancel!");
       break;
     case 3:
-      robot1_shop_action_clint_.cancelGoal();
+      robot3_shop_action_clint_.cancelGoal();
       ROS_INFO("robot3 is cancel!");
       break;
     case 4:
-      robot1_shop_action_clint_.cancelGoal();
+      robot4_shop_action_clint_.cancelGoal();
       ROS_INFO("robot3 is cancel!");
       break;
     default:
@@ -332,7 +361,7 @@ public:
   // @brief 得到move action的状态
   BehaviorState GetMoveBehaviorState(int8_t robot_num)
   {
-    auto state = robot1_move_action_clint_.getState();
+    actionlib::SimpleClientGoalState state(actionlib::SimpleClientGoalState::ACTIVE);
     switch (robot_num)
     {
     case 1:
@@ -376,7 +405,7 @@ public:
   // @brief 得到shop action的状态
   BehaviorState GetShopBehaviorState(int8_t robot_num)
   {
-    auto state = robot1_shop_action_clint_.getState();
+    actionlib::SimpleClientGoalState state(actionlib::SimpleClientGoalState::ACTIVE);
 
     switch (robot_num)
     {
@@ -421,7 +450,7 @@ public:
   // @brief 得到open action的状态
   BehaviorState GetOpenBehaviorState(int8_t robot_num)
   {
-    auto state = robot1_open_action_clint_.getState();    
+    actionlib::SimpleClientGoalState state(actionlib::SimpleClientGoalState::ACTIVE);
 
     switch (robot_num)
     {
@@ -433,6 +462,9 @@ public:
       break;
     case 3:
       state = robot3_open_action_clint_.getState();
+      break;
+    case 4:
+      state = robot4_open_action_clint_.getState();
       break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
@@ -460,6 +492,7 @@ public:
     }
   }
 
+  //得到相机的状态
   BehaviorState GetCameraState()
   {
     auto state = camera_action_clint_.getState();
@@ -485,6 +518,7 @@ public:
     }
   }
 
+  //得到识别的状态
   BehaviorState GetDetectionState()
   {
     auto state = detection_clint_.getState();
@@ -533,6 +567,8 @@ private:
   //robot4
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
+  OPENINGCLINT robot4_open_action_clint_;
+
 };
 
 } // namespace decision

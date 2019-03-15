@@ -97,6 +97,45 @@ class ActionNameDir : public DirBase
     std::string initial_name_;
 };
 
+
+class PhotoNemberDir: public DirBase
+{
+    
+public:
+    PhotoNemberDir(uint8_t number)
+        :DirBase(DictionaryType::PHOTONEMBER),initial_number_(number),number_(number)
+        {}
+    ~PhotoNemberDir() =default;
+
+    uint8_t GetPhotoNumber()
+    {
+        return number_;
+    }
+
+    void Set(uint8_t number)
+    {
+        if(flag_)
+        {
+            number_ = number;
+        }
+        else
+        {
+            ROS_WARN("%d is lock in %s", number, __FUNCTION__);            
+        }
+    }
+
+    void RepeatInit()
+    {
+        number_ = initial_number_;
+        OpenLock();
+    }
+private:
+    uint8_t number_;
+    uint8_t initial_number_;
+
+};
+
+
 //坐标类型
 class CoordinateDir : public DirBase
 {

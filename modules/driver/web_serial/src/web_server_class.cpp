@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-13 18:59:00
+ * @LastEditTime: 2019-03-15 18:50:33
  */
 #include <web_serial/web_server_class.h>
 
@@ -40,25 +40,24 @@ WebServer::WebServer(std::string name)
     bool is_get_port = nh_private_.getParam("port", bind_port_);
     if (is_debug_)
     {
-        if (is_get_addr)
-        {
-            ROS_ERROR("%s addr cant get param", name_.c_str());
-        }
-        else
-        {
-            ROS_INFO("%s is %d", name.c_str(), bind_port_);
-        }
+        // if (is_get_addr)
+        // {
+        //     ROS_INFO("%s addr cant get param", name_.c_str());
+        // }
+        // else
+        // {
+        //     ROS_INFO("%s is %d", name.c_str(), bind_port_);
+        // }
 
-        if (is_get_port)
-        {
-            ROS_ERROR("%s port cant get param", name_.c_str());
-        }
-        else
-        {
-            ROS_INFO("%s is %d", name.c_str(), bind_port_);
-        }
-
-        ROS_WARN("%s %s %d", name_.c_str(), server_addr_.c_str(), bind_port_);
+        // if (is_get_port)
+        // {
+        //     ROS_INFO("%s port cant get param", name_.c_str());
+        // }
+        // else
+        // {
+        //     ROS_INFO("%s is %d", name.c_str(), bind_port_);
+        // }
+        ROS_INFO("%s %s %d", name_.c_str(), server_addr_.c_str(), bind_port_);
     }
 
     //publish init
@@ -78,6 +77,8 @@ WebServer::WebServer(std::string name)
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
     }
+
+    //web init
     if (InitWeb() == false)
     {
         exit(-1);
@@ -86,14 +87,12 @@ WebServer::WebServer(std::string name)
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
     action_as_.registerPreemptCallback(boost::bind(&WebServer::ShopPreemptCB, this));
+    opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
     //action open
     move_as_.start();
     action_as_.start();
-    if (name_ != "robot4_web")
-    {
-        opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
-        opening_as_.start();
-    }
+    opening_as_.start();
+
     ROS_INFO("%s is run", name.c_str());
 }
 
@@ -275,7 +274,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 std::string re_buf_string = Recv();
-                if (re_buf_string.substr(0,6) == "finish")
+                if (re_buf_string.substr(0, 6) == "finish")
                 {
                     ROS_INFO("%s is finish", goal->action_name.c_str());
                     break;
@@ -312,11 +311,11 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 
             std::string re_buf = Recv();
             ROS_INFO("%s", re_buf.c_str());
-            if (re_buf.substr(0,6) == "finish")
+            if (re_buf.substr(0, 6) == "finish")
             {
                 break;
             }
-            else if (re_buf[0] == 'S')
+            else if (re_buf[0] == 'B')
             {
                 data::ShelfBarrier srv = DataToBarrier(re_buf);
                 if (shelf_barrier_client_.call(srv))
@@ -378,7 +377,7 @@ void WebServer::MovePreemptCB()
 //动作抢占中断回调函数
 void WebServer::ShopPreemptCB()
 {
-    std::string stop_buf("shop now");
+    std::string stop_buf("open shop now");
     if (action_as_.isActive())
     {
         Send(stop_buf);
@@ -389,7 +388,7 @@ void WebServer::ShopPreemptCB()
 //开局抢占中断回调函数
 void WebServer::OpenPreemptCB()
 {
-    std::string stop_buf("shop now");
+    std::string stop_buf("open shop now");
     if (opening_as_.isActive())
     {
         Send(stop_buf);
@@ -397,7 +396,7 @@ void WebServer::OpenPreemptCB()
     }
 }
 
-//---------------------------------------------//
+//------------------------------------------------------------------------//
 
 // @breif 数据到坐标
 // @pargm buf,recv读到的数据
@@ -450,7 +449,7 @@ data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 bool WebServer::Send(std::string temp)
 {
     std::string str_ = "HDU" + temp;
-    ROS_INFO("%s",str_.c_str());
+    ROS_INFO("%s", str_.c_str());
     send(client_sockfd_, (char *)str_.c_str(), BUFF_MAX, 0);
 }
 

@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-07 21:11:54
- * @LastEditTime: 2019-03-07 21:14:00
+ * @LastEditTime: 2019-03-15 22:32:15
  */
 #ifndef ACTION_NODE_H
 #define ACTION_NODE_H
@@ -40,6 +40,7 @@ public:
   ~MoveAction() = default;
 
 private:
+  //在此调用actionlib
   virtual void OnInitialize()
   {
     auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
@@ -48,6 +49,7 @@ private:
     uint16_t target_y = dir_ptr->GetCoordinateY();
     uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
     std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
+    ROS_INFO("%d %d %d", target_x, target_y, target_pose);
     if (target_x != 10 && target_y != 10 && target_pose != 10)
     {
       goalaction_ptr_->SendMoveGoal(robot_num_, target_x, target_y, target_pose);
@@ -55,21 +57,25 @@ private:
     }
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
-
-  //fixed!!!
+  //得到状态
   virtual BehaviorState Update()
   {
-    return goalaction_ptr_->GetMoveBehaviorState(robot_num_);
+    if (goal_flag_)
+    {
+      return goalaction_ptr_->GetMoveBehaviorState(robot_num_);
+    }
+    else
+    {
+      return BehaviorState::IDLE;
+    }
   }
 
-  //结束是把对应目标坐标清零
   virtual void OnTerminate(BehaviorState state)
   {
-    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
-    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-    dir_ptr->OpenLock();
-    dir_ptr->Set(10, 10, 10);
-
+    // auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(coordinate_key_);
+    // auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
+    // dir_ptr->OpenLock();
+    // dir_ptr->Set(10, 10, 10);
     switch (state)
     {
     case BehaviorState::IDLE:
@@ -82,6 +88,8 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
+      //成功时候把对应坐标清理
+      private_blackboard_ptr_->SetCoordValue(robot_num_, 10, 10, 10);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -114,9 +122,11 @@ public:
     std::string name_key = "shop/robot" + std::to_string(robot_num_) + "/target_actionname_write";
     client_ = nh_.serviceClient<data::ActionName>(name_key);
   }
+
   ~ShopAction() = default;
 
 private:
+  //初始化开始发送目标
   virtual void OnInitialize()
   {
     data::ActionName srv;
@@ -129,9 +139,17 @@ private:
     }
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
+  //更新状态
   virtual BehaviorState Update()
   {
-    return goalaction_ptr_->GetShopBehaviorState(robot_num_);
+    if (goal_flag_)
+    {
+      return goalaction_ptr_->GetShopBehaviorState(robot_num_);
+    }
+    else
+    {
+      return BehaviorState::IDLE;
+    }
   }
 
   virtual void OnTerminate(BehaviorState state)
@@ -148,6 +166,7 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
+      private_blackboard_ptr_->SetActionName(robot_num_, "NONE");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -165,18 +184,21 @@ private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
+//开局动作
 class OpenAction : public ActionNode
 {
 public:
-  OpenAction(uint8_t robot_num, std::string name, const Blackboard::Ptr &blackboard_ptr,
+  OpenAction(uint8_t robot_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
              const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         robot_num_(robot_num),
+        private_blackboard_ptr_(blackboard_ptr),
         goalaction_ptr_(goalaction_ptr),
         goal_flag_(false)
   {
-    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
+    // auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
   }
+
   ~OpenAction() = default;
 
 private:
@@ -186,9 +208,17 @@ private:
     goal_flag_ = true;
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
+
   virtual BehaviorState Update()
   {
-    return goalaction_ptr_->GetOpenBehaviorState(robot_num_);
+    if (goal_flag_)
+    {
+      return goalaction_ptr_->GetOpenBehaviorState(robot_num_);
+    }
+    else
+    {
+      return BehaviorState::IDLE;
+    }
   }
 
   virtual void OnTerminate(BehaviorState state)
@@ -221,6 +251,7 @@ private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
+//拍照动作
 class CameraAction : public ActionNode
 {
 public:
@@ -228,8 +259,7 @@ public:
                const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         goalaction_ptr_(goalaction_ptr),
-        private_blackboard_ptr_(blackboard_ptr),
-        num_count_(1)
+        private_blackboard_ptr_(blackboard_ptr)
   {
   }
   ~CameraAction() = default;
@@ -238,7 +268,11 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
-    goalaction_ptr_->SendCameraGoal(num_count_);
+    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("photo_number");
+    auto dir_ptr = std::dynamic_pointer_cast<PhotoNemberDir>(temp_dir_ptr);
+    dir_ptr->OpenLock();
+    dir_ptr->Set(dir_ptr->GetPhotoNumber() + 1);
+    goalaction_ptr_->SendCameraGoal(dir_ptr->GetPhotoNumber());
   }
   virtual BehaviorState Update()
   {
@@ -256,28 +290,27 @@ private:
     {
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       private_blackboard_ptr_->SetBoolValue(true, "photo_done_flag");
-      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("robot1/run_coordinate");
-      auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-      dir_ptr->OpenLock();
-      switch (num_count_)
+      auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("photo_number");
+      auto dir_ptr = std::dynamic_pointer_cast<PhotoNemberDir>(temp_dir_ptr);
+      switch (dir_ptr->GetPhotoNumber())
       {
       case 1:
-        // dir_ptr->Set(4, 2, 0);
-        dir_ptr->Set(7, 4, 3);
+        //写下一拍照的坐标
+        private_blackboard_ptr_->SetCoordValue(4, 7, 4, 3);
         break;
       case 2:
-        dir_ptr->Set(5, 7, 2);
+        private_blackboard_ptr_->SetCoordValue(4, 5, 7, 2);
         break;
       case 3:
-        dir_ptr->Set(2, 4, 1);
+        private_blackboard_ptr_->SetCoordValue(4, 2, 5, 1);
         break;
       case 4:
+        private_blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
         break;
       default:
-        ROS_ERROR("photo  number is %d !!err!", num_count_);
+        ROS_ERROR("photo  number is %d !!err!", dir_ptr->GetPhotoNumber());
         break;
       }
-      num_count_++;
     }
     break;
     case BehaviorState::FAILURE:
@@ -289,11 +322,11 @@ private:
     }
   }
   uint8_t robot_num_;
-  uint8_t num_count_;
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
+//识别类
 class DetectionAction : public ActionNode
 {
 public:
@@ -301,8 +334,7 @@ public:
                   const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         goalaction_ptr_(goalaction_ptr),
-        private_blackboard_ptr_(blackboard_ptr),
-        num_count_(1)
+        private_blackboard_ptr_(blackboard_ptr)
   {
   }
   ~DetectionAction() = default;
@@ -311,7 +343,9 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
-    goalaction_ptr_->SendDectionGoal(num_count_);
+    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("photo_number");
+    auto dir_ptr = std::dynamic_pointer_cast<PhotoNemberDir>(temp_dir_ptr);
+    goalaction_ptr_->SendDectionGoal(dir_ptr->GetPhotoNumber());
   }
   virtual BehaviorState Update()
   {
@@ -327,8 +361,6 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
-      num_count_++;
-      ROS_INFO("%d disticion is done", num_count_);
       private_blackboard_ptr_->SetBoolValue(false, "photo_done_flag");
       break;
     case BehaviorState::FAILURE:
@@ -340,7 +372,6 @@ private:
     }
   }
   uint8_t robot_num_;
-  uint8_t num_count_;
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
