@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-15 18:50:33
+ * @LastEditTime: 2019-03-15 23:19:09
  */
 #include <web_serial/web_server_class.h>
 
@@ -253,7 +253,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             }
         }
     }
-    ROS_INFO("FININSH");
+    ROS_INFO("%s FININSH",__FUNCTION__);
     result.success_flag = true;
     move_as_.setSucceeded(result);
 }

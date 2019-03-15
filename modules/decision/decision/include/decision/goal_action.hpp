@@ -11,6 +11,7 @@
 #include <data/ShopActionAction.h>
 #include <data/CameraAction.h>
 #include <data/DetectionAction.h>
+#include <data/LocalPlanAction.h>
 
 #include <decision/behavior_node.hpp>
 #include <blackboard/black_board.hpp>
@@ -25,6 +26,7 @@ typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 typedef actionlib::SimpleActionClient<data::CameraAction> CAMERAACTION;
 typedef actionlib::SimpleActionClient<data::DetectionAction> DETECTION;
+typedef actionlib::SimpleActionClient<data::LocalPlanAction> LOCALPLANACTION;
 
 //行为树专用黑板,
 class PrivateBoard : public Blackboard
@@ -60,10 +62,15 @@ public:
     auto robot2_local_plan_flag = std::make_shared<BoolDir>(false);
     auto robot3_local_plan_flag = std::make_shared<BoolDir>(false);
     auto robot4_local_plan_flag = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot1/local_plan/flag", robot1_local_plan_flag);
-    AddDataIntoWorld("robot2/local_plan/flag", robot2_local_plan_flag);
-    AddDataIntoWorld("robot3/local_plan/flag", robot3_local_plan_flag);
-    AddDataIntoWorld("robot4/local_plan/flag", robot4_local_plan_flag);
+
+    auto robot1_local_plan_fuc = std::make_shared<BoolDir>(false);
+    auto robot2_local_plan_fuc = std::make_shared<BoolDir>(false);
+    auto robot3_local_plan_fuc = std::make_shared<BoolDir>(false);
+    auto robot4_local_plan_fuc = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("robot1/local_plan/fuc", robot1_local_plan_fuc);
+    AddDataIntoWorld("robot2/local_plan/fuc", robot2_local_plan_fuc);
+    AddDataIntoWorld("robot3/local_plan/fuc", robot3_local_plan_fuc);
+    AddDataIntoWorld("robot4/local_plan/fuc", robot4_local_plan_fuc);
 
     //可以在任何地方写的目标坐标
     auto robot1_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
@@ -75,12 +82,11 @@ public:
     AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
     AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
 
-
     //初始值为number1
     auto photo_number = std::make_shared<PhotoNemberDir>(0);
     AddDataIntoWorld("photo_number", photo_number);
 
-    //@breif 
+    //@breif
     //目标动作
     auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
     auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
@@ -117,13 +123,13 @@ public:
     dir_ptr->Set(set_x, set_y, set_pose);
   }
 
-  void SetActionName(uint8_t robot_num,std::string name)
+  void SetActionName(uint8_t robot_num, std::string name)
   {
     std::string action_key = "robot" + std::to_string(robot_num) + "/action_name";
     auto temp_dir_ptr = GetDirPtr(action_key);
     auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
     dir_ptr->OpenLock();
-    dir_ptr->Set(name); 
+    dir_ptr->Set(name);
   }
 
 private:
@@ -137,6 +143,7 @@ public:
 
   GoalAction(const Blackboard::Ptr &blackboard_ptr) : camera_action_clint_("camera_action_server", true),
                                                       detection_clint_("detection_action_server", true),
+                                                      localplan_clint_("local_plan", true),
                                                       robot1_move_action_clint_("robot1_web/move_action", true),
                                                       robot1_open_action_clint_("robot1_web/opening_action", true),
                                                       robot1_shop_action_clint_("robot1_web/shop_action", true),
@@ -152,17 +159,18 @@ public:
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
-    camera_action_clint_.waitForServer();
+    // camera_action_clint_.waitForServer();
     // detection_clint_.waitForServer();
+    // localplan_clint_.waitForServer();
     // robot1_move_action_clint_.waitForServer();
     // robot1_open_action_clint_.waitForServer();
     // robot1_shop_action_clint_.waitForServer();
     // robot2_move_action_clint_.waitForServer();
     // robot2_open_action_clint_.waitForServer();
     // robot2_shop_action_clint_.waitForServer();
-    robot3_move_action_clint_.waitForServer();
-    robot3_open_action_clint_.waitForServer();
-    robot3_shop_action_clint_.waitForServer();
+    // robot3_move_action_clint_.waitForServer();
+    // robot3_open_action_clint_.waitForServer();
+    // robot3_shop_action_clint_.waitForServer();
     // robot4_move_action_clint_.waitForServer();
     // robot4_open_action_clint_.waitForServer();
     // robot4_shop_action_clint_.waitForServer();
@@ -171,6 +179,7 @@ public:
 
   ~GoalAction() = default;
 
+  //@brief 发送拍照目标
   void SendCameraGoal(int8_t image_num)
   {
     data::CameraGoal goal;
@@ -181,6 +190,7 @@ public:
                                   CAMERAACTION::SimpleFeedbackCallback());
   }
 
+  //@brief 发送识别目标
   void SendDectionGoal(int8_t image_num)
   {
     data::DetectionGoal goal;
@@ -191,6 +201,17 @@ public:
                               DETECTION::SimpleFeedbackCallback());
   }
 
+  //@brief 发送局部规划目标
+  void SendLocalPlanGoal(int8_t robot_num, int8_t plan_function)
+  {
+    data::LocalPlanGoal goal;
+    goal.robot_num = robot_num;
+    goal.plan_function = plan_function;
+    localplan_clint_.sendGoal(goal,
+                              LOCALPLANACTION::SimpleDoneCallback(),
+                              LOCALPLANACTION::SimpleActiveCallback(),
+                              LOCALPLANACTION::SimpleFeedbackCallback());
+  }
   // @brief 发布车移动目标
   void SendMoveGoal(int8_t robot_num, int16_t x, int16_t y, int8_t pose)
   {
@@ -270,7 +291,7 @@ public:
 
   // @brief 发布发车命令
   // @note 无robot4,robot4为上位机控制
-  //TODO 需要写一个回调函数来实现不同车的发出
+  //TODO 需要写一个回调函数来实现不同车的发出 //note 应该不用
   void SendOpenGoal(int8_t robot_num, std::string car_begin)
   {
     data::OpeningGoal goal;
@@ -544,14 +565,41 @@ public:
     }
   }
 
+  BehaviorState GetLocalPlanState()
+  {
+    auto state = localplan_clint_.getState();
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
 private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 
   ros::NodeHandle nh_;
-
+  // 拍照action
   CAMERAACTION camera_action_clint_;
+  // 识别action
   DETECTION detection_clint_;
-
+  //局部规划
+  LOCALPLANACTION localplan_clint_;
   //robot1
   MOVEACTIONCLINT robot1_move_action_clint_;
   OPENINGCLINT robot1_open_action_clint_;
@@ -568,7 +616,6 @@ private:
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
   OPENINGCLINT robot4_open_action_clint_;
-
 };
 
 } // namespace decision

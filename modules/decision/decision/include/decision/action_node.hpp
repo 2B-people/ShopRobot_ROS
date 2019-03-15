@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-07 21:11:54
- * @LastEditTime: 2019-03-15 22:32:15
+ * @LastEditTime: 2019-03-16 00:07:42
  */
 #ifndef ACTION_NODE_H
 #define ACTION_NODE_H
@@ -372,6 +372,68 @@ private:
     }
   }
   uint8_t robot_num_;
+  GoalAction::Ptr goalaction_ptr_;
+  PrivateBoard::Ptr private_blackboard_ptr_;
+};
+
+//局部规划action类
+class LocalPlanAction : public ActionNode
+{
+public:
+  LocalPlanAction(int8_t robot_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
+                  const GoalAction::Ptr &goalaction_ptr)
+      : ActionNode(name, blackboard_ptr),
+        robot_num_(robot_num),
+        goalaction_ptr_(goalaction_ptr),
+        private_blackboard_ptr_(blackboard_ptr)
+  {
+    flag_name_key_ = "robot" + std::to_string(robot_num_) + "local_plan/flag";
+    fuc_name_key_ = "robot" + std::to_string(robot_num_) + "local_plan/fuc";
+  }
+  ~LocalPlanAction() = default;
+
+private:
+  virtual void OnInitialize()
+  {
+    ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    private_blackboard_ptr_->SetBoolValue(false, flag_name_key_);
+    //funcname:1为规划取物,2为放物
+    if (private_blackboard_ptr_->GetBoolValue(fuc_name_key_))
+    {
+      goalaction_ptr_->SendLocalPlanGoal(robot_num_, 1);
+    }
+    else
+    {
+      goalaction_ptr_->SendLocalPlanGoal(robot_num_, 2);
+    }
+  }
+  virtual BehaviorState Update()
+  {
+    return goalaction_ptr_->GetLocalPlanState();
+  }
+
+  virtual void OnTerminate(BehaviorState state)
+  {
+    switch (state)
+    {
+    case BehaviorState::IDLE:
+      ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
+      break;
+    case BehaviorState::SUCCESS:
+      ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
+      private_blackboard_ptr_->SetBoolValue(true, flag_name_key_);
+      break;
+    case BehaviorState::FAILURE:
+      ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
+      break;
+    default:
+      ROS_ERROR("%s is err", name_.c_str());
+      return;
+    }
+  }
+  uint8_t robot_num_;
+  std::string flag_name_key_;
+  std::string fuc_name_key_;
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
