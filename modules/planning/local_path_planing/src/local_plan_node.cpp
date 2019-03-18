@@ -22,7 +22,7 @@ class LocalPlan : public LocalBase
 
   public:
     LocalPlan(std::string name)
-        : LocalBase(name), INF(999)
+        : LocalBase::LocalBase(name), INF(999)
     {
         for(int i=0; i<4; i++)
         {

@@ -379,6 +379,8 @@ class RoadblockDir : public DirBase
 //     std::vector<std::vector<bool>> goods_shelf_barrier_;
 // };
 
+//初始化的时候是无,
+//设定为true为有货物
 class GoodShelfDir : public DirBase
 {
   public:

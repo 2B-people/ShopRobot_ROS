@@ -12,8 +12,10 @@
 // bug
 // #include <blackboard/data_structure.hpp>
 
-namespace shop{
-namespace decision{
+namespace shop
+{
+namespace decision
+{
 
 enum class DictionaryType
 {
@@ -22,9 +24,9 @@ enum class DictionaryType
     COORDINATE, //坐标
     ACTIONNAME, //动作名字
     GOODS,      //货物
-    ROADBLOCK,   //路障
-    GOODSHELF,   //货架
-    PHOTONEMBER  //照片次数
+    ROADBLOCK,  //路障
+    GOODSHELF,  //货架
+    PHOTONEMBER //照片次数
 };
 
 //字典基类,提供接口
@@ -33,7 +35,7 @@ class DirBase : public std::enable_shared_from_this<DirBase>
   public:
     typedef std::shared_ptr<DirBase> Ptr;
     DirBase(DictionaryType dictionary_type)
-        : dictionary_type_(dictionary_type) , flag_(true){};
+        : dictionary_type_(dictionary_type), flag_(true){};
     virtual ~DirBase() = default;
     //得到字典类型
     DictionaryType GetDictionaryType()
@@ -57,7 +59,6 @@ class DirBase : public std::enable_shared_from_this<DirBase>
 
   protected:
     bool flag_;
-
 
   private:
     DictionaryType dictionary_type_;
@@ -108,13 +109,14 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
     //example:
     // bool GetBoolValue(std::string key)
     // {
-  ros::NodeHandle nh;
+    ros::NodeHandle nh;
     //     auto dir_ptr = GetDirPtr(key);
     //     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
     //     return bool_dir_ptr->GetValue();
     // }
     DirBase::Ptr GetDirPtr(std::string key)
     {
+        // ROS_ERROR("%s", key.c_str());
         if (black_map_.size() == 0)
         {
             ROS_WARN("dirctionary is nothings!");
@@ -123,6 +125,7 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
         auto search = black_map_.find(key);
         if (search != black_map_.end())
         {
+            // ROS_ERROR("in these!!");
             return black_map_[key];
         }
         else
@@ -131,7 +134,6 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
             return nullptr;
         }
     }
-
 
   protected:
     //数据结构:map容器,储存字典指针

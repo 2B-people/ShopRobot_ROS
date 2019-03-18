@@ -83,6 +83,9 @@ public:
     robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
     robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
     robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
+    
+    plan_as_.start();
+    ROS_INFO("localplan is done!");
   }
 
   virtual ~LocalBase() = default;
@@ -233,14 +236,15 @@ public:
     }
   }
 
-  // @breif 使得目标位置为false
+  // @breif 使得目标位置为true
   // @param location:0~11,0 is 1,1 is 2
   // @param shelf_num =a:1,b:2,c:3,d:4
+  // @breif 设定目标位置为有东西
   void SetShelfToFalse(int8_t shelf_num, int8_t location)
   {
     data::ShelfBarrier srv;
     srv.request.location = location;
-    srv.request.shelf_barrier = false;
+    srv.request.shelf_barrier = true;
     switch (shelf_num)
     {
     case 1:

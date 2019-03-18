@@ -1,0 +1,26 @@
+<launch>
+  <param name="debug" value="true" type="bool"/>
+
+  <node name="robot1_web" pkg="web_serial" type="robot1_web_server" output="screen">
+    <param name="addr" value="192.168.31.100" type="str"/>
+    <param name="port" value="1111" type="int"/>
+  </node>
+
+  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  </node>
+  <node name = "debug_goods" pkg="tools" type="debug_goods.py" output="screen">
+  </node>
+  <!-- <node name = "debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
+  </node> -->
+  <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen"></node> -->
+
+  <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
+
+  <node name="local_debug_decision" pkg="decision" type="local_debug_decision" output="screen"></node>
+
+  <!-- 使用此launch文件,可以测试识别的ros节点 -->
+  <!-- <node name="cv_debug_decision" pkg="decision" type="cv_debug_decision" output="screen"></node> -->
+
+  <!-- 测试时可用 -->
+
+</launch>

@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-07 21:11:54
- * @LastEditTime: 2019-03-16 00:07:42
+ * @LastEditTime: 2019-03-18 22:39:53
  */
 #ifndef ACTION_NODE_H
 #define ACTION_NODE_H
@@ -119,8 +119,8 @@ public:
         private_blackboard_ptr_(blackboard_ptr),
         goal_flag_(false)
   {
-    std::string name_key = "shop/robot" + std::to_string(robot_num_) + "/target_actionname_write";
-    client_ = nh_.serviceClient<data::ActionName>(name_key);
+    name_key_ = "robot" + std::to_string(robot_num_) + "/action_name";
+
   }
 
   ~ShopAction() = default;
@@ -129,15 +129,15 @@ private:
   //初始化开始发送目标
   virtual void OnInitialize()
   {
-    data::ActionName srv;
-    client_.call(srv);
-    std::string goal_name = srv.response.action_name;
+    ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr(name_key_);
+    auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
+    std::string goal_name = dir_ptr->GetActionName();
     if (goal_name != "NONE")
     {
       goalaction_ptr_->SendShopGoal(robot_num_, goal_name);
       goal_flag_ = true;
     }
-    ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
   }
   //更新状态
   virtual BehaviorState Update()
@@ -177,6 +177,7 @@ private:
     }
   }
   uint8_t robot_num_;
+  std::string name_key_;
   ros::NodeHandle nh_;
   ros::ServiceClient client_;
   bool goal_flag_;
@@ -376,7 +377,7 @@ private:
   PrivateBoard::Ptr private_blackboard_ptr_;
 };
 
-//局部规划action类
+//局部规划action类gf
 class LocalPlanAction : public ActionNode
 {
 public:
@@ -387,8 +388,8 @@ public:
         goalaction_ptr_(goalaction_ptr),
         private_blackboard_ptr_(blackboard_ptr)
   {
-    flag_name_key_ = "robot" + std::to_string(robot_num_) + "local_plan/flag";
-    fuc_name_key_ = "robot" + std::to_string(robot_num_) + "local_plan/fuc";
+    flag_name_key_ = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
+    fuc_name_key_ = "robot" + std::to_string(robot_num_) + "/local_plan/fuc";
   }
   ~LocalPlanAction() = default;
 
@@ -398,18 +399,31 @@ private:
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
     private_blackboard_ptr_->SetBoolValue(false, flag_name_key_);
     //funcname:1为规划取物,2为放物
-    if (private_blackboard_ptr_->GetBoolValue(fuc_name_key_))
+    if (private_blackboard_ptr_->GetBoolValue("local_plan_run") == false)
     {
-      goalaction_ptr_->SendLocalPlanGoal(robot_num_, 1);
+      if (private_blackboard_ptr_->GetBoolValue(fuc_name_key_))
+      {
+        goalaction_ptr_->SendLocalPlanGoal(robot_num_, 1);
+      }
+      else
+      {
+        goalaction_ptr_->SendLocalPlanGoal(robot_num_, 2);
+      }
+      private_blackboard_ptr_->SetBoolValue(true,"local_plan_run");
     }
     else
     {
-      goalaction_ptr_->SendLocalPlanGoal(robot_num_, 2);
+      ROS_INFO("%s is writ for local plan", name_.c_str());
     }
   }
   virtual BehaviorState Update()
   {
-    return goalaction_ptr_->GetLocalPlanState();
+    if (private_blackboard_ptr_->GetBoolValue("local_plan_run") == false)
+      return BehaviorState::FAILURE;
+    else
+    {
+      return goalaction_ptr_->GetLocalPlanState();
+    }
   }
 
   virtual void OnTerminate(BehaviorState state)
@@ -422,6 +436,7 @@ private:
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       private_blackboard_ptr_->SetBoolValue(true, flag_name_key_);
+      private_blackboard_ptr_->SetBoolValue(false,"local_plan_run");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);

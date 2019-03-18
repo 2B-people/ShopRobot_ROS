@@ -8,7 +8,7 @@ WorldBoard::WorldBoard(std::string name)
     : shop::common::RRTS(name), Blackboard()
 {
     auto goods_dir_ptr = std::make_shared<GoodsDir>();
-    auto roadblock_dir_ptr = std::make_shared<RoadblockDir>(0);
+    auto roadblock_dir_ptr = std::make_shared<RoadblockDir>(1);
     //目标坐标
     auto robot1_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
     auto robot2_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);

@@ -5,18 +5,23 @@
 #include <actionlib/client/simple_action_client.h>
 
 #include <string>
-
+//action
 #include <data/MoveAction.h>
 #include <data/OpeningAction.h>
 #include <data/ShopActionAction.h>
 #include <data/CameraAction.h>
 #include <data/DetectionAction.h>
 #include <data/LocalPlanAction.h>
+//server
+#include <data/Coordinate.h>
+#include <data/ActionName.h>
+#include <data/Coord.h>
 
 #include <decision/behavior_node.hpp>
 #include <blackboard/black_board.hpp>
 #include <blackboard/data_structure.hpp>
 
+#include <decision/private_board.hpp>
 namespace shop
 {
 namespace decision
@@ -28,112 +33,7 @@ typedef actionlib::SimpleActionClient<data::CameraAction> CAMERAACTION;
 typedef actionlib::SimpleActionClient<data::DetectionAction> DETECTION;
 typedef actionlib::SimpleActionClient<data::LocalPlanAction> LOCALPLANACTION;
 
-//行为树专用黑板,
-class PrivateBoard : public Blackboard
-{
-public:
-  typedef std::shared_ptr<PrivateBoard> Ptr;
-  PrivateBoard()
-      : Blackboard()
-  {
-    //game结束的flag
-    auto end_game = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("end_flag", end_game);
 
-    //各类flag
-    auto robot1_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot1_opeing_flag", robot1_opeing_flag_ptr);
-
-    auto robot2_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot2_opeing_flag", robot2_opeing_flag_ptr);
-
-    auto robot3_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot3_opeing_flag", robot3_opeing_flag_ptr);
-
-    auto robot4_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot4_opeing_flag", robot4_opeing_flag_ptr);
-
-    //拍照成功flag
-    auto photo_done_flag_ptr = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("photo_done_flag", photo_done_flag_ptr);
-
-    //局部规划的flag
-    auto robot1_local_plan_flag = std::make_shared<BoolDir>(false);
-    auto robot2_local_plan_flag = std::make_shared<BoolDir>(false);
-    auto robot3_local_plan_flag = std::make_shared<BoolDir>(false);
-    auto robot4_local_plan_flag = std::make_shared<BoolDir>(false);
-
-    auto robot1_local_plan_fuc = std::make_shared<BoolDir>(false);
-    auto robot2_local_plan_fuc = std::make_shared<BoolDir>(false);
-    auto robot3_local_plan_fuc = std::make_shared<BoolDir>(false);
-    auto robot4_local_plan_fuc = std::make_shared<BoolDir>(false);
-    AddDataIntoWorld("robot1/local_plan/fuc", robot1_local_plan_fuc);
-    AddDataIntoWorld("robot2/local_plan/fuc", robot2_local_plan_fuc);
-    AddDataIntoWorld("robot3/local_plan/fuc", robot3_local_plan_fuc);
-    AddDataIntoWorld("robot4/local_plan/fuc", robot4_local_plan_fuc);
-
-    //可以在任何地方写的目标坐标
-    auto robot1_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
-    auto robot2_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
-    auto robot3_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
-    auto robot4_run_coordinate = std::make_shared<CoordinateDir>(10, 10, 10);
-    AddDataIntoWorld("robot1/run_coordinate", robot1_run_coordinate);
-    AddDataIntoWorld("robot2/run_coordinate", robot2_run_coordinate);
-    AddDataIntoWorld("robot3/run_coordinate", robot3_run_coordinate);
-    AddDataIntoWorld("robot4/run_coordinate", robot4_run_coordinate);
-
-    //初始值为number1
-    auto photo_number = std::make_shared<PhotoNemberDir>(0);
-    AddDataIntoWorld("photo_number", photo_number);
-
-    //@breif
-    //目标动作
-    auto robot1_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot2_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot3_action_name = std::make_shared<ActionNameDir>("NONE");
-    auto robot4_action_name = std::make_shared<ActionNameDir>("NONE");
-    AddDataIntoWorld("robot1/action_name", robot1_action_name);
-    AddDataIntoWorld("robot2/action_name", robot2_action_name);
-    AddDataIntoWorld("robot3/action_name", robot3_action_name);
-    AddDataIntoWorld("robot4/action_name", robot4_action_name);
-  }
-  ~PrivateBoard() = default;
-
-  bool GetBoolValue(std::string key)
-  {
-    auto dir_ptr = GetDirPtr(key);
-    auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
-    return bool_dir_ptr->GetValue();
-  }
-
-  void SetBoolValue(bool set_bool, std::string key)
-  {
-    auto dir_ptr = GetDirPtr(key);
-    auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
-    bool_dir_ptr->OpenLock();
-    bool_dir_ptr->Set(set_bool);
-  }
-
-  void SetCoordValue(uint8_t robot_num, uint16_t set_x, uint16_t set_y, uint8_t set_pose)
-  {
-    std::string coordinate_key = "robot" + std::to_string(robot_num) + "/run_coordinate";
-    auto temp_dir_ptr = GetDirPtr(coordinate_key);
-    auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-    dir_ptr->OpenLock();
-    dir_ptr->Set(set_x, set_y, set_pose);
-  }
-
-  void SetActionName(uint8_t robot_num, std::string name)
-  {
-    std::string action_key = "robot" + std::to_string(robot_num) + "/action_name";
-    auto temp_dir_ptr = GetDirPtr(action_key);
-    auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
-    dir_ptr->OpenLock();
-    dir_ptr->Set(name);
-  }
-
-private:
-};
 
 //动作任务发布的对象
 class GoalAction
@@ -161,10 +61,10 @@ public:
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
     // camera_action_clint_.waitForServer();
     // detection_clint_.waitForServer();
-    // localplan_clint_.waitForServer();
-    // robot1_move_action_clint_.waitForServer();
-    // robot1_open_action_clint_.waitForServer();
-    // robot1_shop_action_clint_.waitForServer();
+    localplan_clint_.waitForServer();
+    robot1_move_action_clint_.waitForServer();
+    robot1_open_action_clint_.waitForServer();
+    robot1_shop_action_clint_.waitForServer();
     // robot2_move_action_clint_.waitForServer();
     // robot2_open_action_clint_.waitForServer();
     // robot2_shop_action_clint_.waitForServer();
@@ -174,10 +74,78 @@ public:
     // robot4_move_action_clint_.waitForServer();
     // robot4_open_action_clint_.waitForServer();
     // robot4_shop_action_clint_.waitForServer();
-    ROS_INFO(" ALL Action server is started");
+    ROS_INFO(" ALL Action server is started!");
+
+    robot1_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_read");
+    robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
+    robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
+    robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
+
+    robot1_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_read");
+    robot2_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_read");
+    robot3_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_read");
+    robot4_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_read");
+    ROS_INFO("ALL Server is started!");
   }
 
   ~GoalAction() = default;
+
+  data::Coord GetTargetCoord(uint8_t robot_num)
+  {
+    data::Coordinate srv;
+    data::Coord coord;
+    switch (robot_num)
+    {
+    case 1:
+      robot1_target_coordinate_read_clt_.call(srv);
+      break;
+    case 2:
+      robot2_target_coordinate_read_clt_.call(srv);
+      break;
+    case 3:
+      robot3_target_coordinate_read_clt_.call(srv);
+      break;
+    case 4:
+      robot4_target_coordinate_read_clt_.call(srv);
+      break;
+    default:
+      ROS_ERROR("no robot num in %s", __FUNCTION__);
+      coord.x = 10;
+      coord.y = 10;
+      coord.pose = 10;
+      return coord;
+      break;
+    }
+    coord.x = srv.response.x;
+    coord.y = srv.response.y;
+    coord.pose = srv.response.pose;
+    return coord;
+  }
+
+  std::string GetTargetActionName(uint8_t robot_num)
+  {
+    data::ActionName srv;
+    switch (robot_num)
+    {
+    case 1:
+      robot1_target_actionname_read_clt_.call(srv);
+      break;
+    case 2:
+      robot2_target_actionname_read_clt_.call(srv);
+      break;
+    case 3:
+      robot3_target_actionname_read_clt_.call(srv);
+      break;
+    case 4:
+      robot4_target_actionname_read_clt_.call(srv);
+      break;
+    default:
+      ROS_ERROR("no robot in %s ", __FUNCTION__);
+      return "NONE";
+      break;
+    }
+    return srv.response.action_name;
+  }
 
   //@brief 发送拍照目标
   void SendCameraGoal(int8_t image_num)
@@ -319,6 +287,7 @@ public:
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
                                          OPENINGCLINT::SimpleFeedbackCallback());
+      break;
     default:
       ROS_ERROR("%s no num %d in robot_num", __FUNCTION__, (int)robot_num);
       break;
@@ -616,6 +585,16 @@ private:
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
   OPENINGCLINT robot4_open_action_clint_;
+
+  //server client
+  ros::ServiceClient robot1_target_actionname_read_clt_;
+  ros::ServiceClient robot2_target_actionname_read_clt_;
+  ros::ServiceClient robot3_target_actionname_read_clt_;
+  ros::ServiceClient robot4_target_actionname_read_clt_;
+  ros::ServiceClient robot1_target_coordinate_read_clt_;
+  ros::ServiceClient robot2_target_coordinate_read_clt_;
+  ros::ServiceClient robot3_target_coordinate_read_clt_;
+  ros::ServiceClient robot4_target_coordinate_read_clt_;
 };
 
 } // namespace decision
