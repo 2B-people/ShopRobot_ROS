@@ -9,6 +9,7 @@
 
 #include <common/rrts.h>
 #include <blackboard/black_board.hpp>
+#include <decision/private_board.hpp>
 
 namespace shop
 {
@@ -56,7 +57,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
     typedef std::shared_ptr<BehaviorNode> Ptr;
 
     BehaviorNode(std::string name, BehaviorType behavior_type,
-                 const Blackboard::Ptr &blackboard_ptr) : name_(name), behavior_type_(behavior_type),
+                 const PrivateBoard::Ptr &blackboard_ptr) : name_(name), behavior_type_(behavior_type),
                                                           blackboard_ptr_(blackboard_ptr),
                                                           behavior_state_(BehaviorState::IDLE),
                                                           parent_node_ptr_(nullptr)
@@ -111,7 +112,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
     //类型
     BehaviorType behavior_type_;
     //黑板给入
-    Blackboard::Ptr blackboard_ptr_;
+    PrivateBoard::Ptr blackboard_ptr_;
     //状态
     BehaviorState behavior_state_;
     //父节点指针
@@ -130,7 +131,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 class ActionNode : public BehaviorNode
 {
   public:
-    ActionNode(std::string name, const Blackboard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, BehaviorType::ACTION, blackboard_ptr)
+    ActionNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, BehaviorType::ACTION, blackboard_ptr)
     {
     }
     ~ActionNode() = default;
@@ -151,7 +152,7 @@ class ActionNode : public BehaviorNode
 class DecoratorNode : public BehaviorNode
 {
   public:
-    DecoratorNode(std::string name, BehaviorType behavior_type, const Blackboard::Ptr &blackboard_ptr,
+    DecoratorNode(std::string name, BehaviorType behavior_type, const PrivateBoard::Ptr &blackboard_ptr,
                   const BehaviorNode::Ptr &child_node_ptr = nullptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
                                                                        child_node_ptr_(child_node_ptr) {}
 
@@ -175,7 +176,7 @@ class DecoratorNode : public BehaviorNode
 class CycleNode : public DecoratorNode
 {
   public:
-    CycleNode(uint8_t cycle_num, std::string name, const Blackboard::Ptr &blackboard_ptr,
+    CycleNode(uint8_t cycle_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
               const BehaviorNode::Ptr &child_node_ptr = nullptr)
         : DecoratorNode(name, BehaviorType::CYCLE, blackboard_ptr, child_node_ptr),
           cycle_num_(cycle_num), count_(0)
@@ -261,13 +262,14 @@ class CycleNode : public DecoratorNode
 class PreconditionNode : public DecoratorNode
 {
   public:
-    PreconditionNode(std::string name, const Blackboard::Ptr &blackboard_ptr,
+    PreconditionNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
                      const BehaviorNode::Ptr &child_node_ptr = nullptr,
                      std::function<bool()> precondition_function = std::function<bool()>(),
                      AbortType abort_type = AbortType::NONE)
         : DecoratorNode::DecoratorNode(name, BehaviorType::PRECONDITION, blackboard_ptr, child_node_ptr),
           precondition_function_(precondition_function), abort_type_(abort_type)
     {
+
     }
     virtual ~PreconditionNode() = default;
     AbortType GetAbortType()
@@ -339,7 +341,7 @@ class PreconditionNode : public DecoratorNode
 class CompositeNode : public BehaviorNode
 {
   public:
-    CompositeNode(std::string name, BehaviorType behavior_type, const Blackboard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
+    CompositeNode(std::string name, BehaviorType behavior_type, const PrivateBoard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
                                                                                                          children_node_index_(0)
     {
     }
@@ -390,7 +392,7 @@ class CompositeNode : public BehaviorNode
 class SelectorNode : public CompositeNode
 {
   public:
-    SelectorNode(std::string name, const Blackboard::Ptr &blackboard_ptr) : CompositeNode::CompositeNode(name, BehaviorType::SELECTOR, blackboard_ptr)
+    SelectorNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr) : CompositeNode::CompositeNode(name, BehaviorType::SELECTOR, blackboard_ptr)
     {
     }
     virtual ~SelectorNode() = default;
@@ -491,7 +493,7 @@ class SelectorNode : public CompositeNode
 class SequenceNode : public CompositeNode
 {
   public:
-    SequenceNode(std::string name, const Blackboard::Ptr &blackboard_ptr)
+    SequenceNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr)
         : CompositeNode::CompositeNode(name, BehaviorType::SEQUENCE, blackboard_ptr)
     {
     }
@@ -555,7 +557,7 @@ class SequenceNode : public CompositeNode
 class ParallelNode : public CompositeNode
 {
   public:
-    ParallelNode(std::string name, const Blackboard::Ptr &blackboard_ptr, unsigned int threshold)
+    ParallelNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr, unsigned int threshold)
         : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, blackboard_ptr),
           threshold_(threshold), success_count_(0),
           failure_count_(0)

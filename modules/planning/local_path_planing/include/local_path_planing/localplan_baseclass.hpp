@@ -3,6 +3,8 @@
 
 #include <ros/ros.h>
 #include <ros/time.h>
+#include <actionlib/server/simple_action_server.h>
+
 
 #include <string>
 
@@ -17,15 +19,21 @@
 #include <data/ShelfBarrier.h>
 #include <data/ActionName.h>
 
+#include <data/LocalPlanAction.h>
+
 namespace shop
 {
 namespace pathplan
 {
 
+typedef actionlib::SimpleActionServer<data::LocalPlanAction> PLANACTIONSERVER;
+
 class LocalBase : public shop::common::RRTS
 {
 public:
-  LocalBase(std::string name) : shop::common::RRTS(name,10)
+  LocalBase(std::string name)
+      : shop::common::RRTS(name, 10),
+        plan_as_(nh_, "local_plan", boost::bind(&LocalBase::PlanExecuteCB, this, _1), false)
   {
     robot1_coord_now_.x = 10;
     robot1_coord_now_.y = 10;
@@ -75,12 +83,35 @@ public:
     robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
     robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
     robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
+    
+    plan_as_.start();
+    ROS_INFO("localplan is done!");
   }
 
   virtual ~LocalBase() = default;
 
   virtual void PlanPlace(uint8_t robot_num) = 0;
   virtual void PlanCarry(uint8_t robot_num) = 0;
+
+  void PlanExecuteCB(const data::LocalPlanGoal::ConstPtr &goal)
+  {
+    //反馈
+    data::LocalPlanFeedback feedback;
+    //结果
+    data::LocalPlanResult result;
+
+    if (goal->plan_function == 1)//规划取物
+    {
+      PlanCarry(goal->robot_num);
+    }
+    else                        //规划放
+    {
+      PlanPlace(goal->robot_num);
+    }
+    ROS_INFO("%s FININSH",__FUNCTION__);
+    result.success_flag = true;
+    plan_as_.setSucceeded(result);
+  }
 
   // auto now = GetNowCoord(1);
   // x = now.x;
@@ -205,14 +236,15 @@ public:
     }
   }
 
-  // @breif 使得目标位置为false
+  // @breif 使得目标位置为true
   // @param location:0~11,0 is 1,1 is 2
   // @param shelf_num =a:1,b:2,c:3,d:4
+  // @breif 设定目标位置为有东西
   void SetShelfToFalse(int8_t shelf_num, int8_t location)
   {
     data::ShelfBarrier srv;
     srv.request.location = location;
-    srv.request.shelf_barrier = false;
+    srv.request.shelf_barrier = true;
     switch (shelf_num)
     {
     case 1:
@@ -284,19 +316,19 @@ public:
     int num = stoi(temp);
     if (num == 1 || num == 2 || num == 3)
     {
-      return 1;//A
+      return 1; //A
     }
     else if (num == 4 || num == 5 || num == 6)
     {
-      return 2;//B
+      return 2; //B
     }
     else if (num == 7 || num == 8 || num == 9)
     {
-      return 3;//C
+      return 3; //C
     }
     else if (num == 10 || num == 11 || num == 12)
     {
-      return 4;//D
+      return 4; //D
     }
   }
 
@@ -341,6 +373,8 @@ protected:
   ros::ServiceClient b_shelf_barrier_read_clt_;
   ros::ServiceClient c_shelf_barrier_read_clt_;
   ros::ServiceClient d_shelf_barrier_read_clt_;
+
+  PLANACTIONSERVER plan_as_;
 
   void Robo1CoordNowCB(const data::Coord::ConstPtr &msg)
   {
