@@ -49,6 +49,7 @@ class LocalPlan : public LocalBase
                     break;
             }
         }
+        ROS_INFO("small plan init OK");
     }
 
     void PlanPlace(uint8_t robot_num)

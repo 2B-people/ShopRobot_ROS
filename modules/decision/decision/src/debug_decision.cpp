@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     auto robot4_action_sw1_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action_sw1_ptr", blackboard_ptr_,
                                                                                     robot4_action_ptr,
                                                                                     [&]() {
-                                                                                        blackboard_ptr_->SetActionName(4, "T");
+                                                                                        blackboard_ptr_->SetActionName(4, "C-1");
                                                                                         return true;
                                                                                     },
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
@@ -69,15 +69,44 @@ int main(int argc, char **argv)
     auto robot4_action_sw2_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action_sw2_ptr", blackboard_ptr_,
                                                                                     robot4_action_ptr,
                                                                                     [&]() {
-                                                                                        blackboard_ptr_->SetActionName(4, "D");
+                                                                                        blackboard_ptr_->SetActionName(4, "P-2");
                                                                                         return true;
                                                                                     },
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
+    auto robot4_move_sw2_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw2_ptr", blackboard_ptr_,
+                                                                                  robot4_move_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetCoordValue(4, 0, 0, 1);
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
+    auto robot4_move_sw3_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw3_ptr", blackboard_ptr_,
+                                                                                  robot4_move_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetCoordValue(4, 2, 4, 0);
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
+    auto robot4_move_sw4_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw4_ptr", blackboard_ptr_,
+                                                                                  robot4_move_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetCoordValue(4, 1, 0, 1);
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
     auto robot_4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 opening behavior", blackboard_ptr_);
     robot_4_opening_behavior_ptr->AddChildren(robot4_move_ptr);
     robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw1_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(photo_ptr);
+    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw2_ptr);
+    // robot_4_opening_behavior_ptr->AddChildren(photo_ptr);
+    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw2_ptr);
+    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw3_ptr);
+    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw1_ptr);
+    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw4_ptr);
     robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw2_ptr);
 
     auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>(4, "robot cycle",
@@ -87,7 +116,7 @@ int main(int argc, char **argv)
     robot4_opening_behavior_ptr->AddChildren(robot4_opening_ptr);
     robot4_opening_behavior_ptr->AddChildren(robot4_cycle_ptr);
 
-    blackboard_ptr_->SetCoordValue(4, 4, 2, 0);
+    blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
     blackboard_ptr_->SetActionName(3, "T");
 
     while (ros::ok)
