@@ -417,6 +417,7 @@ protected:
     robot1_coord_now_.x = msg->x;
     robot1_coord_now_.y = msg->y;
     robot1_coord_now_.pose = msg->pose;
+    ROS_INFO("new coord is%d %d %d",msg->x,msg->y,msg->pose);
   }
 
   void Robo2CoordNowCB(const data::Coord::ConstPtr &msg)

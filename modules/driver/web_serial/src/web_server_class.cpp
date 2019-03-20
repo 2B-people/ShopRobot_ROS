@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-19 21:58:40
+ * @LastEditTime: 2019-03-20 19:58:32
  */
 #include <web_serial/web_server_class.h>
 
@@ -329,6 +329,11 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
                 }
                 feedback.progress = "Is set barrier";
                 opening_as_.publishFeedback(feedback);
+            }
+            else if (re_buf[0] == 'R')
+            {
+                data::Coord now_coord = DataToCoord(re_buf);
+                move_pub_.publish(now_coord);
             }
             else
             {

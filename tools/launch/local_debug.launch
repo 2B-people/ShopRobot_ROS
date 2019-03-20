@@ -1,18 +1,16 @@
 <launch>
   <param name="debug" value="true" type="bool"/>
 
-  <node name="robot1_web" pkg="web_serial" type="robot1_web_server" output="screen">
+  <!-- <node name="robot1_web" pkg="web_serial" type="robot1_web_server" output="screen">
     <param name="addr" value="192.168.31.100" type="str"/>
     <param name="port" value="1111" type="int"/>
-  </node>
+  </node> -->
 
-  <node name="debug_local_plan" pkg="tools" type="debug_local_plan.py" output="screen">
-  </node>
   <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
   </node>
   <!-- <node name = "debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
   </node> -->
-  <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen"></node> -->
+  <node name="debug_local" pkg="tools" type="distinguish_learn.py" output="screen"></node>
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 

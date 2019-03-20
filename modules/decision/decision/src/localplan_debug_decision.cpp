@@ -94,8 +94,17 @@ int main(int argc, char **argv)
     open_behavior_ptr->AddChildren(robot1_opening_jud_ptr);
     open_behavior_ptr->AddChildren(behavior_ptr);
 
-    blackboard_ptr->SetBoolValue(true,"robot1_opening_flag");
+    blackboard_ptr->SetBoolValue(true, "robot1_opening_flag");
 
-    shop::decision::BehaviorTree se(open_behavior_ptr, 10);
-    se.Execute();
+    // shop::decision::BehaviorTree se(open_behavior_ptr, 10);
+    // se.Execute();
+
+    while (ros::ok)
+    {
+        robot1_local_plan_ptr->Run();
+        if (robot1_local_plan_ptr->GetBehaviorState() == BehaviorState::SUCCESS)
+        {
+            blackboard_ptr->SetBoolValue(!blackboard_ptr->GetBoolValue("robot1/local_plan/fuc"), "robot1/local_plan/fuc");
+        }
+    }
 }
