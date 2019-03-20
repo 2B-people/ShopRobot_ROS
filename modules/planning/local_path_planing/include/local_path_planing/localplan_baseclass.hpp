@@ -5,7 +5,6 @@
 #include <ros/time.h>
 #include <actionlib/server/simple_action_server.h>
 
-
 #include <string>
 
 #include <common/rrts.h>
@@ -32,8 +31,8 @@ class LocalBase : public shop::common::RRTS
 {
 public:
   LocalBase(std::string name)
-      : shop::common::RRTS(name, 10),
-        plan_as_(nh_, "local_plan", boost::bind(&LocalBase::PlanExecuteCB, this, _1), false)
+      : shop::common::RRTS(name, 10), all_done_(false),
+                                          plan_as_(nh_, "local_plan", boost::bind(&LocalBase::PlanExecuteCB, this, _1), false)
   {
     robot1_coord_now_.x = 10;
     robot1_coord_now_.y = 10;
@@ -47,6 +46,8 @@ public:
     robot4_coord_now_.x = 10;
     robot4_coord_now_.y = 10;
     robot4_coord_now_.pose = 0;
+
+    nh_.param("debug", is_debug_, false);
 
     robot1_coordinate_now_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&LocalBase::Robo1CoordNowCB, this, _1));
     robot2_coordinate_now_ = nh_.subscribe<data::Coord>("robot2_web/coord_now", 10, boost::bind(&LocalBase::Robo2CoordNowCB, this, _1));
@@ -83,7 +84,7 @@ public:
     robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
     robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
     robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
-    
+
     plan_as_.start();
     ROS_INFO("localplan is done!");
   }
@@ -99,16 +100,40 @@ public:
     data::LocalPlanFeedback feedback;
     //结果
     data::LocalPlanResult result;
+    if (is_debug_)
+    {
+      // ROS_INFO("local plan is run ");
+      // ROS_INFO("plan_function is %d", goal->plan_function);
+      // ROS_INFO("robot_num is %d", goal->robot_num);
+    }
 
-    if (goal->plan_function == 1)//规划取物
+    if (all_done_ == false)
     {
-      PlanCarry(goal->robot_num);
+      if (goal->plan_function == 1) //规划取物
+      {
+        ROS_INFO("PlanCarry is begin");
+        PlanCarry(goal->robot_num);
+      }
+      else //规划放
+      {
+        ROS_INFO("PlanPlace is begin");
+        int index = 0;
+        //确认全部规划好
+        for (int8_t i = 0; i < 12; i++)
+        {
+          auto temp = GetGoods(i);
+          if (temp == 0)
+          {
+            index++;
+            if (index == 11)
+              all_done_ = true;
+          }
+        }
+        PlanPlace(goal->robot_num);
+      }
     }
-    else                        //规划放
-    {
-      PlanPlace(goal->robot_num);
-    }
-    ROS_INFO("%s FININSH",__FUNCTION__);
+
+    ROS_INFO("%s FININSH", __FUNCTION__);
     result.success_flag = true;
     plan_as_.setSucceeded(result);
   }
@@ -167,7 +192,7 @@ public:
   void SetGoodsNONE(int8_t location)
   {
     data::Goods srv;
-    srv.request.location = location;
+    srv.request.location = location - 1;
     srv.request.name = 0;
     goods_write_clt_.call(srv);
   }
@@ -269,6 +294,7 @@ public:
   {
     data::ActionName srv;
     srv.request.action_name = action_name;
+    ROS_INFO("%d is set %s", robot_num, action_name.c_str());
     switch (robot_num)
     {
     case 1:
@@ -311,8 +337,15 @@ public:
       break;
     }
     std::string action_name = srv.response.action_name;
-    //eg action_name is "catch-1"
-    std::string temp = action_name.erase(0, 6);
+    if (action_name == "NONE")
+    {
+      ROS_WARN("cant use GetNowToShelf when no target_action_name");
+      return 5;
+    }
+
+    //eg action_name is "C-1"
+    std::string temp = action_name.erase(0, 2);
+    // bug in these
     int num = stoi(temp);
     if (num == 1 || num == 2 || num == 3)
     {
@@ -331,6 +364,9 @@ public:
       return 4; //D
     }
   }
+
+  bool all_done_;
+  bool is_debug_;
 
 protected:
   data::Coord robot1_coord_now_;

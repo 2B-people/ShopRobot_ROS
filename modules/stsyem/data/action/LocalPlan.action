@@ -2,5 +2,6 @@ int8 plan_function
 int8 robot_num
 ---
 bool success_flag
+bool all_done_flag
 ---
 string progress

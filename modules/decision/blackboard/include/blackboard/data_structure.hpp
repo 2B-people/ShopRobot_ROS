@@ -97,15 +97,15 @@ class ActionNameDir : public DirBase
     std::string initial_name_;
 };
 
-
-class PhotoNemberDir: public DirBase
+class PhotoNemberDir : public DirBase
 {
-    
-public:
+
+  public:
     PhotoNemberDir(uint8_t number)
-        :DirBase(DictionaryType::PHOTONEMBER),initial_number_(number),number_(number)
-        {}
-    ~PhotoNemberDir() =default;
+        : DirBase(DictionaryType::PHOTONEMBER), initial_number_(number), number_(number)
+    {
+    }
+    ~PhotoNemberDir() = default;
 
     uint8_t GetPhotoNumber()
     {
@@ -114,13 +114,13 @@ public:
 
     void Set(uint8_t number)
     {
-        if(flag_)
+        if (flag_)
         {
             number_ = number;
         }
         else
         {
-            ROS_WARN("%d is lock in %s", number, __FUNCTION__);            
+            ROS_WARN("%d is lock in %s", number, __FUNCTION__);
         }
     }
 
@@ -129,12 +129,11 @@ public:
         number_ = initial_number_;
         OpenLock();
     }
-private:
+
+  private:
     uint8_t number_;
     uint8_t initial_number_;
-
 };
-
 
 //坐标类型
 class CoordinateDir : public DirBase
@@ -259,14 +258,14 @@ class GoodsDir : public DirBase
     {
         if (location_goods_lock_flag_.at(location))
         {
-            if (location_goods_.at(location) == GoodsName::NONE)
-            {
-                location_goods_[location] = name;
-            }
-            else
-            {
-                ROS_WARN("%d location have %d", location, (int)location_goods_[location]);
-            }
+            location_goods_[location] = name;
+            // if (location_goods_.at(location) == GoodsName::NONE)
+            // {
+            // }
+            // else
+            // {
+            //     ROS_WARN("%d location have %d", location, (int)location_goods_[location]);
+            // }
         }
         else
         {

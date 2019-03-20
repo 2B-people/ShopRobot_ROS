@@ -25,16 +25,16 @@ class PrivateBoard : public Blackboard
         AddDataIntoWorld("local_plan_run", local_plan_run);
         //各类flag
         auto robot1_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-        AddDataIntoWorld("robot1_opeing_flag", robot1_opeing_flag_ptr);
+        AddDataIntoWorld("robot1_opening_flag", robot1_opeing_flag_ptr);
 
         auto robot2_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-        AddDataIntoWorld("robot2_opeing_flag", robot2_opeing_flag_ptr);
+        AddDataIntoWorld("robot2_opening_flag", robot2_opeing_flag_ptr);
 
         auto robot3_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-        AddDataIntoWorld("robot3_opeing_flag", robot3_opeing_flag_ptr);
+        AddDataIntoWorld("robot3_opening_flag", robot3_opeing_flag_ptr);
 
         auto robot4_opeing_flag_ptr = std::make_shared<BoolDir>(false);
-        AddDataIntoWorld("robot4_opeing_flag", robot4_opeing_flag_ptr);
+        AddDataIntoWorld("robot4_opening_flag", robot4_opeing_flag_ptr);
 
         //拍照成功flag
         auto photo_done_flag_ptr = std::make_shared<BoolDir>(false);

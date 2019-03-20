@@ -6,9 +6,9 @@
     <param name="port" value="1111" type="int"/>
   </node>
 
-  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  <node name="debug_local_plan" pkg="tools" type="debug_local_plan.py" output="screen">
   </node>
-  <node name = "debug_goods" pkg="tools" type="debug_goods.py" output="screen">
+  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
   </node>
   <!-- <node name = "debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
   </node> -->
@@ -16,7 +16,7 @@
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 
-  <node name="local_debug_decision" pkg="decision" type="local_debug_decision" output="screen"></node>
+  <!-- <node name="local_debug_decision" pkg="decision" type="local_debug_decision" output="screen"></node> -->
 
   <!-- 使用此launch文件,可以测试识别的ros节点 -->
   <!-- <node name="cv_debug_decision" pkg="decision" type="cv_debug_decision" output="screen"></node> -->

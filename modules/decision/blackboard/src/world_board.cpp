@@ -91,11 +91,6 @@ bool WorldBoard::GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &
 {
     auto middle_dirbase_ptr = GetDirPtr("shop_all_goods");
     auto goods_dir_ptr = std::dynamic_pointer_cast<GoodsDir>(middle_dirbase_ptr);
-    if (debug_)
-    {
-        /* code */
-    }
-
     ROS_INFO("goods location:%d, is %d", req.location, req.name);
     goods_dir_ptr->OpenLock(req.location);
     goods_dir_ptr->Set(req.location, (GoodsName)req.name);
@@ -154,6 +149,7 @@ bool WorldBoard::TargetCoordinateWriteCB1(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
+    ROS_INFO("robot1 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -171,6 +167,7 @@ bool WorldBoard::TargetCoordinateWriteCB2(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
+    ROS_INFO("robot2 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -188,6 +185,7 @@ bool WorldBoard::TargetCoordinateWriteCB3(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot3_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
+    ROS_INFO("robot3 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -205,6 +203,7 @@ bool WorldBoard::TargetCoordinateWriteCB4(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot4_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, res.pose);
+    ROS_INFO("robot4 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -445,6 +444,7 @@ bool WorldBoard::TargetActionNameWriteCB1(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
+    ROS_INFO("robot1 target action is %s",req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -455,6 +455,7 @@ bool WorldBoard::TargetActionNameWriteCB2(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
+    ROS_INFO("robot2 target action is %s",req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -464,6 +465,7 @@ bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
+    ROS_INFO("robot3 target action is %s",req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -473,6 +475,7 @@ bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name);
+    ROS_INFO("robot4 target action is %s",req.action_name.c_str());
     res.success_flag;
     return true;
 }

@@ -30,10 +30,10 @@ int main(int argc, char **argv)
     auto robot3_move_ptr = std::make_shared<shop::decision::MoveAction>(3, "robot3 move", blackboard_ptr, goal_action_ptr);
     auto robot4_move_ptr = std::make_shared<shop::decision::MoveAction>(4, "robot4 move", blackboard_ptr, goal_action_ptr);
 
-    auto robot1_action_ptr = std::make_shared<shop::decision::ShopAction>(1, "robot1 shop", blackboard_ptr, goal_action_ptr);
-    auto robot2_action_ptr = std::make_shared<shop::decision::ShopAction>(2, "robot2 shop", blackboard_ptr, goal_action_ptr);
-    auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop", blackboard_ptr, goal_action_ptr);
-    auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop", blackboard_ptr, goal_action_ptr);
+    auto robot1_action_ptr = std::make_shared<shop::decision::ShopAction>(1, "robot1 shop action", blackboard_ptr, goal_action_ptr);
+    auto robot2_action_ptr = std::make_shared<shop::decision::ShopAction>(2, "robot2 shop action", blackboard_ptr, goal_action_ptr);
+    auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop action", blackboard_ptr, goal_action_ptr);
+    auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop action", blackboard_ptr, goal_action_ptr);
 
     auto robot1_local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>(1, "robot1 plan", blackboard_ptr, goal_action_ptr);
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
     auto robot1_move_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 move_jud", blackboard_ptr,
-                                                                                  robot1_action_ptr,
+                                                                                  robot1_move_ptr,
                                                                                   [&]() {
                                                                                       if (blackboard_ptr->GetBoolValue("robot1/local_plan/flag"))
                                                                                       {
@@ -71,16 +71,31 @@ int main(int argc, char **argv)
                                                                                   },
                                                                                   shop::decision::AbortType::LOW_PRIORITY);
 
+    auto robot1_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 robot1_opening_jud", blackboard_ptr,
+                                                                                     robot1_opening_ptr,
+                                                                                     [&]() {
+                                                                                         if (blackboard_ptr->GetBoolValue("robot1_opening_flag"))
+                                                                                         {
+                                                                                             return true;
+                                                                                         }
+                                                                                         else
+                                                                                         {
+                                                                                             return false;
+                                                                                         }
+                                                                                     },
+                                                                                     shop::decision::AbortType::LOW_PRIORITY);
+
     auto behavior_ptr = std::make_shared<shop::decision::SequenceNode>("debug local plan", blackboard_ptr);
     behavior_ptr->AddChildren(robot1_local_plan_ptr);
-    behavior_ptr->AddChildren(robot1_action_jud_ptr);
     behavior_ptr->AddChildren(robot1_move_jud_ptr);
+    behavior_ptr->AddChildren(robot1_action_jud_ptr);
 
-    auto cycle_ptr = std::make_shared<shop::decision::CycleNode>(5, "cycle",blackboard_ptr, behavior_ptr);
-    auto open_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("test", blackboard_ptr);
-    open_behavior_ptr->AddChildren(robot1_opening_ptr);
+    auto open_behavior_ptr = std::make_shared<shop::decision::SelectorNode>("test", blackboard_ptr);
+    open_behavior_ptr->AddChildren(robot1_opening_jud_ptr);
     open_behavior_ptr->AddChildren(behavior_ptr);
 
-    shop::decision::BehaviorTree se(open_behavior_ptr, 100);
+    blackboard_ptr->SetBoolValue(true,"robot1_opening_flag");
+
+    shop::decision::BehaviorTree se(open_behavior_ptr, 10);
     se.Execute();
 }
