@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-20 19:58:32
+ * @LastEditTime: 2019-03-20 22:21:56
  */
 #include <web_serial/web_server_class.h>
 
@@ -204,7 +204,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     data::Coord coord_goal;
     coord_goal.x = goal->x;
     coord_goal.y = goal->y;
-    coord_goal.pose = goal->pose;
+    coord_goal.pose = 5;
     std::string coord_goal_str = CoordToData(coord_goal);
     //bug send函数
     Send(coord_goal_str);
@@ -222,12 +222,14 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 std::string re_buf = Recv();
-                if (is_debug_)
-                {
-                    ROS_INFO("RE_BUf is %s", re_buf.c_str());
-                }
+                
+                // if (is_debug_)
+                // {
+                //     ROS_INFO("RE_BUf is %s", re_buf.c_str());
+                // }
 
                 data::Coord now_coord = DataToCoord(re_buf);
+                move_pub_.publish(now_coord);
                 if (now_coord.x == 10 && now_coord.y == 10 && now_coord.pose == 10)
                 {
                     ROS_WARN("move err");
@@ -235,7 +237,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
                 //判断目标坐标
                 //@note 下位机可以不用频道方向
-                if (now_coord.x == goal->x && now_coord.y == goal->y && now_coord.pose == goal->pose)
+                if (now_coord.x == goal->x && now_coord.y == goal->y /*&& now_coord.pose == goal->pose*/)
                 {
                     ROS_INFO("move to target,x:%d,y:%d", goal->x, goal->y);
                     break;
@@ -245,7 +247,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                     ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
                     feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
                     move_as_.publishFeedback(feedback);
-                    move_pub_.publish(now_coord);
                 }
             }
             else

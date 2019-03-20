@@ -10,7 +10,7 @@
   </node>
   <!-- <node name = "debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
   </node> -->
-  <node name="debug_local" pkg="tools" type="distinguish_learn.py" output="screen"></node>
+  <!-- <node name="debug_local_plan" pkg="tools" type="debug_local_plan.py" output="screen"></node> -->
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 

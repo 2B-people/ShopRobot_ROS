@@ -27,8 +27,8 @@ if __name__ == "__main__":
     goods_client.call(10, 0, 11)
     goods_client.call(11, 0, 12)
     rate = rospy.Rate(1)
-    x = 8
-    y = 8
+    x = 1
+    y = 2
     pose = 1
     while not rospy.is_shutdown():
         pub.publish(Coord(x,y,pose))

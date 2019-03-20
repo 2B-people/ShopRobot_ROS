@@ -58,7 +58,7 @@ class LocalPlan : public LocalBase
         vector<Coord> determined_location;
         vector<int> determined_action;
         vector<int> determined_shelf_location;
-        int final_x, final_y;
+        int final_x, final_y, final_distance = 999;
         int final_action, final_shelf_location;
 
         auto goal_shelf = GetNowToShelf(robot_num);
@@ -68,6 +68,7 @@ class LocalPlan : public LocalBase
         }
 
         GetShelfBarrier(shelves, goal_shelf);
+        ROS_INFO("XXXX:%d", goal_shelf);
 
         for (int i = 1; i < 12; i = i + 2)
         {
@@ -165,7 +166,7 @@ class LocalPlan : public LocalBase
                     switch (i)
                     {
                     case 1:
-                        determined_location.push_back(Coord(5, 0));
+                        determined_location.push_back(Coord(9, 5));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -178,7 +179,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 3:
-                        determined_location.push_back(Coord(4, 0));
+                        determined_location.push_back(Coord(9, 4));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -191,7 +192,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 5:
-                        determined_location.push_back(Coord(3, 0));
+                        determined_location.push_back(Coord(9, 3));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -204,7 +205,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 7:
-                        determined_location.push_back(Coord(2, 0));
+                        determined_location.push_back(Coord(9, 2));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -217,7 +218,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 9:
-                        determined_location.push_back(Coord(1, 0));
+                        determined_location.push_back(Coord(9, 1));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -230,7 +231,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 11:
-                        determined_location.push_back(Coord(0, 0));
+                        determined_location.push_back(Coord(9, 0));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -252,7 +253,7 @@ class LocalPlan : public LocalBase
                     switch (i)
                     {
                     case 1:
-                        determined_location.push_back(Coord(5, 0));
+                        determined_location.push_back(Coord(4, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -265,7 +266,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 3:
-                        determined_location.push_back(Coord(4, 0));
+                        determined_location.push_back(Coord(5, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -278,7 +279,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 5:
-                        determined_location.push_back(Coord(3, 0));
+                        determined_location.push_back(Coord(6, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -291,7 +292,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 7:
-                        determined_location.push_back(Coord(2, 0));
+                        determined_location.push_back(Coord(7, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -304,7 +305,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 9:
-                        determined_location.push_back(Coord(1, 0));
+                        determined_location.push_back(Coord(8, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -317,7 +318,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 11:
-                        determined_location.push_back(Coord(0, 0));
+                        determined_location.push_back(Coord(9, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -339,7 +340,7 @@ class LocalPlan : public LocalBase
                     switch (i)
                     {
                     case 1:
-                        determined_location.push_back(Coord(5, 0));
+                        determined_location.push_back(Coord(0, 4));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -352,7 +353,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 3:
-                        determined_location.push_back(Coord(4, 0));
+                        determined_location.push_back(Coord(0, 5));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -365,7 +366,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 5:
-                        determined_location.push_back(Coord(3, 0));
+                        determined_location.push_back(Coord(0, 6));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -378,7 +379,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 7:
-                        determined_location.push_back(Coord(2, 0));
+                        determined_location.push_back(Coord(0, 7));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -391,7 +392,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 9:
-                        determined_location.push_back(Coord(1, 0));
+                        determined_location.push_back(Coord(0, 8));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -404,7 +405,7 @@ class LocalPlan : public LocalBase
                         }
                         break;
                     case 11:
-                        determined_location.push_back(Coord(0, 0));
+                        determined_location.push_back(Coord(0, 9));
                         if (shelves[i - 1] == false)
                         {
                             determined_action.push_back(1);
@@ -424,7 +425,7 @@ class LocalPlan : public LocalBase
         }
 
         auto now_coord = GetNowCoord(robot_num);
-
+        ROS_WARN("NNNN:%d, %d", now_coord.x, now_coord.y);
         for (int i = 0; i < determined_location.size(); i++)
         {
             queue<Coord> que;
@@ -433,7 +434,9 @@ class LocalPlan : public LocalBase
             Coord location = determined_location[i];
             int end_x = location.first;
             int end_y = location.second;
-            int final_distance = 999;
+            int temp_final_distance = 999;
+            int temp_final_x, temp_final_y;
+            int temp_final_action, temp_final_shelf_location;
 
             int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -472,13 +475,13 @@ class LocalPlan : public LocalBase
                         if (now_x == end_x && now_y == end_y)
                         {
                             // ROS_INFO("final_distance %d", distance[now_x][now_y]);
-                            if (distance[end_x][end_y] < final_distance)
+                            if (distance[end_x][end_y] < temp_final_distance)
                             {
-                                final_distance = distance[end_x][end_y];
-                                final_x = end_x;
-                                final_y = end_y;
-                                final_action = determined_action[i];
-                                final_shelf_location = determined_shelf_location[i];
+                                temp_final_distance = distance[end_x][end_y];
+                                temp_final_x = end_x;
+                                temp_final_y = end_y;
+                                temp_final_action = determined_action[i];
+                                temp_final_shelf_location = determined_shelf_location[i];
                             }
                             break;
                         }
@@ -487,8 +490,18 @@ class LocalPlan : public LocalBase
                 if (j != 4)
                     break;
             }
-            // ROS_INFO("x:%d y:%d", end_x, end_y);
+            if(temp_final_distance < final_distance)
+            {
+                final_distance = temp_final_distance;
+                final_x = temp_final_x;
+                final_y = temp_final_y;
+                final_action = temp_final_action;
+                final_shelf_location = temp_final_shelf_location;
+            }
         }
+        ROS_WARN("XXXX:%d", final_distance);
+        ROS_WARN("OOOO:%d, %d", final_x, final_y);
+
         if (is_debug_)
         {
             ROS_INFO("final_x:%d final_y:%d goal_shelf:%d final_action:%d", final_x, final_y, goal_shelf, final_action);
@@ -497,6 +510,7 @@ class LocalPlan : public LocalBase
         TransmissonMessageToRobot(1, robot_num, int16_t(final_x), int16_t(final_y), 0, 0, goal_shelf,
                                   final_action);
 
+        ROS_INFO("XXXX:%d", goal_shelf);
         SetShelfToFalse(goal_shelf, int8_t(final_shelf_location));
     }
 
@@ -505,14 +519,14 @@ class LocalPlan : public LocalBase
         vector<Coord> determined_coord;
         vector<int> determined_location;
         vector<int> determined_category;
-        int final_x, final_y;
-        int final_category, final_location;
         int temp_category;
+        int final_x, final_y, final_category, final_location, final_distance=999;
 
         int index = 0;
         for (int i = 0; i < 12; i++)
         {
             temp_category = GetGoods(int8_t(i));
+
             if (temp_category != 0)
             {
                 switch (i + 1)
@@ -593,9 +607,12 @@ class LocalPlan : public LocalBase
             que.push(Coord(int(now_coord.x), int(now_coord.y)));
 
             Coord location = determined_coord[i];
+            //ROS_INFO("SSSSSSfirst%d, %d", location.first, location.second);
             int end_x = location.first;
             int end_y = location.second;
-            int final_distance = 999;
+            int temp_final_distance = 999;
+            int temp_final_x, temp_final_y;
+            int temp_final_category, temp_final_location;
 
             int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -619,28 +636,32 @@ class LocalPlan : public LocalBase
 
             while (que.size())
             {
+                // ROS_WARN("OOOO:%d", que.size());
                 Coord get_coord = que.front();
                 que.pop();
 
+                // ROS_INFO("XXXX:%d, %d", get_coord.first, get_coord.second);
                 int j = 0;
                 for (j = 0; j < 4; j++)
                 {
                     int now_x = get_coord.first + move_x_[j];
                     int now_y = get_coord.second + move_y_[j];
 
+                    // ROS_INFO("HHHH:%d, %d", now_x, now_y);
                     if (0 <= now_x && now_x < num_x && 0 <= now_y && now_y < num_y && map[now_x][now_y] != 1 && distance[now_x][now_y] == INF)
                     {
                         que.push(Coord(now_x, now_y));
                         distance[now_x][now_y] = distance[get_coord.first][get_coord.second] + 1;
                         if (now_x == end_x && now_y == end_y)
                         {
-                            if (distance[end_x][end_y] < final_distance)
+                            if (distance[end_x][end_y] < temp_final_distance)
                             {
-                                final_distance = distance[end_x][end_y];
-                                final_x = end_x;
-                                final_y = end_y;
-                                final_location = determined_location[i];
-                                final_category = determined_category[i];
+                                
+                                temp_final_distance = distance[end_x][end_y];
+                                temp_final_x = end_x;
+                                temp_final_y = end_y;
+                                temp_final_location = determined_location[i];
+                                temp_final_category = determined_category[i];
                             }
                             break;
                         }
@@ -648,6 +669,14 @@ class LocalPlan : public LocalBase
                 }
                 if (j != 4)
                     break;
+            }
+            if(temp_final_distance < final_distance)
+            {
+                final_x = temp_final_x;
+                final_y = temp_final_y;
+                final_location = temp_final_location;
+                final_category = temp_final_category;
+                final_distance = temp_final_distance;
             }
         }
         if (is_debug_)
