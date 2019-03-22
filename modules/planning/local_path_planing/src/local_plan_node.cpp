@@ -457,6 +457,7 @@ class LocalPlan : public LocalBase
 
             distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
+
             while (que.size())
             {
                 // ROS_INFO("in there");
@@ -633,6 +634,15 @@ class LocalPlan : public LocalBase
                     distance[i][j] = INF;
 
             distance[(int)now_coord.x][(int)now_coord.y] = 0;
+
+            if(now_coord.x == end_x && now_coord.y == end_y)
+            {
+                final_x = end_x;
+                final_y = end_y;
+                final_location = 11;
+                final_category = GetGoods(int8_t(11));
+                break;
+            }
 
             while (que.size())
             {
