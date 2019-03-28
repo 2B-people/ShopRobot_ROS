@@ -24,7 +24,8 @@ enum class BehaviorType
     SEQUENCE,     //序列
     ACTION,       //动作
     PRECONDITION, //初始
-    CYCLE         //循环
+    CYCLE,        //循环
+    SUCCESSDO     //子节点成功执行
 };
 
 //节点运行状态
@@ -58,9 +59,9 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 
     BehaviorNode(std::string name, BehaviorType behavior_type,
                  const PrivateBoard::Ptr &blackboard_ptr) : name_(name), behavior_type_(behavior_type),
-                                                          blackboard_ptr_(blackboard_ptr),
-                                                          behavior_state_(BehaviorState::IDLE),
-                                                          parent_node_ptr_(nullptr)
+                                                            blackboard_ptr_(blackboard_ptr),
+                                                            behavior_state_(BehaviorState::IDLE),
+                                                            parent_node_ptr_(nullptr)
     {
     }
     virtual ~BehaviorNode() = default;
@@ -173,6 +174,73 @@ class DecoratorNode : public BehaviorNode
     virtual void OnTerminate(BehaviorState state) = 0;
 };
 
+class SuccessDoNode : public DecoratorNode
+{
+  public:
+    SuccessDoNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
+                  const BehaviorNode::Ptr &child_node_ptr = nullptr,
+                  std::function<bool()> precondition_function = std::function<bool()>())
+        : DecoratorNode(name, BehaviorType::SUCCESSDO, blackboard_ptr, child_node_ptr),
+          precondition_function_(precondition_function)
+    {
+    }
+    virtual ~SuccessDoNode() = default;
+
+  protected:
+    std::function<bool()> precondition_function_;
+    virtual void OnInitialize()
+    {
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
+    }
+
+    virtual BehaviorState Update()
+    {
+        while (true)
+        {
+            BehaviorState state = child_node_ptr_->Run();
+            if (state != BehaviorState::SUCCESS)
+            {
+                return state;
+            }
+            else
+            {
+                if (precondition_function_)
+                {
+                    precondition_function_();
+                    return BehaviorState::SUCCESS;
+                }
+                else
+                {
+                    return BehaviorState::FAILURE;
+                }
+            }
+        }
+    }
+
+    virtual void OnTerminate(BehaviorState state)
+    {
+
+        switch (state)
+        {
+        case BehaviorState::IDLE:
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
+            child_node_ptr_->Reset();
+
+            break;
+        case BehaviorState::SUCCESS:
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
+            break;
+        case BehaviorState::FAILURE:
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
+            child_node_ptr_->Reset();
+            break;
+        default:
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
+            return;
+        }
+    }
+};
+
 class CycleNode : public DecoratorNode
 {
   public:
@@ -224,7 +292,7 @@ class CycleNode : public DecoratorNode
         case BehaviorState::IDLE:
             ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
             child_node_ptr_->Reset();
-            
+
             break;
         case BehaviorState::SUCCESS:
             ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
@@ -269,7 +337,6 @@ class PreconditionNode : public DecoratorNode
         : DecoratorNode::DecoratorNode(name, BehaviorType::PRECONDITION, blackboard_ptr, child_node_ptr),
           precondition_function_(precondition_function), abort_type_(abort_type)
     {
-
     }
     virtual ~PreconditionNode() = default;
     AbortType GetAbortType()
@@ -342,7 +409,7 @@ class CompositeNode : public BehaviorNode
 {
   public:
     CompositeNode(std::string name, BehaviorType behavior_type, const PrivateBoard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
-                                                                                                         children_node_index_(0)
+                                                                                                           children_node_index_(0)
     {
     }
     virtual ~CompositeNode() = default;
@@ -434,6 +501,7 @@ class SelectorNode : public CompositeNode
             return BehaviorState::SUCCESS;
         }
         //Reevaluation
+
         for (unsigned int index = 0; index < children_node_index_; index++)
         {
             ROS_INFO("Reevaluation");
@@ -653,19 +721,23 @@ bool PreconditionNode::Reevaluation()
         auto parent_selector_node_ptr = std::dynamic_pointer_cast<SelectorNode>(parent_node_ptr_);
 
         auto parent_children = parent_selector_node_ptr->GetChildren();
+        //在父节点的子节点中找到自己
         auto iter_in_parent = std::find(parent_children.begin(), parent_children.end(), shared_from_this());
         if (iter_in_parent == parent_children.end())
         {
             ROS_ERROR_STREAM("Can't find current node in parent!");
             return false;
         }
+        //迭代与自己同级的,在自己之前的子节点
         unsigned int index_in_parent = iter_in_parent - parent_children.begin();
         if (index_in_parent < parent_selector_node_ptr->GetChildrenIndex())
         {
+            //@breif自己描述的一个判断fuc,Precondition
             if (Precondition())
             {
                 //Abort Measures
                 ROS_INFO("Abort Measures");
+                //把在自己运行之前的节点reset,转为执行自己
                 parent_children.at(parent_selector_node_ptr->GetChildrenIndex())->Reset();
                 parent_selector_node_ptr->SetChildrenIndex(index_in_parent);
                 return true;

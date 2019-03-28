@@ -33,9 +33,9 @@ class BehaviorTree
             {
                 ros::spinOnce();
                 root_node_ptr_->Run();
-                // ROS_INFO("tree is Run num:%d", (int)index);
+                ROS_INFO("tree is Run num:%d", (int)index);
                 index++;
-                // ROS_INFO("-------------------------------");
+                ROS_INFO("-------------------------------");
             }
             else
             {

@@ -33,8 +33,6 @@ typedef actionlib::SimpleActionClient<data::CameraAction> CAMERAACTION;
 typedef actionlib::SimpleActionClient<data::DetectionAction> DETECTION;
 typedef actionlib::SimpleActionClient<data::LocalPlanAction> LOCALPLANACTION;
 
-
-
 //动作任务发布的对象
 class GoalAction
 {
@@ -59,21 +57,21 @@ public:
   {
     ROS_INFO("Waiting for action server to start");
     auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
-    // camera_action_clint_.waitForServer();
-    // detection_clint_.waitForServer();
+    camera_action_clint_.waitForServer();
+    detection_clint_.waitForServer();
     localplan_clint_.waitForServer();
-    robot1_move_action_clint_.waitForServer();
-    robot1_open_action_clint_.waitForServer();
-    robot1_shop_action_clint_.waitForServer();
+    // robot1_move_action_clint_.waitForServer();
+    // robot1_open_action_clint_.waitForServer();
+    // robot1_shop_action_clint_.waitForServer();
     // robot2_move_action_clint_.waitForServer();
     // robot2_open_action_clint_.waitForServer();
     // robot2_shop_action_clint_.waitForServer();
     // robot3_move_action_clint_.waitForServer();
     // robot3_open_action_clint_.waitForServer();
     // robot3_shop_action_clint_.waitForServer();
-    // robot4_move_action_clint_.waitForServer();
-    // robot4_open_action_clint_.waitForServer();
-    // robot4_shop_action_clint_.waitForServer();
+    robot4_move_action_clint_.waitForServer();
+    robot4_open_action_clint_.waitForServer();
+    robot4_shop_action_clint_.waitForServer();
     ROS_INFO(" ALL Action server is started!");
 
     robot1_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_read");

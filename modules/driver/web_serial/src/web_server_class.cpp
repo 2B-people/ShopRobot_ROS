@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-20 22:21:56
+ * @LastEditTime: 2019-03-28 21:05:44
  */
 #include <web_serial/web_server_class.h>
 
@@ -144,7 +144,8 @@ bool WebServer::InitWeb()
         ROS_ERROR("%s connect error", name_.c_str());
         return false;
     }
-    ROS_INFO("is to server/n");
+    ROS_WARN("is to server/n");
+    Send("I");
     return true;
 
     //使用服务器的sockot存在问题
@@ -223,10 +224,10 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             {
                 std::string re_buf = Recv();
                 
-                // if (is_debug_)
-                // {
-                //     ROS_INFO("RE_BUf is %s", re_buf.c_str());
-                // }
+                if (is_debug_)
+                {
+                    ROS_INFO("RE_BUf is %s", re_buf.c_str());
+                }
 
                 data::Coord now_coord = DataToCoord(re_buf);
                 move_pub_.publish(now_coord);
@@ -468,7 +469,9 @@ std::string WebServer::Recv(void)
     {
         memset(re_frist_buf, '\0', BUFF_MAX);
         recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
+        ROS_WARN("is recv %s",re_frist_buf);
         temp = re_frist_buf;
+
         std::string jud = temp.substr(0, 3);
         temp = temp.substr(3, temp.size() - 2);
         if (jud == "HDU")

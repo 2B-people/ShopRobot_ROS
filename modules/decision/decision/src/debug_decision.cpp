@@ -23,14 +23,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     bool is_debug_;
     nh.param("debug", is_debug_, false);
-    robot1_coord_now_.x = 0;
-    robot1_coord_now_.y = 0;
-    robot1_coord_now_.pose = 0;
-    ros::Subscriber robot1_coordinate_now_ = nh.subscribe("robot1_web/coord_now", 10, Robo1CoordNowCB);
 
     auto blackboard_ptr_ = std::make_shared<PrivateBoard>();
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr_);
-    int index = 0;
 
     //decision
 
@@ -50,103 +45,224 @@ int main(int argc, char **argv)
     auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, "robot3 shop", blackboard_ptr_, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, "robot4 shop", blackboard_ptr_, goal_action_ptr);
 
-    auto robot1_local_plan = std::make_shared<shop::decision::LocalPlanAction>(1, "robot1 local plan", blackboard_ptr_, goal_action_ptr);
-    auto robot2_local_plan = std::make_shared<shop::decision::LocalPlanAction>(2, "robot2 local plan", blackboard_ptr_, goal_action_ptr);
-    auto robot3_local_plan = std::make_shared<shop::decision::LocalPlanAction>(3, "robot3 local plan", blackboard_ptr_, goal_action_ptr);
-    auto robot4_local_plan = std::make_shared<shop::decision::LocalPlanAction>(4, "robot4 local plan", blackboard_ptr_, goal_action_ptr);
+    auto robot1_local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>(1, "robot1 local plan", blackboard_ptr_, goal_action_ptr);
+    auto robot2_local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>(2, "robot2 local plan", blackboard_ptr_, goal_action_ptr);
+    auto robot3_local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>(3, "robot3 local plan", blackboard_ptr_, goal_action_ptr);
+    auto robot4_local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>(4, "robot4 local plan", blackboard_ptr_, goal_action_ptr);
 
     auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr_, goal_action_ptr);
     auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish", blackboard_ptr_, goal_action_ptr);
 
-    auto robot4_action_sw1_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action_sw1_ptr", blackboard_ptr_,
-                                                                                    robot4_action_ptr,
+    // **********************************Carry action*************************************
+    auto robot4_action_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 action done", blackboard_ptr_,
+                                                                                  robot4_action_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetBoolValue(!blackboard_ptr_->GetBoolValue("robot4/local_plan/fuc"), "robot4/local_plan/fuc");
+                                                                                      blackboard_ptr_->SetBoolValue(false, "robot4/local_plan/flag");
+                                                                                      return true;
+                                                                                  });
+
+    auto robot4_action_set_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action set", blackboard_ptr_,
+                                                                                    robot4_action_done_ptr,
                                                                                     [&]() {
-                                                                                        blackboard_ptr_->SetActionName(4, "C-1");
+                                                                                        blackboard_ptr_->SetActionName(4, goal_action_ptr->GetTargetActionName(4));
                                                                                         return true;
+                                                                                    },
+                                                                                    shop::decision::AbortType::SELF);
+
+    auto robot4_move_set_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 move set", blackboard_ptr_,
+                                                                                  robot4_move_ptr,
+                                                                                  [&]() {
+                                                                                      auto coord = goal_action_ptr->GetTargetCoord(4);
+                                                                                      blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::SELF);
+
+    auto robot4_plan_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 plan jud", blackboard_ptr_,
+                                                                                  robot4_local_plan_ptr,
+                                                                                  [&]() {
+                                                                                      if (blackboard_ptr_->GetBoolValue("robot4/local_plan/flag") == false)
+                                                                                      {
+                                                                                          return true;
+                                                                                      }
+                                                                                      else
+                                                                                      {
+                                                                                          return false;
+                                                                                      }
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
+    auto robot4_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 debug carry", blackboard_ptr_);
+    robot4_carry_seq_ptr->AddChildren(robot4_move_set_ptr);
+    robot4_carry_seq_ptr->AddChildren(robot4_action_set_ptr);
+
+    auto robot4_action_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action jud ", blackboard_ptr_,
+                                                                                  robot4_carry_seq_ptr,
+                                                                                  [&]() {
+                                                                                      if (blackboard_ptr_->GetBoolValue("robot4/local_plan/flag") == false)
+                                                                                      {
+                                                                                          return false;
+                                                                                      }
+                                                                                      else
+                                                                                      {
+                                                                                          return true;
+                                                                                      }
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
+    auto robot4_carry_jud_ptr = std::make_shared<shop::decision::SelectorNode>("robot4 carry sel", blackboard_ptr_);
+    robot4_carry_jud_ptr->AddChildren(robot4_plan_jud_ptr);
+    robot4_carry_jud_ptr->AddChildren(robot4_action_jud_ptr);
+
+    auto robot4_carry_pre_ptr = std::make_shared<shop::decision::PreconditionNode>("robot carry jud", blackboard_ptr_,
+                                                                                   robot4_carry_jud_ptr,
+                                                                                   [&]() {
+                                                                                       if (blackboard_ptr_->GetBoolValue("robot4_opening_flag"))
+                                                                                       {
+                                                                                           return false;
+                                                                                       }
+                                                                                       else
+                                                                                       {
+                                                                                           return true;
+                                                                                       }
+                                                                                   },
+                                                                                   shop::decision::AbortType::LOW_PRIORITY);
+
+    //*******************************robot4 opening what to do********************************
+    auto robot4_action_T_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action T", blackboard_ptr_,
+                                                                                  robot4_action_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetActionName(4, "T");
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::SELF);
+
+    auto robot4_action_D_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action D", blackboard_ptr_,
+                                                                                  robot4_action_ptr,
+                                                                                  [&]() {
+                                                                                      blackboard_ptr_->SetActionName(4, "D");
+                                                                                      return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::SELF);
+
+    auto photo_done_set_ptr = std::make_shared<shop::decision::SuccessDoNode>("photo done set flag", blackboard_ptr_,
+                                                                              photo_ptr,
+                                                                              [&]() {
+                                                                                  blackboard_ptr_->SetBoolValue(false, "photo_done_flag");
+                                                                                  return true;
+                                                                              });
+
+    auto distinguish_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("distinguish done", blackboard_ptr_,
+                                                                                distinguish_ptr,
+                                                                                [&]() {
+                                                                                    blackboard_ptr_->SetBoolValue(false, "photo_done_flag");
+                                                                                    return true;
+                                                                                });
+
+    auto distinguish_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("distinguish jud", blackboard_ptr_,
+                                                                                  distinguish_done_ptr,
+                                                                                  [&]() {
+                                                                                      if (blackboard_ptr_->GetBoolValue("photo_done_flag") == false)
+                                                                                      {
+                                                                                          return true;
+                                                                                      }
+                                                                                      else
+                                                                                      {
+                                                                                          return false;
+                                                                                      }
+                                                                                  },
+                                                                                  shop::decision::AbortType::SELF);
+
+    auto robot4_behavior_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 opening behavior", blackboard_ptr_);
+    robot4_behavior_seq_ptr->AddChildren(robot4_move_ptr);
+    robot4_behavior_seq_ptr->AddChildren(robot4_action_T_ptr);
+    robot4_behavior_seq_ptr->AddChildren(photo_done_set_ptr);
+    robot4_behavior_seq_ptr->AddChildren(distinguish_jud_ptr);
+    robot4_behavior_seq_ptr->AddChildren(robot4_action_D_ptr);
+
+    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>(4, "robot4 cycle",
+                                                                        blackboard_ptr_, robot4_behavior_seq_ptr);
+
+    auto robot4_cycle_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 cycle done", blackboard_ptr_,
+                                                                                 robot4_cycle_ptr,
+                                                                                 [&]() {
+                                                                                     blackboard_ptr_->SetBoolValue(false, "robot4_opening_flag");
+                                                                                     return true;
+                                                                                 });
+
+    auto robot4_opening_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 opening done", blackboard_ptr_,
+                                                                                   robot4_opening_ptr,
+                                                                                   [&]() {
+                                                                                       blackboard_ptr_->SetCoordValue(4, 4, 2, 0);
+                                                                                       return true;
+                                                                                   });
+
+    auto robot4_opening_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 open seq", blackboard_ptr_);
+    robot4_opening_seq_ptr->AddChildren(robot4_opening_done_ptr);
+    robot4_opening_seq_ptr->AddChildren(robot4_cycle_done_ptr);
+
+    // 沒必要,拍照好就識別也來得及
+    // auto robot_opening_par_ptr = std::make_shared<shop::decision::ParallelNode>("opening par", blackboard_ptr_, 0);
+    // robot_opening_par_ptr->AddChildren(robot4_opening_seq_ptr);
+    // robot_opening_par_ptr->AddChildren(distinguish_jud_ptr);
+
+    auto robot_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("opening jud", blackboard_ptr_,
+                                                                                    robot4_opening_seq_ptr,
+                                                                                    [&]() {
+                                                                                        if (blackboard_ptr_->GetBoolValue("robot4_opening_flag"))
+                                                                                        {
+                                                                                            return true;
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            return false;
+                                                                                        }
                                                                                     },
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
-    auto robot4_action_sw2_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action_sw2_ptr", blackboard_ptr_,
-                                                                                    robot4_action_ptr,
-                                                                                    [&]() {
-                                                                                        blackboard_ptr_->SetActionName(4, "P-2");
-                                                                                        return true;
-                                                                                    },
-                                                                                    shop::decision::AbortType::LOW_PRIORITY);
+    // *******************************************opening test*****************************************************
 
-    auto robot4_move_sw2_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw2_ptr", blackboard_ptr_,
-                                                                                  robot4_move_ptr,
-                                                                                  [&]() {
-                                                                                      blackboard_ptr_->SetCoordValue(4, 0, 0, 1);
-                                                                                      return true;
-                                                                                  },
-                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+    auto robot4_opening_done_test_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4_opening_done_test_ptr", blackboard_ptr_,
+                                                                                        robot4_opening_ptr,
+                                                                                        [&]() {
+                                                                                            blackboard_ptr_->SetCoordValue(4, 2, 2, 0);
+                                                                                            return true;
+                                                                                        });
 
-    auto robot4_move_sw3_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw3_ptr", blackboard_ptr_,
-                                                                                  robot4_move_ptr,
-                                                                                  [&]() {
-                                                                                      blackboard_ptr_->SetCoordValue(4, 2, 4, 0);
-                                                                                      return true;
-                                                                                  },
-                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+    auto robot4_opening_seq_test_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 open seq", blackboard_ptr_);
+    robot4_opening_seq_test_ptr->AddChildren(robot4_opening_done_test_ptr);
+    robot4_opening_seq_test_ptr->AddChildren(robot4_move_ptr);
 
-    auto robot4_move_sw4_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 robot4_move_sw4_ptr", blackboard_ptr_,
-                                                                                  robot4_move_ptr,
-                                                                                  [&]() {
-                                                                                      blackboard_ptr_->SetCoordValue(4, 1, 0, 1);
-                                                                                      return true;
-                                                                                  },
-                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+    auto robot4_test_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4_test_done_ptr", blackboard_ptr_,
+                                                                                robot4_opening_seq_test_ptr,
+                                                                                [&]() {
+                                                                                    blackboard_ptr_->SetBoolValue(false, "robot4_opening_flag");
+                                                                                    return true;
+                                                                                });
 
-    auto robot_4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 opening behavior", blackboard_ptr_);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_move_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw1_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw2_ptr);
-    // robot_4_opening_behavior_ptr->AddChildren(photo_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw2_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw3_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw1_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_move_sw4_ptr);
-    robot_4_opening_behavior_ptr->AddChildren(robot4_action_sw2_ptr);
+    auto robot_opening_jud_test_ptr = std::make_shared<shop::decision::PreconditionNode>("opening jud", blackboard_ptr_,
+                                                                                         robot4_test_done_ptr,
+                                                                                         [&]() {
+                                                                                             if (blackboard_ptr_->GetBoolValue("robot4_opening_flag"))
+                                                                                             {
+                                                                                                 return true;
+                                                                                             }
+                                                                                             else
+                                                                                             {
+                                                                                                 return false;
+                                                                                             }
+                                                                                         },
+                                                                                         shop::decision::AbortType::LOW_PRIORITY);
+// *********************************************************************************************************
 
-    auto robot4_cycle_ptr = std::make_shared<shop::decision::CycleNode>(4, "robot cycle",
-                                                                        blackboard_ptr_, robot_4_opening_behavior_ptr);
 
-    auto robot4_opening_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 open", blackboard_ptr_);
-    robot4_opening_behavior_ptr->AddChildren(robot4_opening_ptr);
-    robot4_opening_behavior_ptr->AddChildren(robot4_cycle_ptr);
+    auto debug_game_sel_ptr = std::make_shared<shop::decision::SelectorNode>("test", blackboard_ptr_);
+    debug_game_sel_ptr->AddChildren(robot_opening_jud_test_ptr);
+    debug_game_sel_ptr->AddChildren(robot4_carry_pre_ptr);
 
-    blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
-    blackboard_ptr_->SetActionName(3, "T");
+    blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
 
-    while (ros::ok)
-    {
-        ros::spinOnce();
-        robot4_opening_behavior_ptr->Run();
-        // if (robot1_coord_now_.x == 4 && robot1_coord_now_.y == 2)
-        // {
-        //     goal_action_ptr->CancelMoveGoal(1);
-        //     ROS_INFO("in this");
-        //     while (1)
-        //     {
-        //     }
-        // }
-        auto state = robot4_opening_behavior_ptr->GetBehaviorState();
-        if (state == BehaviorState::SUCCESS)
-        {
-            // auto temp_dir_ptr = blackboard_ptr_->GetDirPtr("robot1/run_coordinate");
-            // auto dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(temp_dir_ptr);
-
-            // dir_ptr->OpenLock();
-            // dir_ptr->Set(7, 4, 4);
-            // robot4_opening_behavior_ptr->Reset();
-            ROS_INFO("success");
-            while (1)
-            {
-            }
-        }
-
-        index++;
-        // ROS_INFO("tree is run %d",index);
-    }
+    shop::decision::BehaviorTree se(debug_game_sel_ptr, 20);
+    se.Execute();
 }

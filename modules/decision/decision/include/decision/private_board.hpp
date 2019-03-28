@@ -114,7 +114,7 @@ class PrivateBoard : public Blackboard
     void SetActionName(uint8_t robot_num, std::string name)
     {
         std::string action_key = "robot" + std::to_string(robot_num) + "/action_name";
-        ROS_INFO("set %s", action_key.c_str());
+        // ROS_INFO("set %s is name", action_key.c_str(),name.c_str());
         auto temp_dir_ptr = GetDirPtr(action_key);
         auto dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(temp_dir_ptr);
         dir_ptr->OpenLock();

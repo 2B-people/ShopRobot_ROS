@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-07 21:11:54
- * @LastEditTime: 2019-03-20 19:10:57
+ * @LastEditTime: 2019-03-28 21:30:47
  */
 #ifndef ACTION_NODE_H
 #define ACTION_NODE_H
@@ -196,8 +196,8 @@ public:
         goalaction_ptr_(goalaction_ptr),
         goal_flag_(false)
   {
-    // auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr); 
-    flag_name_ = "robot"+std::to_string(robot_num)+"_opening_flag";
+    // auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
+    flag_name_ = "robot" + std::to_string(robot_num) + "_opening_flag";
   }
 
   ~OpenAction() = default;
@@ -236,7 +236,7 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
-      private_blackboard_ptr_->SetBoolValue(false,flag_name_);
+      // private_blackboard_ptr_->SetBoolValue(false,flag_name_);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -271,6 +271,7 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    //发送目标照片
     auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("photo_number");
     auto dir_ptr = std::dynamic_pointer_cast<PhotoNemberDir>(temp_dir_ptr);
     dir_ptr->OpenLock();
@@ -311,7 +312,7 @@ private:
         private_blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
         break;
       default:
-        ROS_ERROR("photo  number is %d !!err!", dir_ptr->GetPhotoNumber());
+        ROS_ERROR("photo number is %d !!err!", dir_ptr->GetPhotoNumber());
         break;
       }
     }
@@ -354,7 +355,6 @@ private:
   {
     return goalaction_ptr_->GetDetectionState();
   }
-
   virtual void OnTerminate(BehaviorState state)
   {
     switch (state)
@@ -456,6 +456,6 @@ private:
 };
 
 } // namespace decision
-} // namespace shop
+} // namespace shopr
 
 #endif

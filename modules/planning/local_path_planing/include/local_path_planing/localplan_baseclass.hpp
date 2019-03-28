@@ -1,3 +1,10 @@
+/*
+ * @Description: In User Settings Edit
+ * @Author: your name
+ * @LastEditors: Please set LastEditors
+ * @Date: 2019-03-28 21:02:38
+ * @LastEditTime: 2019-03-28 21:48:17
+ */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
 
@@ -65,9 +72,9 @@ public:
     d_shelf_barrier_write_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
 
     a_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/A_shelf_barrier_read");
-    a_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_read");
-    a_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_read");
-    a_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_read");
+    b_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_read");
+    c_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_read");
+    d_shelf_barrier_read_clt_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_read");
 
     target_coordinate_lock_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot/coordinate_srv");
     robot1_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_write");
@@ -122,16 +129,25 @@ public:
         for (int8_t i = 0; i < 12; i++)
         {
           auto temp = GetGoods(i);
+          ROS_WARN("is %d",temp);
           if (temp == 0)
           {
             index++;
-            if (index == 11)
+            if (index == 12)
+            {
               all_done_ = true;
+            }
           }
         }
         PlanPlace(goal->robot_num);
       }
     }
+    else
+    {
+      plan_as_.setPreempted();      
+      return;
+    }
+    
 
     ROS_INFO("%s FININSH", __FUNCTION__);
     result.success_flag = true;
@@ -255,6 +271,10 @@ public:
       ROS_ERROR("%s no robot in %s ", name_.c_str(), __FUNCTION__);
       break;
     }
+    // for (size_t i = 0; i < 12; i++)
+    // {
+    //   ROS_ERROR("%d is %d",i,srv.response.shelf_barrier_all[i]);
+    // }
     for (size_t i = 0; i < 12; i++)
     {
       shelf_barrier[i] = srv.response.shelf_barrier_all[i];
@@ -268,7 +288,7 @@ public:
   void SetShelfToFalse(int8_t shelf_num, int8_t location)
   {
     data::ShelfBarrier srv;
-    srv.request.location = location;
+    srv.request.location = location - 1;
     srv.request.shelf_barrier = true;
     switch (shelf_num)
     {

@@ -68,7 +68,15 @@ class LocalPlan : public LocalBase
         }
 
         GetShelfBarrier(shelves, goal_shelf);
-        ROS_INFO("XXXX:%d", goal_shelf);
+        ROS_WARN("XXXX:%d", goal_shelf);
+
+        for(int i = 0; i<12; i++)
+        {
+            if(shelves[i] == false)
+                ROS_WARN("QQQ:0");
+            if(shelves[i] == true)
+                ROS_WARN("QQQ:1");
+        }
 
         for (int i = 1; i < 12; i = i + 2)
         {
@@ -497,6 +505,7 @@ class LocalPlan : public LocalBase
                 final_x = temp_final_x;
                 final_y = temp_final_y;
                 final_action = temp_final_action;
+                ROS_WARN("TTT:%d", final_action);
                 final_shelf_location = temp_final_shelf_location;
             }
         }
@@ -527,7 +536,7 @@ class LocalPlan : public LocalBase
         for (int i = 0; i < 12; i++)
         {
             temp_category = GetGoods(int8_t(i));
-
+            ROS_INFO("local plan:%d goods is%d",i,temp_category);
             if (temp_category != 0)
             {
                 switch (i + 1)
@@ -600,6 +609,7 @@ class LocalPlan : public LocalBase
         }
 
         auto now_coord = GetNowCoord(robot_num);
+        ROS_INFO("local plan x:%d y:%d",now_coord.x,now_coord.y);
 
         for (int i = 0; i < determined_coord.size(); i++)
         {
@@ -640,7 +650,7 @@ class LocalPlan : public LocalBase
                 final_x = end_x;
                 final_y = end_y;
                 final_location = 11;
-                final_category = GetGoods(int8_t(11));
+                final_category = GetGoods(int8_t(10));
                 break;
             }
 
