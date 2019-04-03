@@ -3,11 +3,13 @@
 
 #include <ros/ros.h>
 #include <ros/time.h>
+#include <actionlib/server/simple_action_server.h>
+
+#include <string>
 
 #include <common/rrts.h>
 #include <common/main_interface.h>
 
-#include <string>
 
 #include <data/Coord.h>
 #include <data/SetBool.h>
@@ -17,14 +19,20 @@
 #include <data/ShelfBarrier.h>
 #include <data/ActionName.h>
 
+#include <data/GlobalPlanAction.h>
+
 namespace shop
 {
 namespace pathplan
 {
+
+typedef actionlib::SimpleActionServer<data::GlobalPlanAction> PLANACTIONSERVER;
+
 class GlobalBase : public shop::common::RRTS
 {
 public:
-  GlobalBase(std::string name) : common::RRTS(name, 1)
+  GlobalBase(std::string name) : common::RRTS(name, 1),
+                                 plan_as_(nh_, "global_plan", boost::bind(&GlobalBase::PlanExecuteCB, this, _1), false)
   {
     robot1_coord_now_.x = 10;
     robot1_coord_now_.y = 10;
@@ -52,6 +60,52 @@ public:
     robot4_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_read");
   }
   virtual ~GlobalBase() = default;
+
+  virtual data::Coord GetFinalCoord(uint8_t robot_num_) = 0;
+  virtual void RobotGlobalPlanning(void) = 0;
+
+  void PlanExecuteCB(const data::GlobalPlanGoal::ConstPtr &goal)
+  {
+    //反馈
+    data::GlobalPlanFeedback feedback;
+    //结果
+    data::GlobalPlanResult result;
+
+    if (goal->do_flag)
+    {
+      ROS_INFO("Global plan is Run");
+      RobotGlobalPlanning();
+      auto robot1_coord = GetFinalCoord(1);
+      auto robot2_coord = GetFinalCoord(2);
+      auto robot3_coord = GetFinalCoord(3);
+      auto robot4_coord = GetFinalCoord(4);
+
+      result.robot1_coord[0] = robot1_coord.x;
+      result.robot2_coord[0] = robot2_coord.x;
+      result.robot3_coord[0] = robot3_coord.x;
+      result.robot4_coord[0] = robot4_coord.x;
+
+      result.robot1_coord[1] = robot1_coord.y;
+      result.robot2_coord[1] = robot2_coord.y;
+      result.robot3_coord[1] = robot3_coord.y;
+      result.robot4_coord[1] = robot4_coord.y;
+
+      result.robot1_coord[1] = 5;
+      result.robot2_coord[1] = 5;
+      result.robot3_coord[1] = 5;
+      result.robot4_coord[1] = 5;
+    }
+    else
+    {
+      ROS_INFO("Global plan is stop");
+      plan_as_.setPreempted();
+      return;
+    }
+    ROS_INFO("%s FININSH", __FUNCTION__);
+    result.success_flag = true;
+    plan_as_.setSucceeded(result);
+    return;
+  }
 
   // auto now = GetNowCoord(1);
   // x = now.x;
@@ -128,6 +182,8 @@ protected:
   ros::ServiceClient robot2_target_coordinate_read_clt_;
   ros::ServiceClient robot3_target_coordinate_read_clt_;
   ros::ServiceClient robot4_target_coordinate_read_clt_;
+
+  PLANACTIONSERVER plan_as_;
 
   void Robo1CoordNowCB(const data::Coord::ConstPtr &msg)
   {

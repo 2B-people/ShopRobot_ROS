@@ -12,6 +12,8 @@
 #include <data/CameraAction.h>
 #include <data/DetectionAction.h>
 #include <data/LocalPlanAction.h>
+#include <data/GlobalPlanAction.h>
+
 //server
 #include <data/Coordinate.h>
 #include <data/ActionName.h>
@@ -22,6 +24,7 @@
 #include <blackboard/data_structure.hpp>
 
 #include <decision/private_board.hpp>
+
 namespace shop
 {
 namespace decision
@@ -32,6 +35,7 @@ typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
 typedef actionlib::SimpleActionClient<data::CameraAction> CAMERAACTION;
 typedef actionlib::SimpleActionClient<data::DetectionAction> DETECTION;
 typedef actionlib::SimpleActionClient<data::LocalPlanAction> LOCALPLANACTION;
+typedef actionlib::SimpleActionClient<data::GlobalPlanAction> GLOBALPLANACTION;
 
 //动作任务发布的对象
 class GoalAction
@@ -42,6 +46,7 @@ public:
   GoalAction(const Blackboard::Ptr &blackboard_ptr) : camera_action_clint_("camera_action_server", true),
                                                       detection_clint_("detection_action_server", true),
                                                       localplan_clint_("local_plan", true),
+                                                      globalplan_clint_("global_plan", true),
                                                       robot1_move_action_clint_("robot1_web/move_action", true),
                                                       robot1_open_action_clint_("robot1_web/opening_action", true),
                                                       robot1_shop_action_clint_("robot1_web/shop_action", true),
@@ -60,6 +65,7 @@ public:
     camera_action_clint_.waitForServer();
     detection_clint_.waitForServer();
     localplan_clint_.waitForServer();
+    globalplan_clint_.waitForServer();
     // robot1_move_action_clint_.waitForServer();
     // robot1_open_action_clint_.waitForServer();
     // robot1_shop_action_clint_.waitForServer();
@@ -178,6 +184,19 @@ public:
                               LOCALPLANACTION::SimpleActiveCallback(),
                               LOCALPLANACTION::SimpleFeedbackCallback());
   }
+
+  //@brief 发送全局规划目标
+  void SendGlobalPlanGoal(int8_t robot_num, bool do_flag)
+  {
+    data::GlobalPlanGoal goal;
+    goal.do_flag = do_flag;
+    globalplan_clint_.sendGoal(goal,
+                              /*todo : done callback*/
+                              GLOBALPLANACTION::SimpleDoneCallback(),
+                              GLOBALPLANACTION::SimpleActiveCallback(),
+                              GLOBALPLANACTION::SimpleFeedbackCallback());
+  }
+
   // @brief 发布车移动目标
   void SendMoveGoal(int8_t robot_num, int16_t x, int16_t y, int8_t pose)
   {
@@ -532,9 +551,36 @@ public:
     }
   }
 
+  //得到局部規劃的狀態
   BehaviorState GetLocalPlanState()
   {
     auto state = localplan_clint_.getState();
+    if (state == actionlib::SimpleClientGoalState::ACTIVE)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::PENDING)
+    {
+      return BehaviorState::RUNNING;
+    }
+    else if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      return BehaviorState::SUCCESS;
+    }
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else
+    {
+      return BehaviorState::FAILURE;
+    }
+  }
+
+  //得到全局規劃的狀態
+  BehaviorState GetGlobalPlanState()
+  {
+    auto state = globalplan_clint_.getState();
     if (state == actionlib::SimpleClientGoalState::ACTIVE)
     {
       return BehaviorState::RUNNING;
@@ -567,6 +613,8 @@ private:
   DETECTION detection_clint_;
   //局部规划
   LOCALPLANACTION localplan_clint_;
+  //全局規劃
+  GLOBALPLANACTION globalplan_clint_;
   //robot1
   MOVEACTIONCLINT robot1_move_action_clint_;
   OPENINGCLINT robot1_open_action_clint_;

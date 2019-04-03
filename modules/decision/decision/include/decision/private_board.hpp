@@ -85,6 +85,7 @@ class PrivateBoard : public Blackboard
         auto photo_number = std::make_shared<PhotoNemberDir>(0);
         AddDataIntoWorld("photo_number", photo_number);
     }
+    
     ~PrivateBoard() = default;
 
     bool GetBoolValue(std::string key)

@@ -100,7 +100,6 @@ private:
   bool TargetActionNameReadCB3(data::ActionName::Request &req, data::ActionName::Response &res);
   bool TargetActionNameReadCB4(data::ActionName::Request &req, data::ActionName::Response &res);
   
-
   //货架障碍物读写服务
   bool AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
   bool BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);

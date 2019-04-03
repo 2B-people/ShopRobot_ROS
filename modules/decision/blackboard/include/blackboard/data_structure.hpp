@@ -59,6 +59,7 @@ class BoolDir : public DirBase
     bool real_bool_;
 };
 
+// 動作名字
 class ActionNameDir : public DirBase
 {
   public:
@@ -97,6 +98,7 @@ class ActionNameDir : public DirBase
     std::string initial_name_;
 };
 
+// 識別照片數目
 class PhotoNemberDir : public DirBase
 {
 

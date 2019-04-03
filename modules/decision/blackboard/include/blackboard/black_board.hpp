@@ -42,12 +42,11 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     {
         return dictionary_type_;
     }
-
+    // 數據上鎖
     bool GetLock()
     {
         return flag_;
     }
-    virtual void RepeatInit() = 0;
     virtual void Lock()
     {
         flag_ = false;
@@ -56,6 +55,9 @@ class DirBase : public std::enable_shared_from_this<DirBase>
     {
         flag_ = true;
     }
+
+    //重啓
+    virtual void RepeatInit() = 0;
 
   protected:
     bool flag_;
@@ -109,7 +111,6 @@ class Blackboard : public std::enable_shared_from_this<Blackboard>
     //example:
     // bool GetBoolValue(std::string key)
     // {
-    ros::NodeHandle nh;
     //     auto dir_ptr = GetDirPtr(key);
     //     auto bool_dir_ptr = std::dynamic_pointer_cast<BoolDir>(dir_ptr);
     //     return bool_dir_ptr->GetValue();

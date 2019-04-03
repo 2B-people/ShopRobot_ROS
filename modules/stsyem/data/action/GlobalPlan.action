@@ -1,0 +1,9 @@
+bool do_flag
+---
+bool success_flag
+int8[3] robot1_coord
+int8[3] robot2_coord
+int8[3] robot3_coord
+int8[3] robot4_coord
+---
+string progress

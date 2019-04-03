@@ -38,6 +38,7 @@ add_action_files(FILES
                       Camera.action
                       Detection.action
                       LocalPlan.action
+                      GlobalPlan.action
 )
 
 generate_messages(DEPENDENCIES std_msgs actionlib_msgs std_srvs nav_msgs sensor_msgs)
