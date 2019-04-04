@@ -468,6 +468,7 @@ class SelectorNode : public CompositeNode
     virtual void AddChildren(const BehaviorNode::Ptr &child_node_ptr)
     {
         CompositeNode::AddChildren(child_node_ptr);
+        //實現對優先級的判斷
         children_node_reevaluation_.push_back(child_node_ptr->GetBehaviorType() == BehaviorType::PRECONDITION && (std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY || std::dynamic_pointer_cast<PreconditionNode>(child_node_ptr)->GetAbortType() == AbortType::BOTH));
     }
     // @breif 加入多个子节点
@@ -478,6 +479,7 @@ class SelectorNode : public CompositeNode
         //遍历
         for (auto child_node_ptr = child_node_ptr_list.begin(); child_node_ptr != child_node_ptr_list.end(); child_node_ptr++)
         {
+            //實現對優先級的判斷
             children_node_reevaluation_.push_back((*child_node_ptr)->GetBehaviorType() == BehaviorType::PRECONDITION && (std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::LOW_PRIORITY || std::dynamic_pointer_cast<PreconditionNode>(*child_node_ptr)->GetAbortType() == AbortType::BOTH));
         }
     }
@@ -501,10 +503,11 @@ class SelectorNode : public CompositeNode
             return BehaviorState::SUCCESS;
         }
         //Reevaluation
-
+        //init後children_node_index_爲0
         for (unsigned int index = 0; index < children_node_index_; index++)
         {
             ROS_INFO("Reevaluation");
+            //對LOW_PRIORITY和BOTH的Precondition進行判斷
             if (children_node_reevaluation_.at(index))
             {
                 BehaviorState state = children_node_ptr_.at(index)->Run();
@@ -515,6 +518,7 @@ class SelectorNode : public CompositeNode
                     {
                         return state;
                     }
+                    
                     ++children_node_index_;
                     break;
                 }
