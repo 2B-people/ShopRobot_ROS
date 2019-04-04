@@ -44,7 +44,6 @@ private:
     uint16_t target_y = dir_ptr->GetCoordinateY();
     uint16_t target_pose = dir_ptr->GetCoordinatePOSE();
 
-    // std::string bool_key = "robot" + std::to_string(robot_num_) + "/local_plan/flag";
     ROS_INFO("%d %d %d", target_x, target_y, target_pose);
     // 發布目標
     if (target_x != 10 && target_y != 10 && target_pose != 10)
@@ -478,17 +477,17 @@ private:
 };
 
 //全局规划action类
-class GloalPlanAction : public ActionNode
+class GlobalPlanAction : public ActionNode
 {
 public:
-  GloalPlanAction(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
+  GlobalPlanAction(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
                   const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         goalaction_ptr_(goalaction_ptr),
         private_blackboard_ptr_(blackboard_ptr)
   {
   }
-  ~GloalPlanAction() = default;
+  ~GlobalPlanAction() = default;
 
 private:
   virtual void OnInitialize()
