@@ -47,9 +47,9 @@ public:
     robot4_coord_now_.pose = 0;
 
     robot1_coordinate_sub_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&GlobalBase::Robo1CoordNowCB, this, _1));
-    robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
-    robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
-    robot4_coordinate_sub_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&GlobalBase::Robo4CoordNowCB, this, _1));
+    robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("robot2_web/coord_now", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
+    robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("robot3_web/coord_now", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
+    robot4_coordinate_sub_ = nh_.subscribe<data::Coord>("robot4_web/coord_now", 10, boost::bind(&GlobalBase::Robo4CoordNowCB, this, _1));
 
     roadblock_read_clt_ = nh_.serviceClient<data::Roadblock>("shop/roadblock_read_srv");
 
@@ -59,8 +59,10 @@ public:
     robot4_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_read");
 
     plan_as_.start();
+
     ROS_WARN("global is init");
   }
+  
   virtual ~GlobalBase() = default;
 
   virtual data::Coord GetFinalCoord(uint8_t robot_num_) = 0;
@@ -96,6 +98,7 @@ public:
       result.robot2_coord[2] = 5;
       result.robot3_coord[2] = 5;
       result.robot4_coord[2] = 5;
+
     }
     else
     {

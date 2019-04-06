@@ -65,7 +65,7 @@ public:
 
     // camera_action_clint_.waitForServer();
     // detection_clint_.waitForServer();
-    
+
     localplan_clint_.waitForServer();
     globalplan_clint_.waitForServer();
 
@@ -194,6 +194,7 @@ public:
     data::GlobalPlanGoal goal;
     goal.do_flag = do_flag;
     globalplan_clint_.sendGoal(goal,
+                                // GLOBALPLANACTION::SimpleDoneCallback(),
                                boost::bind(&GoalAction::GlobalPlanDoneCB, this, _1,_2),
                                GLOBALPLANACTION::SimpleActiveCallback(),
                                GLOBALPLANACTION::SimpleFeedbackCallback());
@@ -675,7 +676,6 @@ private:
     if (feedback->begin_flag == true)
     {
       private_blackboard_ptr_->SetBoolValue(true, "robot2_opening_flag");
-      ROS_WARN("IN HERE DECISION");
     }
   }
 

@@ -242,7 +242,7 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
-      private_blackboard_ptr_->SetBoolValue(false,flag_name_);
+      private_blackboard_ptr_->SetBoolValue(false, flag_name_);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -480,7 +480,7 @@ class GlobalPlanAction : public ActionNode
 {
 public:
   GlobalPlanAction(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
-                  const GoalAction::Ptr &goalaction_ptr)
+                   const GoalAction::Ptr &goalaction_ptr)
       : ActionNode(name, blackboard_ptr),
         goalaction_ptr_(goalaction_ptr),
         private_blackboard_ptr_(blackboard_ptr)
@@ -492,11 +492,17 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
-    goalaction_ptr_->SendGlobalPlanGoal(true);
   }
   virtual BehaviorState Update()
   {
-    return goalaction_ptr_->GetGlobalPlanState();
+    auto state = goalaction_ptr_->GetGlobalPlanState();
+
+    if (state != BehaviorState::RUNNING) {
+      goalaction_ptr_->SendGlobalPlanGoal(true);
+      return BehaviorState::RUNNING;
+    }
+
+    return state;
   }
   virtual void OnTerminate(BehaviorState state)
   {
@@ -519,6 +525,7 @@ private:
 
   GoalAction::Ptr goalaction_ptr_;
   PrivateBoard::Ptr private_blackboard_ptr_;
+  bool ing_flag_;
 };
 
 } // namespace decision

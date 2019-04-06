@@ -1,6 +1,8 @@
 <launch>
   <param name="debug" value="true" type="bool"/>
 
+  <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
+
   <include file="$(find tools)/launch/web_serial.launch"/>
   
   <!-- <node name="camera_node" pkg="camera" type="camera_node.py" output="screen"> 
@@ -24,7 +26,6 @@
   <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
   </node> -->
 
-  <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 
   <!-- 测试单独使用 -->
   <!-- <node name="debug_decision" pkg="decision" type="debug_decision" output="screen"></node> -->
