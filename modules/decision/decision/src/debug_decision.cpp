@@ -98,18 +98,18 @@ int main(int argc, char **argv)
     robot4_carry_seq_ptr->AddChildren(robot4_action_set_ptr);
 
     auto robot4_action_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action jud ", blackboard_ptr_,
-                                                                                  robot4_carry_seq_ptr,
-                                                                                  [&]() {
-                                                                                      if (blackboard_ptr_->GetBoolValue("robot4/local_plan/flag") == false)
-                                                                                      {
-                                                                                          return false;
-                                                                                      }
-                                                                                      else
-                                                                                      {
-                                                                                          return true;
-                                                                                      }
-                                                                                  },
-                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+                                                                                    robot4_carry_seq_ptr,
+                                                                                    [&]() {
+                                                                                        if (blackboard_ptr_->GetBoolValue("robot4/local_plan/flag") == false)
+                                                                                        {
+                                                                                            return false;
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            return true;
+                                                                                        }
+                                                                                    },
+                                                                                    shop::decision::AbortType::LOW_PRIORITY);
 
     auto robot4_carry_jud_ptr = std::make_shared<shop::decision::SelectorNode>("robot4 carry sel", blackboard_ptr_);
     robot4_carry_jud_ptr->AddChildren(robot4_plan_jud_ptr);
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     auto robot4_carry_pre_ptr = std::make_shared<shop::decision::PreconditionNode>("robot carry jud", blackboard_ptr_,
                                                                                    robot4_carry_jud_ptr,
                                                                                    [&]() {
-                                                                                       if (blackboard_ptr_->GetBoolValue("robot4_opening_flag"))
+                                                                                       if (blackboard_ptr_->GetBoolValue("end_flag") == false)
                                                                                        {
                                                                                            return false;
                                                                                        }
@@ -128,6 +128,7 @@ int main(int argc, char **argv)
                                                                                        }
                                                                                    },
                                                                                    shop::decision::AbortType::LOW_PRIORITY);
+
 
     //*******************************robot4 opening what to do********************************
     auto robot4_action_T_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 action T", blackboard_ptr_,
@@ -222,8 +223,48 @@ int main(int argc, char **argv)
                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
     // *******************************************opening test*****************************************************
+    auto robot1_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 opening jud", blackboard_ptr_,
+                                                                                     robot1_opening_ptr,
+                                                                                     [&]() {
+                                                                                         if (blackboard_ptr_->GetBoolValue("robot1_opening_flag"))
+                                                                                         {
+                                                                                             return true;
+                                                                                         }
+                                                                                         else
+                                                                                         {
+                                                                                             return false;
+                                                                                         }
+                                                                                     },
+                                                                                     shop::decision::AbortType::LOW_PRIORITY);
 
-    auto robot4_opening_done_test_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4_opening_done_test_ptr", blackboard_ptr_,
+    auto robot2_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot2 opening jud", blackboard_ptr_,
+                                                                                     robot2_opening_ptr,
+                                                                                     [&]() {
+                                                                                         if (blackboard_ptr_->GetBoolValue("robot2_opening_flag"))
+                                                                                         {
+                                                                                             return true;
+                                                                                         }
+                                                                                         else
+                                                                                         {
+                                                                                             return false;
+                                                                                         }
+                                                                                     },
+                                                                                     shop::decision::AbortType::LOW_PRIORITY);
+    auto robot3_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot3 opening jud", blackboard_ptr_,
+                                                                                     robot3_opening_ptr,
+                                                                                     [&]() {
+                                                                                         if (blackboard_ptr_->GetBoolValue("robot3_opening_flag"))
+                                                                                         {
+                                                                                             return true;
+                                                                                         }
+                                                                                         else
+                                                                                         {
+                                                                                             return false;
+                                                                                         }
+                                                                                     },
+                                                                                     shop::decision::AbortType::LOW_PRIORITY);
+
+    auto robot4_opening_test_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 opening done", blackboard_ptr_,
                                                                                         robot4_opening_ptr,
                                                                                         [&]() {
                                                                                             blackboard_ptr_->SetCoordValue(4, 2, 2, 0);
@@ -231,18 +272,11 @@ int main(int argc, char **argv)
                                                                                         });
 
     auto robot4_opening_seq_test_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 open seq", blackboard_ptr_);
-    robot4_opening_seq_test_ptr->AddChildren(robot4_opening_done_test_ptr);
+    robot4_opening_seq_test_ptr->AddChildren(robot4_opening_test_done_ptr);
     robot4_opening_seq_test_ptr->AddChildren(robot4_move_ptr);
 
-    auto robot4_test_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4_test_done_ptr", blackboard_ptr_,
-                                                                                robot4_opening_seq_test_ptr,
-                                                                                [&]() {
-                                                                                    blackboard_ptr_->SetBoolValue(false, "robot4_opening_flag");
-                                                                                    return true;
-                                                                                });
-
-    auto robot_opening_jud_test_ptr = std::make_shared<shop::decision::PreconditionNode>("opening jud", blackboard_ptr_,
-                                                                                         robot4_test_done_ptr,
+    auto robot4_opening_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 s jud", blackboard_ptr_,
+                                                                                         robot4_opening_seq_test_ptr,
                                                                                          [&]() {
                                                                                              if (blackboard_ptr_->GetBoolValue("robot4_opening_flag"))
                                                                                              {
@@ -254,14 +288,27 @@ int main(int argc, char **argv)
                                                                                              }
                                                                                          },
                                                                                          shop::decision::AbortType::LOW_PRIORITY);
-// *********************************************************************************************************
+    
+    auto open_behavior_ptr = std::make_shared<shop::decision::ParallelNode>("open behavior", blackboard_ptr_,4);
+    open_behavior_ptr->AddChildren(robot1_opening_jud_ptr);
+    open_behavior_ptr->AddChildren(robot2_opening_jud_ptr);
+    open_behavior_ptr->AddChildren(robot3_opening_jud_ptr);
+    open_behavior_ptr->AddChildren(robot4_opening_jud_ptr);
 
+    auto open_behavior_success_ptr = std::make_shared<shop::decision::SuccessDoNode>("open_behavior_success", blackboard_ptr_,
+                                                                              open_behavior_ptr,
+                                                                              [&]() {
+                                                                                  blackboard_ptr_->SetBoolValue(true, "end_flag");
+                                                                                  return true;
+                                                                              });
+
+    // *********************************************************************************************************
 
     auto debug_game_sel_ptr = std::make_shared<shop::decision::SelectorNode>("test", blackboard_ptr_);
-    debug_game_sel_ptr->AddChildren(robot_opening_jud_test_ptr);
+    debug_game_sel_ptr->AddChildren(open_behavior_success_ptr);
     debug_game_sel_ptr->AddChildren(robot4_carry_pre_ptr);
 
-    blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
+    blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
 
     shop::decision::BehaviorTree se(debug_game_sel_ptr, 20);
     se.Execute();

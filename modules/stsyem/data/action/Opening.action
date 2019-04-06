@@ -3,3 +3,4 @@ string car_begin
 bool success_flag
 ---
 string progress
+bool begin_flag

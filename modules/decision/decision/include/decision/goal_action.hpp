@@ -43,38 +43,41 @@ class GoalAction
 public:
   typedef std::shared_ptr<GoalAction> Ptr;
 
-  GoalAction(const Blackboard::Ptr &blackboard_ptr) : camera_action_clint_("camera_action_server", true),
-                                                      detection_clint_("detection_action_server", true),
-                                                      localplan_clint_("local_plan", true),
-                                                      globalplan_clint_("global_plan", true),
-                                                      robot1_move_action_clint_("robot1_web/move_action", true),
-                                                      robot1_open_action_clint_("robot1_web/opening_action", true),
-                                                      robot1_shop_action_clint_("robot1_web/shop_action", true),
-                                                      robot2_move_action_clint_("robot2_web/move_action", true),
-                                                      robot2_open_action_clint_("robot2_web/opening_action", true),
-                                                      robot2_shop_action_clint_("robot2_web/shop_action", true),
-                                                      robot3_move_action_clint_("robot3_web/move_action", true),
-                                                      robot3_open_action_clint_("robot3_web/opening_action", true),
-                                                      robot3_shop_action_clint_("robot3_web/shop_action", true),
-                                                      robot4_move_action_clint_("robot4_web/move_action", true),
-                                                      robot4_shop_action_clint_("robot4_web/shop_action", true),
-                                                      robot4_open_action_clint_("robot4_web/opening_action", true)
+  GoalAction(const PrivateBoard::Ptr &blackboard_ptr) : private_blackboard_ptr_(blackboard_ptr),
+                                                        camera_action_clint_("camera_action_server", true),
+                                                        detection_clint_("detection_action_server", true),
+                                                        localplan_clint_("local_plan", true),
+                                                        globalplan_clint_("global_plan", true),
+                                                        robot1_move_action_clint_("robot1_web/move_action", true),
+                                                        robot1_open_action_clint_("robot1_web/opening_action", true),
+                                                        robot1_shop_action_clint_("robot1_web/shop_action", true),
+                                                        robot2_move_action_clint_("robot2_web/move_action", true),
+                                                        robot2_open_action_clint_("robot2_web/opening_action", true),
+                                                        robot2_shop_action_clint_("robot2_web/shop_action", true),
+                                                        robot3_move_action_clint_("robot3_web/move_action", true),
+                                                        robot3_open_action_clint_("robot3_web/opening_action", true),
+                                                        robot3_shop_action_clint_("robot3_web/shop_action", true),
+                                                        robot4_move_action_clint_("robot4_web/move_action", true),
+                                                        robot4_shop_action_clint_("robot4_web/shop_action", true),
+                                                        robot4_open_action_clint_("robot4_web/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
-    auto private_blackboard_ptr_ = std::dynamic_pointer_cast<PrivateBoard>(blackboard_ptr);
-    camera_action_clint_.waitForServer();
-    detection_clint_.waitForServer();
+
+    // camera_action_clint_.waitForServer();
+    // detection_clint_.waitForServer();
+    
     localplan_clint_.waitForServer();
     globalplan_clint_.waitForServer();
-    // robot1_move_action_clint_.waitForServer();
-    // robot1_open_action_clint_.waitForServer();
-    // robot1_shop_action_clint_.waitForServer();
-    // robot2_move_action_clint_.waitForServer();
-    // robot2_open_action_clint_.waitForServer();
-    // robot2_shop_action_clint_.waitForServer();
-    // robot3_move_action_clint_.waitForServer();
-    // robot3_open_action_clint_.waitForServer();
-    // robot3_shop_action_clint_.waitForServer();
+
+    robot1_move_action_clint_.waitForServer();
+    robot1_open_action_clint_.waitForServer();
+    robot1_shop_action_clint_.waitForServer();
+    robot2_move_action_clint_.waitForServer();
+    robot2_open_action_clint_.waitForServer();
+    robot2_shop_action_clint_.waitForServer();
+    robot3_move_action_clint_.waitForServer();
+    robot3_open_action_clint_.waitForServer();
+    robot3_shop_action_clint_.waitForServer();
     robot4_move_action_clint_.waitForServer();
     robot4_open_action_clint_.waitForServer();
     robot4_shop_action_clint_.waitForServer();
@@ -186,15 +189,14 @@ public:
   }
 
   //@brief 发送全局规划目标
-  void SendGlobalPlanGoal(int8_t robot_num, bool do_flag)
+  void SendGlobalPlanGoal(bool do_flag)
   {
     data::GlobalPlanGoal goal;
     goal.do_flag = do_flag;
     globalplan_clint_.sendGoal(goal,
-                              /*todo : done callback*/
-                              GLOBALPLANACTION::SimpleDoneCallback(),
-                              GLOBALPLANACTION::SimpleActiveCallback(),
-                              GLOBALPLANACTION::SimpleFeedbackCallback());
+                               boost::bind(&GoalAction::GlobalPlanDoneCB, this, _1,_2),
+                               GLOBALPLANACTION::SimpleActiveCallback(),
+                               GLOBALPLANACTION::SimpleFeedbackCallback());
   }
 
   // @brief 发布车移动目标
@@ -287,18 +289,20 @@ public:
       robot1_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
-                                         OPENINGCLINT::SimpleFeedbackCallback());
+                                         boost::bind(&GoalAction::OpeningFB1, this, _1));
+      break;
     case 2:
       robot2_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
-                                         OPENINGCLINT::SimpleFeedbackCallback());
+                                         boost::bind(&GoalAction::OpeningFB2, this, _1));
       break;
     case 3:
       robot3_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
-                                         OPENINGCLINT::SimpleFeedbackCallback());
+                                         boost::bind(&GoalAction::OpeningFB3, this, _1));
+      break;
     case 4:
       robot4_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
@@ -641,6 +645,57 @@ private:
   ros::ServiceClient robot2_target_coordinate_read_clt_;
   ros::ServiceClient robot3_target_coordinate_read_clt_;
   ros::ServiceClient robot4_target_coordinate_read_clt_;
+
+  void GlobalPlanDoneCB(const actionlib::SimpleClientGoalState &state,const data::GlobalPlanResult::ConstPtr &result)
+  {
+    data::Coord coord;
+    coord.x = result->robot1_coord[0];
+    coord.y = result->robot1_coord[1];
+    coord.pose = result->robot1_coord[2];
+    private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
+
+    coord.x = result->robot2_coord[0];
+    coord.y = result->robot2_coord[1];
+    coord.pose = result->robot2_coord[2];
+    private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
+
+    coord.x = result->robot3_coord[0];
+    coord.y = result->robot3_coord[1];
+    coord.pose = result->robot3_coord[2];
+    private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
+
+    coord.x = result->robot4_coord[0];
+    coord.y = result->robot4_coord[1];
+    coord.pose = result->robot4_coord[2];
+    private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
+  }
+
+  void OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)
+  {
+    if (feedback->begin_flag == true)
+    {
+      private_blackboard_ptr_->SetBoolValue(true, "robot2_opening_flag");
+      ROS_WARN("IN HERE DECISION");
+    }
+  }
+
+  void OpeningFB2(const data::OpeningFeedback::ConstPtr &feedback)
+  {
+    if (feedback->begin_flag == true)
+    {
+      private_blackboard_ptr_->SetBoolValue(true, "robot3_opening_flag");
+    }
+  }
+
+  void OpeningFB3(const data::OpeningFeedback::ConstPtr &feedback)
+  {
+    if (feedback->begin_flag == true)
+    {
+      private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
+    }
+  }
+
+
 };
 
 } // namespace decision

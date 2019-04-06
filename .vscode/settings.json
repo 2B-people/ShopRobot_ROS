@@ -43,6 +43,11 @@
         "tuple": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "*.ipp": "cpp",
+        "cstdarg": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "list": "cpp"
     }
 }

@@ -242,8 +242,7 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
-      //用done_success解決
-      // private_blackboard_ptr_->SetBoolValue(false,flag_name_);
+      private_blackboard_ptr_->SetBoolValue(false,flag_name_);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -493,9 +492,11 @@ private:
   virtual void OnInitialize()
   {
     ROS_INFO("%s is %s", name_.c_str(), __FUNCTION__);
+    goalaction_ptr_->SendGlobalPlanGoal(true);
   }
   virtual BehaviorState Update()
   {
+    return goalaction_ptr_->GetGlobalPlanState();
   }
   virtual void OnTerminate(BehaviorState state)
   {

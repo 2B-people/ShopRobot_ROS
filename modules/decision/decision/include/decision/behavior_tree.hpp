@@ -27,8 +27,10 @@ class BehaviorTree
     {
         running_ = true;
         uint64_t index = 0;
+        ros::Rate	r(2);	//10HZ
         while (ros::ok)
         {
+            r.sleep();
             if (running_)
             {
                 ros::spinOnce();
