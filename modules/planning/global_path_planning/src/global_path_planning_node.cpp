@@ -25,6 +25,7 @@ class GlobalPlan : public GlobalBase
         flag = 1;
         plan_flag_1 = plan_flag_2 = plan_flag_3 = plan_flag_4 = 0;
         arrive_flag_1 = arrive_flag_2 = arrive_flag_3 = arrive_flag_4 = 1;
+        final_coord_1 = final_coord_2 = final_coord_3 =final_coord_4 = Coord(10, 10);
 
         for (int i = 0; i < 4; i++)
             robot_level.push_back(i + 1);
@@ -153,8 +154,11 @@ class GlobalPlan : public GlobalBase
 
     void RobotGlobalPlanning(void)
     {
+        ROS_INFO("11111");
         if (flag == 1)
         {
+            ROS_INFO("22222");
+            
             auto now_1 = GetNowCoord(1);
             auto end_1 = GetTargetCoord(1);
 
@@ -167,13 +171,30 @@ class GlobalPlan : public GlobalBase
             auto now_4 = GetNowCoord(4);
             auto end_4 = GetTargetCoord(4);
 
-            queue<Coord> path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
+            ROS_WARN("1 nowx:%d nowy:%d",now_1.x,now_1.y);
+            ROS_WARN("2 nowx:%d nowy:%d",now_2.x,now_2.y);
+            ROS_WARN("3 nowx:%d nowy:%d",now_3.x,now_3.y);
+            ROS_WARN("4 nowx:%d nowy:%d",now_4.x,now_4.y);
+
+            ROS_WARN("1 endx:%d endy:%d",end_1.x,end_1.y);
+            ROS_WARN("2 endx:%d endy:%d",end_2.x,end_2.y);
+            ROS_WARN("3 endx:%d endy:%d",end_3.x,end_3.y);
+            ROS_WARN("4 endx:%d endy:%d",end_4.x,end_4.y);
+            
+            queue<Coord> path_1, path_2, path_3, path_4;
+
+            ROS_INFO("23243");
+            if(end_1.x != 10 && end_1.y != 10) 
+                path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
             ROS_WARN("path_1 of size:%d", path_1.size());
-            queue<Coord> path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
+            if(end_2.x != 10 && end_2.y != 10)
+                path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
             ROS_WARN("path_2 of size:%d", path_2.size());
-            queue<Coord> path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
+            if(end_3.x != 10 && end_3.y != 10)
+                path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
             ROS_WARN("path_3 of size:%d", path_3.size());
-            queue<Coord> path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
+            if(end_4.x != 10 && end_4.y != 10)
+                path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
             ROS_WARN("path_4 of size:%d", path_4.size());
             queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
 
@@ -215,6 +236,8 @@ class GlobalPlan : public GlobalBase
         }
         else
         {
+            ROS_INFO("3333");
+            
             auto now_1 = GetNowCoord(1);
             auto end_1 = GetTargetCoord(1);
 
@@ -226,11 +249,32 @@ class GlobalPlan : public GlobalBase
 
             auto now_4 = GetNowCoord(4);
             auto end_4 = GetTargetCoord(4);
+            
+            ROS_WARN("1 nowx:%d nowy:%d",now_1.x,now_1.y);
+            ROS_WARN("2 nowx:%d nowy:%d",now_2.x,now_2.y);
+            ROS_WARN("3 nowx:%d nowy:%d",now_3.x,now_3.y);
+            ROS_WARN("4 nowx:%d nowy:%d",now_4.x,now_4.y);
 
-            queue<Coord> path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
-            queue<Coord> path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
-            queue<Coord> path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
-            queue<Coord> path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
+            ROS_WARN("1 endx:%d endy:%d",end_1.x,end_1.y);
+            ROS_WARN("2 endx:%d endy:%d",end_2.x,end_2.y);
+            ROS_WARN("3 endx:%d endy:%d",end_3.x,end_3.y);
+            ROS_WARN("4 endx:%d endy:%d",end_4.x,end_4.y);
+
+            queue<Coord> path_1, path_2, path_3, path_4;
+
+            ROS_INFO("XXXXX");
+            if(end_1.x != 10 && end_1.y != 10) 
+                path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
+            ROS_WARN("path_1 of size:%d", path_1.size());
+            if(end_2.x != 10 && end_2.y != 10)
+                path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
+            ROS_WARN("path_2 of size:%d", path_2.size());
+            if(end_3.x != 10 && end_3.y != 10)
+                path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
+            ROS_WARN("path_3 of size:%d", path_3.size());
+            if(end_4.x != 10 && end_4.y != 10)
+                path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
+            ROS_WARN("path_4 of size:%d", path_4.size());
             queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
 
             for (int i = 0; i < 4; i++) //计算优先级为2的机器人所停位置
@@ -240,10 +284,11 @@ class GlobalPlan : public GlobalBase
                     int vehicle_num = i + 1;
                     if (vehicle_num == 1)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("2QQQQ1:%d", temp_path_2.size());
                         while (arrive_flag_1)
                         {
-
+                            ROS_WARN("2QQ1 go");
                             Coord stop_coord = temp_path_1.front();
 
                             if (temp_path_1.size() == 0)
@@ -274,10 +319,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 2)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("2QQQQ2:%d", temp_path_2.size());
                         while (arrive_flag_2)
                         {
-
+                            ROS_WARN("2QQ2 go");
                             Coord stop_coord = temp_path_2.front();
 
                             if (temp_path_2.size() == 0)
@@ -308,10 +354,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 3)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("2QQQQ3:%d", temp_path_2.size());
                         while (arrive_flag_3)
                         {
-
+                            ROS_WARN("2QQ3 go");
                             Coord stop_coord = temp_path_3.front();
 
                             if (temp_path_3.size() == 0)
@@ -342,10 +389,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 4)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("2QQQQ4:%d", temp_path_2.size());
                         while (arrive_flag_4)
                         {
-
+                            ROS_WARN("2QQ4 go");
                             Coord stop_coord = temp_path_4.front();
 
                             if (temp_path_4.size() == 0)
@@ -373,7 +421,12 @@ class GlobalPlan : public GlobalBase
                             last_coord = stop_coord;
                         }
                     }
+                    
                 }
+                ROS_WARN("2final_1:%d, %d", final_coord_1.first, final_coord_1.second);
+                ROS_WARN("2final_2:%d, %d", final_coord_2.first, final_coord_2.second);
+                ROS_WARN("2final_3:%d, %d", final_coord_3.first, final_coord_3.second);
+                ROS_WARN("2final_4:%d, %d", final_coord_4.first, final_coord_4.second);
             }
 
             for (int i = 0; i < 4; i++) //计算优先级为3的机器人所停位置
@@ -381,14 +434,16 @@ class GlobalPlan : public GlobalBase
                 if (robot_level[i] == 3)
                 {
                     int vehicle_num = i + 1;
-                    Coord last_coord;
+                    
+                    
 
                     if (vehicle_num == 1)
                     {
-
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("3QQQQ1:%d", temp_path_2.size());
                         while (arrive_flag_1)
                         {
-
+                            ROS_WARN("3QQ1 go");
                             Coord stop_coord = temp_path_1.front();
 
                             if (temp_path_1.size() == 0)
@@ -417,11 +472,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 2)
                     {
-                        Coord last_coord;
-
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("3QQQQ2:%d", temp_path_2.size());
                         while (arrive_flag_2)
                         {
-
+                            ROS_WARN("3QQ2 go");
                             Coord stop_coord = temp_path_2.front();
 
                             if (temp_path_2.size() == 0)
@@ -450,11 +505,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 3)
                     {
-                        Coord last_coord;
-
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("3QQQQ3:%d", temp_path_2.size());
                         while (arrive_flag_3)
                         {
-
+                            ROS_WARN("3QQ3 go");
                             Coord stop_coord = temp_path_3.front();
 
                             if (temp_path_3.size() == 0)
@@ -483,10 +538,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 4)
                     {
-                        Coord last_coord;
-
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("3QQQQ4:%d", temp_path_2.size());
                         while (arrive_flag_4)
                         {
+                            ROS_WARN("3QQ4 go");
                             if (temp_path_4.size() == 0)
                             {
                                 final_coord_1 = last_coord;
@@ -512,6 +568,10 @@ class GlobalPlan : public GlobalBase
                         }
                     }
                 }
+                ROS_WARN("3final_1:%d, %d", final_coord_1.first, final_coord_1.second);
+                ROS_WARN("3final_2:%d, %d", final_coord_2.first, final_coord_2.second);
+                ROS_WARN("3final_3:%d, %d", final_coord_3.first, final_coord_3.second);
+                ROS_WARN("3final_4:%d, %d", final_coord_4.first, final_coord_4.second);
             }
 
             for (int i = 0; i < 4; i++) //计算优先级为4的机器人所停位置
@@ -521,9 +581,11 @@ class GlobalPlan : public GlobalBase
                     int vehicle_num = i + 1;
                     if (vehicle_num == 1)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("4QQQQ1:%d", temp_path_2.size());
                         while (arrive_flag_1)
                         {
+                            ROS_WARN("4QQ1 go");
                             if (temp_path_1.size() == 0)
                             {
                                 final_coord_1 = last_coord;
@@ -549,10 +611,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 2)
                     {
-                        Coord last_coord;
-
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("4QQQQ2:%d", temp_path_2.size());
                         while (arrive_flag_2)
                         {
+                            ROS_WARN("4QQ2 go");
                             if (temp_path_2.size() == 0)
                             {
                                 final_coord_2 = last_coord;
@@ -578,9 +641,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 3)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("4QQQQ3:%d", temp_path_2.size());
                         while (arrive_flag_3)
                         {
+                            ROS_WARN("4QQ3 go");
                             if (temp_path_3.size() == 0)
                             {
                                 final_coord_3 = last_coord;
@@ -606,9 +671,11 @@ class GlobalPlan : public GlobalBase
 
                     if (vehicle_num == 4)
                     {
-                        Coord last_coord;
+                        Coord last_coord = Coord(10, 10);
+                        ROS_WARN("4QQQQ4:%d", temp_path_2.size());
                         while (arrive_flag_4)
                         {
+                            ROS_WARN("4QQ4 go");
                             if (temp_path_4.size() == 0)
                             {
                                 final_coord_1 = last_coord;
@@ -632,6 +699,10 @@ class GlobalPlan : public GlobalBase
                         }
                     }
                 }
+                ROS_WARN("4final_1:%d, %d", final_coord_1.first, final_coord_1.second);
+                ROS_WARN("4final_2:%d, %d", final_coord_2.first, final_coord_2.second);
+                ROS_WARN("4final_3:%d, %d", final_coord_3.first, final_coord_3.second);
+                ROS_WARN("4final_4:%d, %d", final_coord_4.first, final_coord_4.second);
             }
 
             for (int i = 0; i < 4; i++) //得到优先级为1的机器人所走过的路径并更新地图
@@ -775,6 +846,7 @@ class GlobalPlan : public GlobalBase
                         }
                     }
                 }
+                
             }
 
             for (int i = 0; i < 4; i++) //为优先级为2的机器人定义剩下路径
@@ -1529,6 +1601,7 @@ class GlobalPlan : public GlobalBase
 
                 plan_flag_4 = 0;
             }
+            ROS_WARN("1");
         }
     }
 

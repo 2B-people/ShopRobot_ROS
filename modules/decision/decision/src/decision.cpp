@@ -540,15 +540,19 @@ int main(int argc, char **argv)
                                                                                      });
 
     // *********************************************************************************************************
-    auto carry_behavior_ptr = std::make_shared<shop::decision::ParallelNode>("carry behavior", blackboard_ptr_,5 );
-    carry_behavior_ptr->AddChildren(global_plan_ptr);
+    auto carry_behavior_ptr = std::make_shared<shop::decision::ParallelNode>("carry behavior", blackboard_ptr_,4);
+    // carry_behavior_ptr->AddChildren(global_plan_ptr);
     carry_behavior_ptr->AddChildren(robot1_carry_jud_ptr);
     carry_behavior_ptr->AddChildren(robot2_carry_jud_ptr);
     carry_behavior_ptr->AddChildren(robot3_carry_jud_ptr);
     carry_behavior_ptr->AddChildren(robot4_carry_jud_ptr);
 
+    auto robot_behavior_ptr = std::make_shared<shop::decision::SequenceNode>("4 robot behavior", blackboard_ptr_);
+    robot_behavior_ptr->AddChildren(global_plan_ptr);
+    robot_behavior_ptr->AddChildren(carry_behavior_ptr);
+
     auto carry_pre_ptr = std::make_shared<shop::decision::PreconditionNode>("carry jud", blackboard_ptr_,
-                                                                                     carry_behavior_ptr,
+                                                                                     robot_behavior_ptr,
                                                                                      [&]() {
                                                                                          if (blackboard_ptr_->GetBoolValue("end_flag"))
                                                                                          {

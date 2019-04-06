@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-03-28 21:05:44
+ * @LastEditTime: 2019-04-06 22:29:48
  */
 #include <web_serial/web_server_class.h>
 
@@ -246,7 +246,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 }
                 else
                 {
-                    ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
+                    // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
                     feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
                     move_as_.publishFeedback(feedback);
                 }

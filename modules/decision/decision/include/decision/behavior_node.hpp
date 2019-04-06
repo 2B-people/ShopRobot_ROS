@@ -681,6 +681,7 @@ class ParallelNode : public CompositeNode
                     children_node_done_.at(index) = true;
                     //只有当失败节点数量大于
                     if (++failure_count_ >= children_node_ptr_.size() - threshold_)
+                    //0 
                     {
                         return BehaviorState::FAILURE;
                     }

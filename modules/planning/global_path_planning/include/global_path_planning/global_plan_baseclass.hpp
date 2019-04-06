@@ -78,6 +78,7 @@ public:
 
     if (goal->do_flag == true)
     {
+      ROS_WARN("in here");      
       RobotGlobalPlanning();
       auto robot1_coord = GetFinalCoord(1);
       auto robot2_coord = GetFinalCoord(2);

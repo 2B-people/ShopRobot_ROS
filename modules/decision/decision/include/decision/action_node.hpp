@@ -74,18 +74,18 @@ private:
     case BehaviorState::IDLE:
       ROS_INFO("%s %s IDLE", name_.c_str(), __FUNCTION__);
       // 調用reset，時候使用stop
-      if (goal_flag_)
-      {
-        goalaction_ptr_->CancelMoveGoal(robot_num_);
-        // 把对应坐标清理
-        private_blackboard_ptr_->SetCoordValue(robot_num_, 10, 10, 10);
-        goal_flag_ = false;
-      }
+      // if (goal_flag_)
+      // {
+      //   goalaction_ptr_->CancelMoveGoal(robot_num_);
+      //   // 把对应坐标清理
+      //   private_blackboard_ptr_->SetCoordValue(robot_num_, 10, 10, 10);
+      //   goal_flag_ = false;
+      // }
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       //成功时候把对应坐标清理
-      private_blackboard_ptr_->SetCoordValue(robot_num_, 10, 10, 10);
+      // private_blackboard_ptr_->SetCoordValue(robot_num_, 10, 10, 10);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -242,7 +242,8 @@ private:
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
-      private_blackboard_ptr_->SetBoolValue(false, flag_name_);
+      // 單車測試不用這個
+      // private_blackboard_ptr_->SetBoolValue(false, flag_name_);
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
