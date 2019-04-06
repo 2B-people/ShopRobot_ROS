@@ -209,7 +209,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     std::string coord_goal_str = CoordToData(coord_goal);
     //bug send函数
     Send(coord_goal_str);
-    ROS_INFO("move is write %s", coord_goal_str.c_str());
+
+    // ROS_INFO("move is write %s", coord_goal_str.c_str());
 
     //得到一次现在的坐标,得到进度计算的分母
     std::string re_frist_buf = Recv();
@@ -223,7 +224,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 std::string re_buf = Recv();
-                
+
                 if (is_debug_)
                 {
                     ROS_INFO("RE_BUf is %s", re_buf.c_str());
@@ -256,7 +257,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             }
         }
     }
-    ROS_INFO("%s FININSH",__FUNCTION__);
+    ROS_INFO("%s FININSH", __FUNCTION__);
     result.success_flag = true;
     move_as_.setSucceeded(result);
 }
@@ -313,12 +314,18 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
         {
 
             std::string re_buf = Recv();
-            ROS_INFO("%s", re_buf.c_str());
+            // ROS_INFO("%s", re_buf.c_str());
             if (re_buf.substr(0, 6) == "finish")
             {
                 break;
             }
             else if (re_buf[0] == 'B')
+            {
+                // ROS_INFO("IN HERE");
+                feedback.begin_flag = true;
+                opening_as_.publishFeedback(feedback);
+            }
+            else if (re_buf[0] == 'S')
             {
                 data::ShelfBarrier srv = DataToBarrier(re_buf);
                 if (shelf_barrier_client_.call(srv))
@@ -469,14 +476,19 @@ std::string WebServer::Recv(void)
     {
         memset(re_frist_buf, '\0', BUFF_MAX);
         recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
-        ROS_WARN("is recv %s",re_frist_buf);
+
+        // ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+
         temp = re_frist_buf;
 
-        std::string jud = temp.substr(0, 3);
-        temp = temp.substr(3, temp.size() - 2);
-        if (jud == "HDU")
+        if (temp.size() >= 3)
         {
-            break;
+            std::string jud = temp.substr(0, 3);
+            temp = temp.substr(3, temp.size() - 2);
+            if (jud == "HDU")
+            {
+                break;
+            }
         }
     }
     return temp;

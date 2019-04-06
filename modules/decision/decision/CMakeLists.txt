@@ -33,7 +33,7 @@ add_executable(debug_decision src/debug_decision.cpp)
 add_dependencies(debug_decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(debug_decision PRIVATE  ${catkin_LIBRARIES})
 
-add_executable(local_debug_decision src/localplan_debug_decision.cpp)
-add_dependencies(local_debug_decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(local_debug_decision PRIVATE  ${catkin_LIBRARIES})
+add_executable(decision_test src/decision_test.cpp)
+add_dependencies(decision_test  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(decision_test PRIVATE  ${catkin_LIBRARIES})
 

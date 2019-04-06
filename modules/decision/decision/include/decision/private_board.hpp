@@ -17,6 +17,9 @@ class PrivateBoard : public Blackboard
     PrivateBoard()
         : Blackboard()
     {
+        auto opeing_flag_ptr = std::make_shared<BoolDir>(false);
+        AddDataIntoWorld("opening_flag", opeing_flag_ptr);
+        
         //game结束的flag
         auto end_game = std::make_shared<BoolDir>(false);
         AddDataIntoWorld("end_flag", end_game);
@@ -24,6 +27,7 @@ class PrivateBoard : public Blackboard
         auto local_plan_run = std::make_shared<BoolDir>(false);
         AddDataIntoWorld("local_plan_run", local_plan_run);
         //各类flag
+
         auto robot1_opeing_flag_ptr = std::make_shared<BoolDir>(false);
         AddDataIntoWorld("robot1_opening_flag", robot1_opeing_flag_ptr);
 
