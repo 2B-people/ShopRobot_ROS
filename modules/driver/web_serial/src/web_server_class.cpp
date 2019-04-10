@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-06 22:29:48
+ * @LastEditTime: 2019-04-07 07:41:36
  */
 #include <web_serial/web_server_class.h>
 
@@ -321,7 +321,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
             }
             else if (re_buf[0] == 'B')
             {
-                // ROS_INFO("IN HERE");
+                ROS_INFO("IN HERE");
                 feedback.begin_flag = true;
                 opening_as_.publishFeedback(feedback);
             }
@@ -477,7 +477,7 @@ std::string WebServer::Recv(void)
         memset(re_frist_buf, '\0', BUFF_MAX);
         recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
 
-        // ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
 
         temp = re_frist_buf;
 

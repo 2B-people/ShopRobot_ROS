@@ -708,10 +708,10 @@ class ParallelNode : public CompositeNode
             ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
-        for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
-        {
-            children_node_ptr_.at(index)->Reset();
-        }
+        // for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
+        // {
+        //     children_node_ptr_.at(index)->Reset();
+        // }
     }
 };
 

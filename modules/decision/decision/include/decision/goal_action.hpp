@@ -66,15 +66,15 @@ public:
     camera_action_clint_.waitForServer();
     detection_clint_.waitForServer();
 
-    localplan_clint_.waitForServer();
+    // localplan_clint_.waitForServer();
     // globalplan_clint_.waitForServer();
 
-    robot1_move_action_clint_.waitForServer();
-    robot1_open_action_clint_.waitForServer();
-    robot1_shop_action_clint_.waitForServer();
-    robot2_move_action_clint_.waitForServer();
-    robot2_open_action_clint_.waitForServer();
-    robot2_shop_action_clint_.waitForServer();
+    // robot1_move_action_clint_.waitForServer();
+    // robot1_open_action_clint_.waitForServer();
+    // robot1_shop_action_clint_.waitForServer();
+    // robot2_move_action_clint_.waitForServer();
+    // robot2_open_action_clint_.waitForServer();
+    // robot2_shop_action_clint_.waitForServer();
     // robot3_move_action_clint_.waitForServer();
     // robot3_open_action_clint_.waitForServer();
     // robot3_shop_action_clint_.waitForServer();
