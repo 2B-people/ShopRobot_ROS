@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-03-28 21:48:17
+ * @LastEditTime: 2019-04-10 21:59:12
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -56,10 +56,10 @@ public:
 
     nh_.param("debug", is_debug_, false);
 
-    robot1_coordinate_now_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&LocalBase::Robo1CoordNowCB, this, _1));
-    robot2_coordinate_now_ = nh_.subscribe<data::Coord>("robot2_web/coord_now", 10, boost::bind(&LocalBase::Robo2CoordNowCB, this, _1));
-    robot3_coordinate_now_ = nh_.subscribe<data::Coord>("robot3_web/coord_now", 10, boost::bind(&LocalBase::Robo3CoordNowCB, this, _1));
-    robot4_coordinate_now_ = nh_.subscribe<data::Coord>("robot4_web/coord_now", 10, boost::bind(&LocalBase::Robo4CoordNowCB, this, _1));
+    robot1_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot1/coord_now", 10, boost::bind(&LocalBase::Robo1CoordNowCB, this, _1));
+    robot2_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot2/coord_now", 10, boost::bind(&LocalBase::Robo2CoordNowCB, this, _1));
+    robot3_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot3/coord_now", 10, boost::bind(&LocalBase::Robo3CoordNowCB, this, _1));
+    robot4_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot4/coord_now", 10, boost::bind(&LocalBase::Robo4CoordNowCB, this, _1));
 
     goods_write_clt_ = nh_.serviceClient<data::Goods>("shop/goods_write_srv");
     goods_read_clt_ = nh_.serviceClient<data::Goods>("shop/goods_read_srv");
@@ -385,8 +385,8 @@ public:
     }
   }
 
-  bool all_done_;
   bool is_debug_;
+  bool all_done_;
 
 protected:
   data::Coord robot1_coord_now_;

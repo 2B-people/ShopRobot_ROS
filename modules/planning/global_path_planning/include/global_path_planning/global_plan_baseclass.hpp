@@ -85,20 +85,22 @@ public:
       auto robot3_coord = GetFinalCoord(3);
       auto robot4_coord = GetFinalCoord(4);
 
-      result.robot1_coord[0] = robot1_coord.x;
-      result.robot2_coord[0] = robot2_coord.x;
-      result.robot3_coord[0] = robot3_coord.x;
-      result.robot4_coord[0] = robot4_coord.x;
 
-      result.robot1_coord[1] = robot1_coord.y;
-      result.robot2_coord[1] = robot2_coord.y;
-      result.robot3_coord[1] = robot3_coord.y;
-      result.robot4_coord[1] = robot4_coord.y;
+      //@bug 不能达到实时性,用topic解决这个问题
+      // result.robot1_coord[0] = robot1_coord.x;
+      // result.robot2_coord[0] = robot2_coord.x;
+      // result.robot3_coord[0] = robot3_coord.x;
+      // result.robot4_coord[0] = robot4_coord.x;
 
-      result.robot1_coord[2] = 5;
-      result.robot2_coord[2] = 5;
-      result.robot3_coord[2] = 5;
-      result.robot4_coord[2] = 5;
+      // result.robot1_coord[1] = robot1_coord.y;
+      // result.robot2_coord[1] = robot2_coord.y;
+      // result.robot3_coord[1] = robot3_coord.y;
+      // result.robot4_coord[1] = robot4_coord.y;
+
+      // result.robot1_coord[2] = 5;
+      // result.robot2_coord[2] = 5;
+      // result.robot3_coord[2] = 5;
+      // result.robot4_coord[2] = 5;
 
     }
     else

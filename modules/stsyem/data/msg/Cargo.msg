@@ -1,0 +1,1 @@
+int8[12] goods_loction

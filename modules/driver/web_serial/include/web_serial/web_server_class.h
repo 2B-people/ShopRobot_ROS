@@ -48,7 +48,7 @@ class WebServer : public shop::common::RRTS
 public:
   WebServer(std::string name);
   ~WebServer();
-  void Run();
+  void Run(void);
   void Stop();
   void Resume();
 
@@ -78,6 +78,9 @@ private:
   //service
   ros::ServiceClient roadblock_client_;
   ros::ServiceClient shelf_barrier_client_;
+  ros::ServiceClient target_move_client_;
+  ros::ServiceClient target_action_client_;
+
   //publish
   ros::Publisher move_pub_;
 

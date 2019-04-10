@@ -160,14 +160,14 @@ private:
       if (goal_flag_)
       {
         goalaction_ptr_->CancelShopGoal(robot_num_);
-        private_blackboard_ptr_->SetActionName(robot_num_, "NONE");
+        // private_blackboard_ptr_->SetActionName(robot_num_, "NONE");
         goal_flag_ = false;
       }
       break;
     case BehaviorState::SUCCESS:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       // 成功時請空
-      private_blackboard_ptr_->SetActionName(robot_num_, "NONE");
+      // private_blackboard_ptr_->SetActionName(robot_num_, "NONE");
       break;
     case BehaviorState::FAILURE:
       ROS_INFO("%s %s FAILURE", name_.c_str(), __FUNCTION__);
@@ -307,25 +307,25 @@ private:
       // 更新坐標
       auto temp_dir_ptr = private_blackboard_ptr_->GetDirPtr("photo_number");
       auto dir_ptr = std::dynamic_pointer_cast<PhotoNemberDir>(temp_dir_ptr);
-      switch (dir_ptr->GetPhotoNumber())
-      {
-      case 1:
-        //写下一拍照的坐标
-        private_blackboard_ptr_->SetCoordValue(4, 7, 4, 3);
-        break;
-      case 2:
-        private_blackboard_ptr_->SetCoordValue(4, 5, 7, 2);
-        break;
-      case 3:
-        private_blackboard_ptr_->SetCoordValue(4, 2, 5, 1);
-        break;
-      case 4:
-        private_blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
-        break;
-      default:
-        ROS_ERROR("photo number is %d !!err!", dir_ptr->GetPhotoNumber());
-        break;
-      }
+      // switch (dir_ptr->GetPhotoNumber())
+      // {
+      // case 1:
+      //   //写下一拍照的坐标
+      //   private_blackboard_ptr_->SetCoordValue(4, 7, 4, 3);
+      //   break;
+      // case 2:
+      //   private_blackboard_ptr_->SetCoordValue(4, 5, 7, 2);
+      //   break;
+      // case 3:
+      //   private_blackboard_ptr_->SetCoordValue(4, 2, 5, 1);
+      //   break;
+      // case 4:
+      //   private_blackboard_ptr_->SetCoordValue(4, 2, 5, 0);
+      //   break;
+      // default:
+      //   ROS_ERROR("photo number is %d !!err!", dir_ptr->GetPhotoNumber());
+      //   break;
+      // }
     }
     break;
     case BehaviorState::FAILURE:

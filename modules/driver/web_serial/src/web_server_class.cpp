@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-07 07:41:36
+ * @LastEditTime: 2019-04-10 22:15:29
  */
 #include <web_serial/web_server_class.h>
 
@@ -61,21 +61,24 @@ WebServer::WebServer(std::string name)
     }
 
     //publish init
-    move_pub_ = nh_.advertise<data::Coord>(name_ + "/coord_now", 1);
+    move_pub_ = nh_.advertise<data::Coord>("shop/" + name_ + "/now_coord", 1);
 
     roadblock_client_ = nh_.serviceClient<data::Roadblock>("shop/roadblock_write_srv");
 
-    if (name_ == "robot1_web")
+    if (name_ == "robot1")
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_wirte");
     }
-    else if (name_ == "robot2_web")
+    else if (name_ == "robot2")
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_wirte");
     }
-    else if (name_ == "robot3_web")
+    else if (name_ == "robot3")
     {
         shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
+    }
+    else if (name_ == "robot4")
+    {
     }
 
     //web init
@@ -88,6 +91,7 @@ WebServer::WebServer(std::string name)
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
     action_as_.registerPreemptCallback(boost::bind(&WebServer::ShopPreemptCB, this));
     opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
+
     //action open
     move_as_.start();
     action_as_.start();
@@ -105,6 +109,14 @@ WebServer::~WebServer()
     /*关闭套接字*/
     close(client_sockfd_);
     close(server_sockfd_);
+}
+
+//RUN MAIN里调用实际运行
+void WebServer::Run(void)
+{
+    ros::AsyncSpinner async_spinner(thread_num_);
+    async_spinner.start();
+    ros::waitForShutdown();
 }
 
 void WebServer::Stop()
@@ -144,51 +156,10 @@ bool WebServer::InitWeb()
         ROS_ERROR("%s connect error", name_.c_str());
         return false;
     }
+
     ROS_WARN("is to server/n");
-    Send("I");
+
     return true;
-
-    //使用服务器的sockot存在问题
-    // /*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
-    // if ((server_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-    // {
-    //     ROS_ERROR("%s socket error", name_.c_str());
-    //     return false;
-    // }
-
-    // /*将套接字绑定到服务器的网络地址上*/
-    // if (bind(server_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
-    // {
-    //     ROS_ERROR("%s bind error", name_.c_str());
-    //     return false;
-    // }
-
-    // /*监听连接请求--监听队列长度为10*/
-    // if (listen(server_sockfd_, 10) < 0)
-    // {
-    //     ROS_ERROR("%s listen error", name_.c_str());
-    //     return false;
-    // };
-
-    // sin_size = sizeof(struct sockaddr_in);
-
-    // /*等待客户端连接请求到达*/
-    // //@breif accept为,要一直等待阻塞型
-    // if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size)) < 0)
-    // {
-    //     ROS_ERROR("%s accept error", name_.c_str());
-    //     return false;
-    // }
-    // ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
-    // send(client_sockfd_, "server", 21, 0); //发送欢迎信息
-}
-
-//RUN MAIN里调用实际运行
-void WebServer::Run()
-{
-    ros::AsyncSpinner async_spinner(thread_num_);
-    async_spinner.start();
-    ros::waitForShutdown();
 }
 
 //移动的回调函数
@@ -232,9 +203,9 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
                 data::Coord now_coord = DataToCoord(re_buf);
                 move_pub_.publish(now_coord);
-                if (now_coord.x == 10 && now_coord.y == 10 && now_coord.pose == 10)
+                if (now_coord.x == 10 && now_coord.y == 10)
                 {
-                    ROS_WARN("move err");
+                    ROS_WARN("coord data is err");
                 }
 
                 //判断目标坐标
@@ -268,8 +239,10 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
     ROS_INFO("%s is write action", name_.c_str());
-    //发送指令
-    Send(goal->action_name);
+    // 发送指令
+    // 存在bug
+    // Send(goal->action_name);
+
     //等待结束
     while (ros::ok())
     {
@@ -464,7 +437,11 @@ data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
 bool WebServer::Send(std::string temp)
 {
     std::string str_ = "HDU" + temp;
-    ROS_INFO("%s", str_.c_str());
+    if (is_debug_)
+    {
+        ROS_INFO("%s", str_.c_str());
+    }
+
     send(client_sockfd_, (char *)str_.c_str(), BUFF_MAX, 0);
 }
 
@@ -476,8 +453,10 @@ std::string WebServer::Recv(void)
     {
         memset(re_frist_buf, '\0', BUFF_MAX);
         recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
-
-        ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        if (is_debug_)
+        {
+            ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        }
 
         temp = re_frist_buf;
 

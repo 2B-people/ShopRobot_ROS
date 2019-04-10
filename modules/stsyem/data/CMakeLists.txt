@@ -19,6 +19,11 @@ add_message_files(DIRECTORY msg
                       Remote.msg
                       CarScan.msg
                       Coord.msg
+                      Action.msg
+                      Cargo.msg
+                      Barrier.msg
+                      RoadblockMsg.msg
+                      Photo.msg
                  )
 
 add_service_files(FILES

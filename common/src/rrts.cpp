@@ -17,14 +17,18 @@
 
 #include "common/rrts.h"
 
-namespace shop {
-namespace common {
+namespace shop
+{
+namespace common
+{
 
 RRTS::RRTS(std::string name, uint32_t thread_num)
     : name_(name), thread_num_(thread_num) {}
 
-void RRTS::Run() {
-  ros::spin();
+void RRTS::Run()
+{
+  ros::AsyncSpinner async_spinner(thread_num_);
+  async_spinner.start();
   ros::waitForShutdown();
 }
 

@@ -653,22 +653,22 @@ private:
     coord.x = result->robot1_coord[0];
     coord.y = result->robot1_coord[1];
     coord.pose = result->robot1_coord[2];
-    private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
+    // private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
 
     coord.x = result->robot2_coord[0];
     coord.y = result->robot2_coord[1];
     coord.pose = result->robot2_coord[2];
-    private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
+    // private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
 
     coord.x = result->robot3_coord[0];
     coord.y = result->robot3_coord[1];
     coord.pose = result->robot3_coord[2];
-    private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
+    // private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
 
     coord.x = result->robot4_coord[0];
     coord.y = result->robot4_coord[1];
     coord.pose = result->robot4_coord[2];
-    private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
+    // private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
   }
 
   void OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)

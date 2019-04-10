@@ -63,9 +63,9 @@ class BoolDir : public DirBase
 class ActionNameDir : public DirBase
 {
   public:
-    ActionNameDir(std::string initial_name)
-        : DirBase(DictionaryType::ACTIONNAME),
-          initial_name_(initial_name), name_(initial_name)
+    ActionNameDir(std::string initial_name,int8_t init_state)
+        : DirBase(DictionaryType::ACTIONNAME),state_(init_state),
+          init_state_(init_state),initial_name_(initial_name), name_(initial_name)
     {
     }
     virtual ~ActionNameDir() = default;
@@ -75,11 +75,17 @@ class ActionNameDir : public DirBase
         return name_;
     }
 
-    void Set(std::string set_name)
+    int8_t GetActionState()
+    {
+        return state_;
+    }
+
+    void Set(std::string set_name,int8_t set_state)
     {
         if (flag_)
         {
             name_ = set_name;
+            state_ = set_state;
         }
         else
         {
@@ -90,10 +96,13 @@ class ActionNameDir : public DirBase
     void RepeatInit()
     {
         name_ = initial_name_;
+        state_ = init_state_;
         OpenLock();
     }
 
   private:
+    int8_t state_;
+    int8_t init_state_;
     std::string name_;
     std::string initial_name_;
 };

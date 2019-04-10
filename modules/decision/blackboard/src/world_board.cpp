@@ -16,10 +16,10 @@ WorldBoard::WorldBoard(std::string name)
     auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 0);
 
     //目标动作
-    auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE");
-    auto robot2_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE");
-    auto robot3_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE");
-    auto robot4_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE");
+    auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
+    auto robot2_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
+    auto robot3_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
+    auto robot4_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
 
     //货架障碍物
     auto a_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
@@ -27,31 +27,33 @@ WorldBoard::WorldBoard(std::string name)
     auto c_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
     auto d_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
 
-    nh_.param("debug", debug_, false);
+    nh_.param("debug", is_debug_, false);
+    
     //goods
     AddDataIntoWorld("shop_all_goods", goods_dir_ptr);
     goods_write_srv_ = nh_.advertiseService("shop/goods_write_srv", &WorldBoard::GoodsWirteCB, this);
-    goods_read_srv_ = nh_.advertiseService("shop/goods_read_srv", &WorldBoard::GoodsReadCB, this);
+    goods_pub_ = nh_.advertise<data::Cargo>("shop/goods", 1);
 
     //roadblock
     AddDataIntoWorld("shop_roadblock", roadblock_dir_ptr);
     roadblock_write_srv_ = nh_.advertiseService("shop/roadblock_write_srv", &WorldBoard::RoadblockWirteCB, this);
-    roadblock_read_srv_ = nh_.advertiseService("shop/roadblock_read_srv", &WorldBoard::RoadblockReadCB, this);
+    roadblock_pub_ = nh_.advertise<data::RoadblockMsg>("shop/roadblock", 1);
 
     //coordinate
     AddDataIntoWorld("robot1_target_coordinate", robot1_target_coordinate_dir_ptr);
     AddDataIntoWorld("robot2_target_coordinate", robot2_target_coordinate_dir_ptr);
     AddDataIntoWorld("robot3_target_coordinate", robot3_target_coordinate_dir_ptr);
     AddDataIntoWorld("robot4_target_coordinate", robot4_target_coordinate_dir_ptr);
+    robot1_target_coord_pub_ = nh_.advertise<data::Coord>("shop/robot1/target_coord", 1);
+    robot2_target_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/target_coord", 1);
+    robot3_target_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/target_coord", 1);
+    robot4_target_coord_pub_ = nh_.advertise<data::Coord>("shop/robot4/target_coord", 1);
+
     target_coordinate_lock_srv_ = nh_.advertiseService("shop/robot/coordinate_srv", &WorldBoard::TargetCoordinateLockCB, this);
     robot1_target_coordinate_write_srv_ = nh_.advertiseService("shop/robot1/target_coordinate_write", &WorldBoard::TargetCoordinateWriteCB1, this);
     robot2_target_coordinate_write_srv_ = nh_.advertiseService("shop/robot2/target_coordinate_write", &WorldBoard::TargetCoordinateWriteCB2, this);
     robot3_target_coordinate_write_srv_ = nh_.advertiseService("shop/robot3/target_coordinate_write", &WorldBoard::TargetCoordinateWriteCB3, this);
     robot4_target_coordinate_write_srv_ = nh_.advertiseService("shop/robot4/target_coordinate_write", &WorldBoard::TargetCoordinateWriteCB4, this);
-    robot1_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot1/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB1, this);
-    robot2_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot2/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB2, this);
-    robot3_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot3/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB3, this);
-    robot4_target_coordinate_read_srv_ = nh_.advertiseService("shop/robot4/target_coordinate_read", &WorldBoard::TargetCoordinateReadCB4, this);
 
     // actionname
     AddDataIntoWorld("robot1_target_actionname", robot1_target_actionname_dir_ptr);
@@ -62,29 +64,143 @@ WorldBoard::WorldBoard(std::string name)
     robot2_target_actionname_write_srv_ = nh_.advertiseService("shop/robot2/target_actionname_write", &WorldBoard::TargetActionNameWriteCB2, this);
     robot3_target_actionname_write_srv_ = nh_.advertiseService("shop/robot3/target_actionname_write", &WorldBoard::TargetActionNameWriteCB3, this);
     robot4_target_actionname_write_srv_ = nh_.advertiseService("shop/robot4/target_actionname_write", &WorldBoard::TargetActionNameWriteCB4, this);
-    robot1_target_actionname_read_srv_ = nh_.advertiseService("shop/robot1/target_actionname_read", &WorldBoard::TargetActionNameReadCB1, this);
-    robot2_target_actionname_read_srv_ = nh_.advertiseService("shop/robot2/target_actionname_read", &WorldBoard::TargetActionNameReadCB2, this);
-    robot3_target_actionname_read_srv_ = nh_.advertiseService("shop/robot3/target_actionname_read", &WorldBoard::TargetActionNameReadCB3, this);
-    robot4_target_actionname_read_srv_ = nh_.advertiseService("shop/robot4/target_actionname_read", &WorldBoard::TargetActionNameReadCB4, this);
+    robot1_target_action_pub_ = nh_.advertise<data::Action>("shop/robot1/target_action", 1);
+    robot2_target_action_pub_ = nh_.advertise<data::Action>("shop/robot2/target_action", 1);
+    robot3_target_action_pub_ = nh_.advertise<data::Action>("shop/robot3/target_action", 1);
+    robot4_target_action_pub_ = nh_.advertise<data::Action>("shop/robot4/target_action", 1);
 
     // good shelf barrier
     AddDataIntoWorld("A_shelf_barrier", a_shelf_barrier_dir_ptr);
     AddDataIntoWorld("B_shelf_barrier", b_shelf_barrier_dir_ptr);
     AddDataIntoWorld("C_shelf_barrier", c_shelf_barrier_dir_ptr);
     AddDataIntoWorld("D_shelf_barrier", d_shelf_barrier_dir_ptr);
+    a_shelf_barrier_pub_ = nh_.advertise<data::Barrier>("shop/a_barrier", 1);
+    b_shelf_barrier_pub_ = nh_.advertise<data::Barrier>("shop/b_barrier", 1);
+    c_shelf_barrier_pub_ = nh_.advertise<data::Barrier>("shop/c_barrier", 1);
+    d_shelf_barrier_pub_ = nh_.advertise<data::Barrier>("shop/d_barrier", 1);
     a_shelf_barrier_write_srv_ = nh_.advertiseService("shop/A_shelf_barrier_wirte", &WorldBoard::AshelfWirteCB, this);
     b_shelf_barrier_write_srv_ = nh_.advertiseService("shop/B_shelf_barrier_wirte", &WorldBoard::BshelfWirteCB, this);
     c_shelf_barrier_write_srv_ = nh_.advertiseService("shop/C_shelf_barrier_wirte", &WorldBoard::CshelfWirteCB, this);
     d_shelf_barrier_write_srv_ = nh_.advertiseService("shop/D_shelf_barrier_wirte", &WorldBoard::DshelfWirteCB, this);
-    a_shelf_barrier_read_srv_ = nh_.advertiseService("shop/A_shelf_barrier_read", &WorldBoard::AshelfReadCB, this);
-    b_shelf_barrier_read_srv_ = nh_.advertiseService("shop/B_shelf_barrier_read", &WorldBoard::BshelfReadCB, this);
-    c_shelf_barrier_read_srv_ = nh_.advertiseService("shop/C_shelf_barrier_read", &WorldBoard::CshelfReadCB, this);
-    d_shelf_barrier_read_srv_ = nh_.advertiseService("shop/D_shelf_barrier_read", &WorldBoard::DshelfReadCB, this);
+ 
 }
 
 WorldBoard::~WorldBoard()
 {
     black_map_.clear();
+}
+
+void WorldBoard::Run()
+{
+
+    auto middle_dirbase_ptr = GetDirPtr("shop_all_goods");
+    auto goods_dir_ptr = std::dynamic_pointer_cast<GoodsDir>(middle_dirbase_ptr);
+
+    middle_dirbase_ptr = GetDirPtr("shop_roadblock");
+    auto roadblock_dir_ptr = std::dynamic_pointer_cast<RoadblockDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
+    auto robot1_coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
+    auto robot2_coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot3_target_coordinate");
+    auto robot3_coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot4_target_coordinate");
+    auto robot4_coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
+
+    middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
+    auto robot1_action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
+    auto robot2_action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
+    auto robot3_action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
+    auto robot4_action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
+
+    middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
+    auto a_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
+    auto b_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
+    auto c_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+    middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
+    auto d_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
+
+    data::Cargo goods;
+    data::RoadblockMsg roadblock;
+    data::Coord coord;
+    data::Action action;
+    data::Barrier barrier;
+
+    while (ros::ok)
+    {
+        ros::spinOnce();
+        // 广播goods
+        for (int i = 0; i < 12; i++)
+        {
+            goods.goods_loction[i] = (int8_t)goods_dir_ptr->GetLocationGoods(i);
+        }
+        goods_pub_.publish(goods);
+
+        // 广播roadblock
+        roadblock.location_place = roadblock_dir_ptr->GetRoadbockNumber();
+        roadblock_pub_.publish(roadblock);
+
+        //广播coord
+        coord.x = robot1_coordinate_dir_ptr->GetCoordinateX();
+        coord.y = robot1_coordinate_dir_ptr->GetCoordinateY();
+        robot1_target_coord_pub_.publish(coord);
+
+        coord.x = robot2_coordinate_dir_ptr->GetCoordinateX();
+        coord.y = robot2_coordinate_dir_ptr->GetCoordinateY();
+        robot2_target_coord_pub_.publish(coord);
+
+        coord.x = robot3_coordinate_dir_ptr->GetCoordinateX();
+        coord.y = robot3_coordinate_dir_ptr->GetCoordinateY();
+        robot3_target_coord_pub_.publish(coord);
+
+        coord.x = robot4_coordinate_dir_ptr->GetCoordinateX();
+        coord.y = robot4_coordinate_dir_ptr->GetCoordinateY();
+        robot4_target_coord_pub_.publish(coord);
+
+        // 广播action
+        action.name = robot1_action_dir_ptr->GetActionName();
+        action.action_state = robot1_action_dir_ptr->GetActionState();
+        robot1_target_action_pub_.publish(action);
+
+        action.name = robot2_action_dir_ptr->GetActionName();
+        action.action_state = robot2_action_dir_ptr->GetActionState();
+        robot2_target_action_pub_.publish(action);
+
+        action.name = robot3_action_dir_ptr->GetActionName();
+        action.action_state = robot3_action_dir_ptr->GetActionState();
+        robot3_target_action_pub_.publish(action);
+
+        action.name = robot4_action_dir_ptr->GetActionName();
+        action.action_state = robot4_action_dir_ptr->GetActionState();
+        robot4_target_action_pub_.publish(action);
+
+        //广播
+        for (int i = 0; i < 12; i++)
+        {
+            barrier.shelf_barrier_all[i] = a_shelf_dir_ptr->GetGoodShelfBarrier(i);
+        }
+        a_shelf_barrier_pub_.publish(barrier);
+        for (int i = 0; i < 12; i++)
+        {
+            barrier.shelf_barrier_all[i] = b_shelf_dir_ptr->GetGoodShelfBarrier(i);
+        }
+        b_shelf_barrier_pub_.publish(barrier);
+        for (int i = 0; i < 12; i++)
+        {
+            barrier.shelf_barrier_all[i] = c_shelf_dir_ptr->GetGoodShelfBarrier(i);
+        }
+        c_shelf_barrier_pub_.publish(barrier);
+        for (int i = 0; i < 12; i++)
+        {
+            barrier.shelf_barrier_all[i] = d_shelf_dir_ptr->GetGoodShelfBarrier(i);
+        }
+        d_shelf_barrier_pub_.publish(barrier);
+    }
 }
 
 bool WorldBoard::GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &res)
@@ -106,15 +222,7 @@ bool WorldBoard::GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &
         return true;
     }
 }
-bool WorldBoard::GoodsReadCB(data::Goods::Request &req, data::Goods::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("shop_all_goods");
-    auto goods_dir_ptr = std::dynamic_pointer_cast<GoodsDir>(middle_dirbase_ptr);
-    GoodsName goods_name = goods_dir_ptr->GetLocationGoods(req.location);
-    res.success_flag = true;
-    res.name = (uint8_t)goods_name;
-    return true;
-}
+
 
 bool WorldBoard::RoadblockWirteCB(data::Roadblock::Request &req, data::Roadblock::Response &res)
 {
@@ -125,31 +233,14 @@ bool WorldBoard::RoadblockWirteCB(data::Roadblock::Request &req, data::Roadblock
 
     return true;
 }
-bool WorldBoard::RoadblockReadCB(data::Roadblock::Request &req, data::Roadblock::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("shop_roadblock");
-    auto roadblock_dir_ptr = std::dynamic_pointer_cast<RoadblockDir>(middle_dirbase_ptr);
-    uint8_t number = roadblock_dir_ptr->GetRoadbockNumber();
-    if (number != 0)
-    {
-        res.number = number;
-        res.success_flag = true;
-        return true;
-    }
-    else
-    {
-        ROS_WARN("we don't know roadblack");
-        res.success_flag = false;
-        return false;
-    }
-}
+
 
 bool WorldBoard::TargetCoordinateWriteCB1(data::Coordinate::Request &req, data::Coordinate::Response &res)
 {
     auto middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
-    ROS_INFO("robot1 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
+    ROS_INFO("robot1 board set x:%d y:%d pose:%d", req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -167,7 +258,7 @@ bool WorldBoard::TargetCoordinateWriteCB2(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
-    ROS_INFO("robot2 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
+    ROS_INFO("robot2 board set x:%d y:%d pose:%d", req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -185,7 +276,7 @@ bool WorldBoard::TargetCoordinateWriteCB3(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot3_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, req.pose);
-    ROS_INFO("robot3 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
+    ROS_INFO("robot3 board set x:%d y:%d pose:%d", req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -203,7 +294,7 @@ bool WorldBoard::TargetCoordinateWriteCB4(data::Coordinate::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot4_target_coordinate");
     auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
     coordinate_dir_ptr->Set(req.x, req.y, res.pose);
-    ROS_INFO("robot4 board set x:%d y:%d pose:%d",req.x, req.y, req.pose);
+    ROS_INFO("robot4 board set x:%d y:%d pose:%d", req.x, req.y, req.pose);
     if (coordinate_dir_ptr->GetLock())
     {
         res.success_flag = true;
@@ -216,38 +307,7 @@ bool WorldBoard::TargetCoordinateWriteCB4(data::Coordinate::Request &req, data::
         return false;
     }
 }
-bool WorldBoard::TargetCoordinateReadCB1(data::Coordinate::Request &req, data::Coordinate::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot1_target_coordinate");
-    auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    res.x = coordinate_dir_ptr->GetCoordinateX();
-    res.y = coordinate_dir_ptr->GetCoordinateY();
-    return true;
-}
-bool WorldBoard::TargetCoordinateReadCB2(data::Coordinate::Request &req, data::Coordinate::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot2_target_coordinate");
-    auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    res.x = coordinate_dir_ptr->GetCoordinateX();
-    res.y = coordinate_dir_ptr->GetCoordinateY();
-    return true;
-}
-bool WorldBoard::TargetCoordinateReadCB3(data::Coordinate::Request &req, data::Coordinate::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot3_target_coordinate");
-    auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    res.x = coordinate_dir_ptr->GetCoordinateX();
-    res.y = coordinate_dir_ptr->GetCoordinateY();
-    return true;
-}
-bool WorldBoard::TargetCoordinateReadCB4(data::Coordinate::Request &req, data::Coordinate::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot4_target_coordinate");
-    auto coordinate_dir_ptr = std::dynamic_pointer_cast<CoordinateDir>(middle_dirbase_ptr);
-    res.x = coordinate_dir_ptr->GetCoordinateX();
-    res.y = coordinate_dir_ptr->GetCoordinateY();
-    return true;
-}
+
 
 bool WorldBoard::TargetCoordinateLockCB(data::Coordinate::Request &req, data::Coordinate::Response &res)
 {
@@ -288,7 +348,10 @@ bool WorldBoard::AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
     good_shelf_dir_ptr->OpenLock();
-    ROS_WARN("location %d is set %d",req.location,req.shelf_barrier);
+    if (is_debug_)
+    {
+        ROS_WARN("location %d is set %d", req.location, req.shelf_barrier);
+    }
     // good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     good_shelf_dir_ptr->Set(req.location, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
@@ -308,7 +371,11 @@ bool WorldBoard::BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     auto middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
     good_shelf_dir_ptr->OpenLock();
-    ROS_WARN("location %d is set %d",req.location,req.shelf_barrier);
+    if (is_debug_)
+    {
+        ROS_WARN("location %d is set %d", req.location, req.shelf_barrier);
+    }
+
     // good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     good_shelf_dir_ptr->Set(req.location, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
@@ -328,7 +395,10 @@ bool WorldBoard::CshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     auto middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
     good_shelf_dir_ptr->OpenLock();
-    ROS_WARN("location %d is set %d",req.location,req.shelf_barrier);
+    if (is_debug_)
+    {
+        ROS_WARN("location %d is set %d", req.location, req.shelf_barrier);
+    }
     good_shelf_dir_ptr->Set(req.location, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
     {
@@ -347,7 +417,10 @@ bool WorldBoard::DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     auto middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
     auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
     good_shelf_dir_ptr->OpenLock();
-    ROS_WARN("location %d is set %d",req.location,req.shelf_barrier);
+    if (is_debug_)
+    {
+        ROS_WARN("location %d is set %d", req.location, req.shelf_barrier);
+    }
     // good_shelf_dir_ptr->Set(req.x, req.y, req.shelf_barrier);
     good_shelf_dir_ptr->Set(req.location, req.shelf_barrier);
     if (good_shelf_dir_ptr->GetLock())
@@ -363,92 +436,13 @@ bool WorldBoard::DshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarr
     }
 }
 
-//fixed !!!!err ,is dufferent in read function
-bool WorldBoard::AshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("A_shelf_barrier");
-    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
-    // for (size_t x = 0; x < 6; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
-    // }
-    // for (size_t x = 6; x < 12; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
-    // }
-    for (size_t i = 0; i < 12; i++)
-    {
-        res.shelf_barrier_all[i] = good_shelf_dir_ptr->GetGoodShelfBarrier(i);
-    }
-
-    return true;
-}
-
-bool WorldBoard::BshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("B_shelf_barrier");
-    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
-    // bug
-    // for (size_t x = 0; x < 6; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
-    // }
-    // for (size_t x = 6; x < 12; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
-    // }
-    for (size_t i = 0; i < 12; i++)
-    {
-        res.shelf_barrier_all[i] = good_shelf_dir_ptr->GetGoodShelfBarrier(i);
-    }
-    return true;
-}
-bool WorldBoard::CshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("C_shelf_barrier");
-    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
-    // bug
-    // for (size_t x = 0; x < 6; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
-    // }
-    // for (size_t x = 6; x < 12; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
-    // }
-    for (size_t i = 0; i < 12; i++)
-    {
-        res.shelf_barrier_all[i] = good_shelf_dir_ptr->GetGoodShelfBarrier(i);
-    }
-    return true;
-}
-bool WorldBoard::DshelfReadCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("D_shelf_barrier");
-    auto good_shelf_dir_ptr = std::dynamic_pointer_cast<GoodShelfDir>(middle_dirbase_ptr);
-    // bug
-    // for (size_t x = 0; x < 6; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 0);
-    // }
-    // for (size_t x = 6; x < 12; x++)
-    // {
-    //     res.shelf_barrier_all[x] = good_shelf_dir_ptr->GetGoodShelfBarrier(x, 1);
-    // }
-    for (size_t i = 0; i < 12; i++)
-    {
-        res.shelf_barrier_all[i] = good_shelf_dir_ptr->GetGoodShelfBarrier(i);
-    }
-    return true;
-}
-
 bool WorldBoard::TargetActionNameWriteCB1(data::ActionName::Request &req, data::ActionName::Response &res)
 {
     auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name);
-    ROS_INFO("robot1 target action is %s",req.action_name.c_str());
+    action_dir_ptr->Set(req.action_name, req.action_state);
+    ROS_INFO("robot1 target action is %s", req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -458,8 +452,8 @@ bool WorldBoard::TargetActionNameWriteCB2(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name);
-    ROS_INFO("robot2 target action is %s",req.action_name.c_str());
+    action_dir_ptr->Set(req.action_name, req.action_state);
+    ROS_INFO("robot2 target action is %s", req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -468,8 +462,8 @@ bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name);
-    ROS_INFO("robot3 target action is %s",req.action_name.c_str());
+    action_dir_ptr->Set(req.action_name, req.action_state);
+    ROS_INFO("robot3 target action is %s", req.action_name.c_str());
     res.success_flag;
     return true;
 }
@@ -478,39 +472,12 @@ bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name);
-    ROS_INFO("robot4 target action is %s",req.action_name.c_str());
+    action_dir_ptr->Set(req.action_name, req.action_state);
+    ROS_INFO("robot4 target action is %s", req.action_name.c_str());
     res.success_flag;
     return true;
 }
-bool WorldBoard::TargetActionNameReadCB1(data::ActionName::Request &req, data::ActionName::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
-    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
-    res.action_name = action_dir_ptr->GetActionName();
-    return true;
-}
-bool WorldBoard::TargetActionNameReadCB2(data::ActionName::Request &req, data::ActionName::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
-    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
-    res.action_name = action_dir_ptr->GetActionName();
-    return true;
-}
-bool WorldBoard::TargetActionNameReadCB3(data::ActionName::Request &req, data::ActionName::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
-    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
-    res.action_name = action_dir_ptr->GetActionName();
-    return true;
-}
-bool WorldBoard::TargetActionNameReadCB4(data::ActionName::Request &req, data::ActionName::Response &res)
-{
-    auto middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
-    auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
-    res.action_name = action_dir_ptr->GetActionName();
-    return true;
-}
+
 
 } // namespace decision
 } // namespace shop
