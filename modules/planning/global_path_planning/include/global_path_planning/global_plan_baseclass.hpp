@@ -11,6 +11,8 @@
 #include <common/main_interface.h>
 
 #include <data/Coord.h>
+#include <data/RoadblockMsg.h>
+
 #include <data/SetBool.h>
 #include <data/Goods.h>
 #include <data/Roadblock.h>
@@ -45,24 +47,42 @@ public:
     robot4_coord_now_.x = 10;
     robot4_coord_now_.y = 10;
     robot4_coord_now_.pose = 0;
+    robot1_target_coord_.x = 10;
+    robot1_target_coord_.y = 10;
+    robot1_target_coord_.pose = 0;
+    robot2_target_coord_.x = 10;
+    robot2_target_coord_.y = 10;
+    robot2_target_coord_.pose = 0;
+    robot3_target_coord_.x = 10;
+    robot3_target_coord_.y = 10;
+    robot3_target_coord_.pose = 0;
+    robot4_target_coord_.x = 10;
+    robot4_target_coord_.y = 10;
+    robot4_target_coord_.pose = 0;
+    roadblock_.location_place = 0;
 
-    robot1_coordinate_sub_ = nh_.subscribe<data::Coord>("robot1_web/coord_now", 10, boost::bind(&GlobalBase::Robo1CoordNowCB, this, _1));
-    robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("robot2_web/coord_now", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
-    robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("robot3_web/coord_now", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
-    robot4_coordinate_sub_ = nh_.subscribe<data::Coord>("robot4_web/coord_now", 10, boost::bind(&GlobalBase::Robo4CoordNowCB, this, _1));
+    roadblock_sub_ = nh_.subscribe<data::RoadblockMsg>("shop/roadblock", 10, boost::bind(&GlobalBase::RoadblockCB, this, _1));
 
-    roadblock_read_clt_ = nh_.serviceClient<data::Roadblock>("shop/roadblock_read_srv");
+    robot1_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot1/now_coord", 10, boost::bind(&GlobalBase::Robo1CoordNowCB, this, _1));
+    robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot2/now_coord", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
+    robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot3/now_coord", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
+    robot4_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot4/now_coord", 10, boost::bind(&GlobalBase::Robo4CoordNowCB, this, _1));
 
-    robot1_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_read");
-    robot2_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_read");
-    robot3_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_read");
-    robot4_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_read");
+    target_robot1_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot1/target_coord", 10, boost::bind(&GlobalBase::Robo1TargetCoordCB, this, _1));
+    target_robot2_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot2/target_coord", 10, boost::bind(&GlobalBase::Robo2TargetCoordCB, this, _1));
+    target_robot3_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot3/target_coord", 10, boost::bind(&GlobalBase::Robo3TargetCoordCB, this, _1));
+    target_robot4_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot4/target_coord", 10, boost::bind(&GlobalBase::Robo4TargetCoordCB, this, _1));
+
+    robot1_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot1/cmd_coord", 1);
+    robot2_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/cmd_coord", 1);
+    robot3_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot3/cmd_coord", 1);
+    robot4_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot4/cmd_coord", 1);
 
     plan_as_.start();
 
     ROS_WARN("global is init");
   }
-  
+
   virtual ~GlobalBase() = default;
 
   virtual data::Coord GetFinalCoord(uint8_t robot_num_) = 0;
@@ -78,30 +98,16 @@ public:
 
     if (goal->do_flag == true)
     {
-      ROS_WARN("in here");      
+      ROS_WARN("in here");
       RobotGlobalPlanning();
       auto robot1_coord = GetFinalCoord(1);
       auto robot2_coord = GetFinalCoord(2);
       auto robot3_coord = GetFinalCoord(3);
       auto robot4_coord = GetFinalCoord(4);
-
-
-      //@bug 不能达到实时性,用topic解决这个问题
-      // result.robot1_coord[0] = robot1_coord.x;
-      // result.robot2_coord[0] = robot2_coord.x;
-      // result.robot3_coord[0] = robot3_coord.x;
-      // result.robot4_coord[0] = robot4_coord.x;
-
-      // result.robot1_coord[1] = robot1_coord.y;
-      // result.robot2_coord[1] = robot2_coord.y;
-      // result.robot3_coord[1] = robot3_coord.y;
-      // result.robot4_coord[1] = robot4_coord.y;
-
-      // result.robot1_coord[2] = 5;
-      // result.robot2_coord[2] = 5;
-      // result.robot3_coord[2] = 5;
-      // result.robot4_coord[2] = 5;
-
+      robot1_cmd_coord_pub_.publish(robot1_coord);
+      robot2_cmd_coord_pub_.publish(robot2_coord);
+      robot3_cmd_coord_pub_.publish(robot3_coord);
+      robot4_cmd_coord_pub_.publish(robot4_coord);
     }
     else
     {
@@ -142,55 +148,61 @@ public:
 
   int8_t GetRoadblock()
   {
-    data::Roadblock srv;
-    roadblock_read_clt_.call(srv);
-    return srv.response.number;
+    return roadblock_.location_place;
   }
 
   data::Coord GetTargetCoord(uint8_t robot_num)
   {
-    data::Coordinate srv;
-    data::Coord result;
     switch (robot_num)
     {
     case 1:
-      robot1_target_coordinate_read_clt_.call(srv);
+      return robot1_target_coord_;
       break;
     case 2:
-      robot2_target_coordinate_read_clt_.call(srv);
+      return robot2_target_coord_;
       break;
     case 3:
-      robot3_target_coordinate_read_clt_.call(srv);
+      return robot3_target_coord_;
       break;
     case 4:
-      robot4_target_coordinate_read_clt_.call(srv);
+      return robot4_target_coord_;      
       break;
     default:
       ROS_ERROR("no robot num in %s in %s", __FUNCTION__, name_.c_str());
       break;
     }
-    result.x = srv.response.x;
-    result.y = srv.response.y;
-    result.pose = srv.response.pose;
-    return result;
   }
 
 protected:
-  ros::NodeHandle nh_;
   data::Coord robot1_coord_now_;
   data::Coord robot2_coord_now_;
   data::Coord robot3_coord_now_;
   data::Coord robot4_coord_now_;
+
+  data::Coord robot1_target_coord_;
+  data::Coord robot2_target_coord_;
+  data::Coord robot3_target_coord_;
+  data::Coord robot4_target_coord_;
+
+  data::RoadblockMsg roadblock_;
+
+  ros::NodeHandle nh_;
   ros::Subscriber robot1_coordinate_sub_;
   ros::Subscriber robot2_coordinate_sub_;
   ros::Subscriber robot3_coordinate_sub_;
   ros::Subscriber robot4_coordinate_sub_;
-  ros::ServiceClient roadblock_read_clt_;
 
-  ros::ServiceClient robot1_target_coordinate_read_clt_;
-  ros::ServiceClient robot2_target_coordinate_read_clt_;
-  ros::ServiceClient robot3_target_coordinate_read_clt_;
-  ros::ServiceClient robot4_target_coordinate_read_clt_;
+  ros::Subscriber roadblock_sub_;
+
+  ros::Subscriber target_robot1_coord_sub_;
+  ros::Subscriber target_robot2_coord_sub_;
+  ros::Subscriber target_robot3_coord_sub_;
+  ros::Subscriber target_robot4_coord_sub_;
+
+  ros::Publisher robot1_cmd_coord_pub_;
+  ros::Publisher robot2_cmd_coord_pub_;
+  ros::Publisher robot3_cmd_coord_pub_;
+  ros::Publisher robot4_cmd_coord_pub_;
 
   PLANACTIONSERVER plan_as_;
 
@@ -220,6 +232,36 @@ protected:
     robot4_coord_now_.x = msg->x;
     robot4_coord_now_.y = msg->y;
     robot4_coord_now_.pose = msg->pose;
+  }
+
+  void Robo1TargetCoordCB(const data::Coord::ConstPtr &msg)
+  {
+    robot1_target_coord_.x = msg->x;
+    robot1_target_coord_.y = msg->y;
+    robot1_target_coord_.pose = msg->pose;
+  }
+  void Robo2TargetCoordCB(const data::Coord::ConstPtr &msg)
+  {
+    robot2_target_coord_.x = msg->x;
+    robot2_target_coord_.y = msg->y;
+    robot2_target_coord_.pose = msg->pose;
+  }
+  void Robo3TargetCoordCB(const data::Coord::ConstPtr &msg)
+  {
+    robot3_target_coord_.x = msg->x;
+    robot3_target_coord_.y = msg->y;
+    robot3_target_coord_.pose = msg->pose;
+  }
+  void Robo4TargetCoordCB(const data::Coord::ConstPtr &msg)
+  {
+    robot4_target_coord_.x = msg->x;
+    robot4_target_coord_.y = msg->y;
+    robot4_target_coord_.pose = msg->pose;
+  }
+
+  void RoadblockCB(const data::RoadblockMsg::ConstPtr &msg)
+  {
+    roadblock_.location_place = msg->location_place;
   }
 
 private:

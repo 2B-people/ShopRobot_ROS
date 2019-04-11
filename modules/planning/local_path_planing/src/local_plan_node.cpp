@@ -609,6 +609,12 @@ class LocalPlan : public LocalBase
         }
 
         auto now_coord = GetNowCoord(robot_num);
+        if (now_coord.x == 10 && now_coord.y == 10)
+        {
+            ROS_WARN("now_coord is 10 10 is err");
+            return;
+        }
+        
         ROS_INFO("local plan x:%d y:%d",now_coord.x,now_coord.y);
 
         for (int i = 0; i < determined_coord.size(); i++)

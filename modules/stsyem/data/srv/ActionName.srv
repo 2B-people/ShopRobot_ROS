@@ -1,5 +1,7 @@
 string action_name
 bool is_action
+# 动作的状态
+# @brief: 0为无动作执行,1为抓取动作,2为放置动作,3为特种动作
 int8 action_state
 ---
 string action_name

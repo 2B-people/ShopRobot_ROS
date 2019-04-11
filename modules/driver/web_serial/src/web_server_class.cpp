@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-10 22:15:29
+ * @LastEditTime: 2019-04-11 23:25:37
  */
 #include <web_serial/web_server_class.h>
 
@@ -14,11 +14,11 @@ namespace webserver
 
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true), is_debug_(false),
-      client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.100"), bind_port_(1111),
+      client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.100"), bind_port_(1111), go_flag_(false),
       //atcion初始化
-      move_as_(nh_, (name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
-      opening_as_(nh_, (name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
-      action_as_(nh_, (name + "/shop_action"), boost::bind(&WebServer::ShopExecuteCB, this, _1), false)
+      move_as_(nh_, ("shop/" + name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
+      opening_as_(nh_, ("shop/" + name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
+      action_as_(nh_, ("shop/" + name + "/shop_action"), boost::bind(&WebServer::ShopExecuteCB, this, _1), false)
 {
     ros::NodeHandle nh_private_("~");
 
@@ -26,9 +26,21 @@ WebServer::WebServer(std::string name)
     move_stop_ = false;
     shop_stop_ = false;
 
-    now_coord_.x = 10;
-    now_coord_.y = 10;
+    now_coord_.x = 2;
+    now_coord_.y = 4;
     now_coord_.pose = 10;
+
+    target_coord_.x = 10;
+    target_coord_.y = 10;
+    target_coord_.pose = 10;
+
+    cmd_coord_.x = 10;
+    cmd_coord_.y = 10;
+    cmd_coord_.pose = 10;
+
+    target_action_.name = "NONE";
+    target_action_.is_action = false;
+    target_action_.action_state = 0;
 
     memset(&my_addr_, 0, sizeof(my_addr_)); //数据初始化--清零
 
@@ -63,7 +75,15 @@ WebServer::WebServer(std::string name)
     //publish init
     move_pub_ = nh_.advertise<data::Coord>("shop/" + name_ + "/now_coord", 1);
 
+    move_pub_.publish(now_coord_);
+    //subscribe init
+    move_target_sub_ = nh_.subscribe<data::Coord>("shop/" + name_ + "/target_coord", 10, boost::bind(&WebServer::TargetCoordCB, this, _1));
+    move_cmd_sub_ = nh_.subscribe<data::Coord>("shop/" + name_ + "/cmd_coord", 10, boost::bind(&WebServer::CmdCoordCB, this, _1));
+    action_sub_ = nh_.subscribe<data::Action>("shop/" + name_ + "/target_action", 10, boost::bind(&WebServer::TargetActionCB, this, _1));
+
+    //clint init
     roadblock_client_ = nh_.serviceClient<data::Roadblock>("shop/roadblock_write_srv");
+    action_client_ = nh_.serviceClient<data::ActionName>("shop/" + name_ + "/target_actionname_write");
 
     if (name_ == "robot1")
     {
@@ -81,11 +101,11 @@ WebServer::WebServer(std::string name)
     {
     }
 
-    //web init
-    if (InitWeb() == false)
-    {
-        exit(-1);
-    }
+    // //web init
+    // if (InitWeb() == false)
+    // {
+    //     exit(-1);
+    // }
 
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
@@ -97,7 +117,7 @@ WebServer::WebServer(std::string name)
     action_as_.start();
     opening_as_.start();
 
-    ROS_INFO("%s is run", name.c_str());
+    ROS_WARN("%s is run", name.c_str());
 }
 
 WebServer::~WebServer()
@@ -114,9 +134,14 @@ WebServer::~WebServer()
 //RUN MAIN里调用实际运行
 void WebServer::Run(void)
 {
-    ros::AsyncSpinner async_spinner(thread_num_);
-    async_spinner.start();
-    ros::waitForShutdown();
+    // ros::AsyncSpinner async_spinner(thread_num_);
+    // async_spinner.start();
+    // ros::waitForShutdown();
+    while (ros::ok)
+    {
+        ros::spinOnce();
+        move_pub_.publish(now_coord_);
+    }
 }
 
 void WebServer::Stop()
@@ -173,12 +198,19 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     ROS_INFO("%s is write move", name_.c_str());
 
     //目标转化为string在发下去
-    data::Coord coord_goal;
-    coord_goal.x = goal->x;
-    coord_goal.y = goal->y;
-    coord_goal.pose = 5;
-    std::string coord_goal_str = CoordToData(coord_goal);
-    //bug send函数
+    // coord_goal.x = goal->x;
+    // coord_goal.y = goal->y;
+    // coord_goal.pose = 5;
+
+    if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
+    {
+        result.success_flag = false;
+        move_as_.setPreempted(result);
+        return;
+    }
+
+    //发送目标
+    std::string coord_goal_str = CoordToData(cmd_coord_);
     Send(coord_goal_str);
 
     // ROS_INFO("move is write %s", coord_goal_str.c_str());
@@ -186,7 +218,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     //得到一次现在的坐标,得到进度计算的分母
     std::string re_frist_buf = Recv();
     data::Coord begin_coord = DataToCoord(re_frist_buf);
-    float progress_overall = float((goal->x + goal->y) - (begin_coord.x + begin_coord.y));
+    move_pub_.publish(begin_coord);
+    float progress_overall = float((target_coord_.x + target_coord_.y) - (begin_coord.x + begin_coord.y));
     //等待结束,移动到目标坐标
     while (ros::ok)
     {
@@ -202,18 +235,30 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 }
 
                 data::Coord now_coord = DataToCoord(re_buf);
-                move_pub_.publish(now_coord);
                 if (now_coord.x == 10 && now_coord.y == 10)
                 {
                     ROS_WARN("coord data is err");
                 }
+                move_pub_.publish(now_coord);
 
                 //判断目标坐标
                 //@note 下位机可以不用频道方向
-                if (now_coord.x == goal->x && now_coord.y == goal->y /*&& now_coord.pose == goal->pose*/)
+                if (now_coord.x == cmd_coord_.x && now_coord.y == cmd_coord_.y)
                 {
-                    ROS_INFO("move to target,x:%d,y:%d", goal->x, goal->y);
-                    break;
+                    if (target_coord_.x == cmd_coord_.x && target_coord_.y == cmd_coord_.y)
+                    {
+                        ROS_INFO("move to target,x:%d,y:%d", target_coord_.x, target_coord_.y);
+                        ROS_INFO("%s FININSH", __FUNCTION__);
+                        result.success_flag = true;
+                        move_as_.setSucceeded(result);
+                        return;
+                    }
+                    else
+                    {
+                        ROS_INFO("%s is waitting other robot", name_.c_str());
+                        std::string coord_goal_str = CoordToData(cmd_coord_);
+                        Send(coord_goal_str);
+                    }
                 }
                 else
                 {
@@ -228,9 +273,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             }
         }
     }
-    ROS_INFO("%s FININSH", __FUNCTION__);
-    result.success_flag = true;
-    move_as_.setSucceeded(result);
 }
 
 //shopatcion的回调函数
@@ -238,10 +280,24 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 {
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
+
     ROS_INFO("%s is write action", name_.c_str());
-    // 发送指令
-    // 存在bug
-    // Send(goal->action_name);
+
+    //判断目标的是否能用
+    if (target_action_.action_state == 0)
+    {
+        ROS_INFO("action state is 0");
+        result.success_flag = false;
+        action_as_.setPreempted(result);
+        return;
+    }
+
+    data::ActionName action_srv;
+    action_srv.request.is_action = true;
+    action_client_.call(action_srv);
+
+    //发送此次的目标
+    Send(target_action_.name);
 
     //等待结束
     while (ros::ok())
@@ -251,9 +307,10 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             if (move_stop_ == false)
             {
                 std::string re_buf_string = Recv();
+
                 if (re_buf_string.substr(0, 6) == "finish")
                 {
-                    ROS_INFO("%s is finish", goal->action_name.c_str());
+                    ROS_INFO("%s is finish", target_action_.name.c_str());
                     break;
                 }
                 else
@@ -268,8 +325,30 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             }
         }
     }
+
+    action_srv.request.is_action = false;
+    switch (target_action_.action_state)
+    {
+    case 1:
+        action_srv.request.action_state = 2;
+        break;
+    case 2:
+        action_srv.request.action_state = 1;
+        break;
+    case 3:
+        action_srv.request.action_state = 1;
+        break;
+    default:
+        ROS_ERROR("error is %s", __FUNCTION__);
+        break;
+    }
+
+    action_client_.call(action_srv);
+
+    ROS_INFO("%s FININSH", __FUNCTION__);
     result.success_flag = true;
     action_as_.setSucceeded(result);
+    return;
 }
 
 //开局函数
@@ -279,7 +358,15 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
     data::OpeningResult result;
     ROS_INFO("%s is write Open", name_.c_str());
 
-    Send(goal->car_begin);
+    if (go_flag_)
+    {
+        ROS_ERROR("this is bug!");
+        result.success_flag = false;
+        opening_as_.setPreempted(result);
+        return;
+    }
+
+    Send("go");
 
     while (ros::ok())
     {
@@ -325,8 +412,10 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
         }
     }
 
+    go_flag_ = true;
     result.success_flag = true;
     opening_as_.setSucceeded(result);
+    return;
 }
 
 //移动抢占中断回调函数
@@ -365,7 +454,7 @@ void WebServer::MovePreemptCB()
 //动作抢占中断回调函数
 void WebServer::ShopPreemptCB()
 {
-    std::string stop_buf("open shop now");
+    std::string stop_buf("stop");
     if (action_as_.isActive())
     {
         Send(stop_buf);
@@ -376,7 +465,7 @@ void WebServer::ShopPreemptCB()
 //开局抢占中断回调函数
 void WebServer::OpenPreemptCB()
 {
-    std::string stop_buf("open shop now");
+    std::string stop_buf("stop");
     if (opening_as_.isActive())
     {
         Send(stop_buf);
@@ -423,7 +512,7 @@ std::string WebServer::CoordToData(data::Coord temp)
     return temp_str;
 }
 
-// TODO
+// TODO !!!
 // @breif data到货框障碍物
 // @pargm 坐标类型
 // @return 货框
@@ -473,5 +562,25 @@ std::string WebServer::Recv(void)
     return temp;
 }
 
+void WebServer::TargetCoordCB(const data::Coord::ConstPtr &msg)
+{
+    target_coord_.x = msg->x;
+    target_coord_.y = msg->y;
+    target_coord_.pose = msg->pose;
+}
+
+void WebServer::CmdCoordCB(const data::Coord::ConstPtr &msg)
+{
+    cmd_coord_.x = msg->x;
+    cmd_coord_.y = msg->y;
+    cmd_coord_.pose = msg->pose;
+}
+void WebServer::TargetActionCB(const data::Action::ConstPtr &msg)
+{
+    target_action_.name = msg->name;
+    target_action_.is_action = msg->is_action;
+    target_action_.action_state = msg->action_state;
+}
 } // namespace webserver
+
 } // namespace shop

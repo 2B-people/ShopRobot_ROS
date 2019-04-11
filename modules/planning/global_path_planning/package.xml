@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>global_path_planning</name>
+  <name>global_path_planing</name>
   <version>0.0.0</version>
-  <description>The global_path_planning package</description>
+  <description>The global_path_planing package</description>
 
   <maintainer email="nqq0915@163.com">nqq09</maintainer>
 
