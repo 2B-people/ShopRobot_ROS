@@ -90,7 +90,6 @@ class GlobalPlan : public GlobalBase
         int x = end.first, y = end.second;
         Coord local = map_path[x][y];
         // ROS_WARN("LOCAL1:%d, %d", local.first, local.second);
-        local = map_path[end.first][end.first];
         // ROS_WARN("LOCAL2:%d, %d", local.first, local.second);
         que = RecordShortestPath(local, begin, map_path);
         que.push(local);
@@ -133,22 +132,26 @@ class GlobalPlan : public GlobalBase
         {
             Coord local = que.front();
             que.pop();
-            ROS_WARN("START:%d, %d", local.first, local.second);
+            // ROS_WARN("START:%d, %d", local.first, local.second);
             int i = 0;
             for (i = 0; i < 4; i++)
             {
                 int temp_x = local.first + move_x[i];
                 int temp_y = local.second + move_y[i];
-                ROS_WARN("$$$:%d, %d", temp_x, temp_y);
+                // ROS_WARN("$$$:%d, %d", temp_x, temp_y);
                 if (0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
                 {
-                    ROS_WARN("&&&:%d, %d", temp_x, temp_y);
+                    // ROS_WARN("&&&:%d, %d", temp_x, temp_y);
                     que.push(Coord(temp_x, temp_y)); 
                     map_path[temp_x][temp_y] = local;
-                    ROS_INFO("MAP_PATH:%d, %d", map_path[temp_x][temp_y].first, map_path[temp_x][temp_y].second);
+                    // ROS_INFO("MAP_PATH:%d, %d", map_path[temp_x][temp_y].first, map_path[temp_x][temp_y].second);
                     map[temp_x][temp_y] = 1;
                     if (temp_x == end.first && temp_y == end.second)
+                    {
+                        ROS_INFO("final_get!!!!!");
                         break;
+                    }
+                        
                 }
             }
             if (i != 4)
@@ -156,13 +159,14 @@ class GlobalPlan : public GlobalBase
         }
 
         ROS_WARN("kaishijilvlujing");
-        ROS_WARN("END:%d, %d", end.first, end.second);
-        ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
+        // ROS_WARN("END:%d, %d", end.first, end.second);
+        // ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
         int x = end.first, y = end.second;
         Coord local = map_path[x][y];
-        ROS_WARN("LOCAL:%d, %d", local.first, local.second);
-        ROS_WARN("BBBBB:%d, %d", map_path[begin.first][begin.second].first, map_path[begin.first][begin.second].second);
+        // ROS_WARN("LOCAL:%d, %d", local.first, local.second);
+        // ROS_WARN("BBBBB:%d, %d", map_path[begin.first][begin.second].first, map_path[begin.first][begin.second].second);
         path = RecordShortestPath(end, begin, map_path);
+        ROS_WARN("jeishu");
         return path;
     }
 
@@ -293,6 +297,42 @@ class GlobalPlan : public GlobalBase
                 path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
             ROS_WARN("path_4 of size:%d", path_4.size());
             queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
+
+            while (temp_path_1.size())
+            {
+                Coord local_1 = temp_path_1.front();
+                temp_path_1.pop();
+
+                map_1[local_1.first][local_1.second] = 1;
+            }
+            memcpy(map_2, map_1, sizeof(map_1));
+
+            while (temp_path_2.size())
+            {
+                Coord local_2 = temp_path_2.front();
+                temp_path_2.pop();
+
+                map_2[local_2.first][local_2.second] += 1;
+            }
+            memcpy(map_3, map_2, sizeof(map_2));
+
+            while (temp_path_3.size())
+            {
+                Coord local_3 = temp_path_3.front();
+                temp_path_3.pop();
+
+                map_3[local_3.first][local_3.second] += 1;
+            }
+            memcpy(map_4, map_3, sizeof(map_3));
+
+            while (temp_path_4.size())
+            {
+                Coord local_4 = temp_path_4.front();
+                temp_path_4.pop();
+
+                map_4[local_4.first][local_4.second] += 1;
+            }
+
 
             for (int i = 0; i < 4; i++) //计算优先级为2的机器人所停位置
             {

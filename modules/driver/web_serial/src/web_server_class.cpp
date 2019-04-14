@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-14 03:10:50
+ * @LastEditTime: 2019-04-14 15:17:44
  */
 #include <web_serial/web_server_class.h>
 
@@ -212,7 +212,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             move_as_.setPreempted(result);
             return;
         }
-
+        data::ActionName action_srv;
+        action_srv.request.action_name = target_action_.name;
+        action_srv.request.action_state = target_action_.action_state;
+        action_srv.request.is_action = true;
+        action_client_.call(action_srv);
         //发送目标
         std::string coord_goal_str = CoordToData(cmd_coord_);
         Send(coord_goal_str);
@@ -270,6 +274,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     else if (goal->pose == 2)
     {
         //发送目标
+        data::ActionName action_srv;
+        action_srv.request.action_name = target_action_.name;
+        action_srv.request.action_state = target_action_.action_state;
+        action_srv.request.is_action = true;
+        action_client_.call(action_srv);
         std::string coord_goal_str = CoordToData(target_coord_);
         Send(coord_goal_str);
 
@@ -292,7 +301,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             }
 
             // ROS_INFO("RE_BUf is %s", re_buf.c_str());
-
 
             data::Coord now_coord = DataToCoord(re_buf);
             if (now_coord.x == 10 && now_coord.y == 10)
@@ -340,10 +348,6 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     data::ActionName action_srv;
-    action_srv.request.action_name = target_action_.name;
-    action_srv.request.action_state = target_action_.action_state;
-    action_srv.request.is_action = true;
-    action_client_.call(action_srv);
 
     //发送此次的目标
     Send(target_action_.name);

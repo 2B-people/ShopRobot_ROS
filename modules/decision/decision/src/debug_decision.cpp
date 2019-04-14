@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     auto robot3_action_ptr = std::make_shared<shop::decision::ShopAction>(3, 0, "robot3 shop", blackboard_ptr_, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, 0, "robot4 shop", blackboard_ptr_, goal_action_ptr);
 
-    auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo ", blackboard_ptr_, goal_action_ptr);
+    auto photo_ptr = std::make_shared<shop::decision::CameraAction>("photo", blackboard_ptr_, goal_action_ptr);
     auto distinguish_ptr = std::make_shared<shop::decision::DetectionAction>("distinguish", blackboard_ptr_, goal_action_ptr);
     auto global_plan_ptr = std::make_shared<shop::decision::GlobalPlanAction>("global plan", blackboard_ptr_, goal_action_ptr);
     auto local_plan_ptr = std::make_shared<shop::decision::LocalPlanAction>("local plan", blackboard_ptr_, goal_action_ptr);
@@ -161,9 +161,12 @@ int main(int argc, char **argv)
     robot4_carry_seq_ptr->AddChildren(robot4_move_ptr);
     robot4_carry_seq_ptr->AddChildren(robot4_action_ptr);
 
+    auto plan_seq_ptr = std::make_shared<shop::decision::SequenceNode>("plan seq", blackboard_ptr_);
+    plan_seq_ptr->AddChildren(local_plan_ptr);
+    plan_seq_ptr->AddChildren(global_plan_ptr);
+
     auto carry_while_ptr = std::make_shared<shop::decision::WhileNode>("carry while", blackboard_ptr_);
-    carry_while_ptr->AddChildren(local_plan_ptr);
-    carry_while_ptr->AddChildren(global_plan_ptr);
+    carry_while_ptr->AddChildren(plan_seq_ptr);
     carry_while_ptr->AddChildren(robot1_carry_seq_ptr);
     carry_while_ptr->AddChildren(robot2_carry_seq_ptr);
     carry_while_ptr->AddChildren(robot3_carry_seq_ptr);
