@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-11 23:25:37
+ * @LastEditTime: 2019-04-14 03:10:50
  */
 #include <web_serial/web_server_class.h>
 
@@ -26,8 +26,8 @@ WebServer::WebServer(std::string name)
     move_stop_ = false;
     shop_stop_ = false;
 
-    now_coord_.x = 2;
-    now_coord_.y = 4;
+    now_coord_.x = 10;
+    now_coord_.y = 10;
     now_coord_.pose = 10;
 
     target_coord_.x = 10;
@@ -101,11 +101,13 @@ WebServer::WebServer(std::string name)
     {
     }
 
-    // //web init
-    // if (InitWeb() == false)
-    // {
-    //     exit(-1);
-    // }
+    //web init
+    if (InitWeb() == false)
+    {
+        exit(-1);
+    }
+
+    Send("I");
 
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
@@ -125,7 +127,7 @@ WebServer::~WebServer()
     is_open_ = false;
     move_stop_ = true;
     shop_stop_ = true;
-    ROS_INFO("%s is destrust", name_.c_str());
+    // ROS_INFO("%s is destrust", name_.c_str());
     /*关闭套接字*/
     close(client_sockfd_);
     close(server_sockfd_);
@@ -134,14 +136,14 @@ WebServer::~WebServer()
 //RUN MAIN里调用实际运行
 void WebServer::Run(void)
 {
-    // ros::AsyncSpinner async_spinner(thread_num_);
-    // async_spinner.start();
-    // ros::waitForShutdown();
-    while (ros::ok)
-    {
-        ros::spinOnce();
-        move_pub_.publish(now_coord_);
-    }
+    ros::AsyncSpinner async_spinner(thread_num_);
+    async_spinner.start();
+    ros::waitForShutdown();
+    // while (ros::ok)
+    // {
+    //     ros::spinOnce();
+    //     move_pub_.publish(now_coord_);
+    // }
 }
 
 void WebServer::Stop()
@@ -202,74 +204,119 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     // coord_goal.y = goal->y;
     // coord_goal.pose = 5;
 
-    if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
+    if (goal->pose == 1)
     {
-        result.success_flag = false;
-        move_as_.setPreempted(result);
-        return;
-    }
-
-    //发送目标
-    std::string coord_goal_str = CoordToData(cmd_coord_);
-    Send(coord_goal_str);
-
-    // ROS_INFO("move is write %s", coord_goal_str.c_str());
-
-    //得到一次现在的坐标,得到进度计算的分母
-    std::string re_frist_buf = Recv();
-    data::Coord begin_coord = DataToCoord(re_frist_buf);
-    move_pub_.publish(begin_coord);
-    float progress_overall = float((target_coord_.x + target_coord_.y) - (begin_coord.x + begin_coord.y));
-    //等待结束,移动到目标坐标
-    while (ros::ok)
-    {
-        if (is_open_)
+        if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
         {
-            if (move_stop_ == false)
+            result.success_flag = false;
+            move_as_.setPreempted(result);
+            return;
+        }
+
+        //发送目标
+        std::string coord_goal_str = CoordToData(cmd_coord_);
+        Send(coord_goal_str);
+
+        // ROS_INFO("move is write %s", coord_goal_str.c_str());
+
+        //得到一次现在的坐标,得到进度计算的分母
+        std::string re_frist_buf = Recv();
+        data::Coord begin_coord = DataToCoord(re_frist_buf);
+        move_pub_.publish(begin_coord);
+        float progress_overall = float((target_coord_.x + target_coord_.y) - (begin_coord.x + begin_coord.y));
+        while (ros::ok && is_open_ && move_stop_ == false)
+        {
+            std::string re_buf = Recv();
+
+            if (is_debug_)
             {
-                std::string re_buf = Recv();
+                // ROS_INFO("RE_BUf is %s", re_buf.c_str());
+            }
 
-                if (is_debug_)
-                {
-                    ROS_INFO("RE_BUf is %s", re_buf.c_str());
-                }
+            data::Coord now_coord = DataToCoord(re_buf);
+            if (now_coord.x == 10 && now_coord.y == 10)
+            {
+                ROS_WARN("coord data is err");
+            }
+            move_pub_.publish(now_coord);
 
-                data::Coord now_coord = DataToCoord(re_buf);
-                if (now_coord.x == 10 && now_coord.y == 10)
+            //判断目标坐标
+            //@note 下位机可以不用频道方向
+            if (now_coord.x == cmd_coord_.x && now_coord.y == cmd_coord_.y)
+            {
+                if (target_coord_.x == cmd_coord_.x && target_coord_.y == cmd_coord_.y)
                 {
-                    ROS_WARN("coord data is err");
-                }
-                move_pub_.publish(now_coord);
-
-                //判断目标坐标
-                //@note 下位机可以不用频道方向
-                if (now_coord.x == cmd_coord_.x && now_coord.y == cmd_coord_.y)
-                {
-                    if (target_coord_.x == cmd_coord_.x && target_coord_.y == cmd_coord_.y)
-                    {
-                        ROS_INFO("move to target,x:%d,y:%d", target_coord_.x, target_coord_.y);
-                        ROS_INFO("%s FININSH", __FUNCTION__);
-                        result.success_flag = true;
-                        move_as_.setSucceeded(result);
-                        return;
-                    }
-                    else
-                    {
-                        ROS_INFO("%s is waitting other robot", name_.c_str());
-                        std::string coord_goal_str = CoordToData(cmd_coord_);
-                        Send(coord_goal_str);
-                    }
+                    ROS_INFO("move to target,x:%d,y:%d", target_coord_.x, target_coord_.y);
+                    ROS_INFO("%s FININSH", __FUNCTION__);
+                    result.success_flag = true;
+                    move_as_.setSucceeded(result);
+                    return;
                 }
                 else
                 {
-                    // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
-                    feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
-                    move_as_.publishFeedback(feedback);
+                    ROS_INFO("%s is waitting other robot", name_.c_str());
+                    std::string coord_goal_str = CoordToData(cmd_coord_);
+                    Send(coord_goal_str);
                 }
             }
             else
             {
-                ROS_WARN("shop flag is stop!!!");
+                // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
+                feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
+                move_as_.publishFeedback(feedback);
+            }
+        }
+    }
+    else if (goal->pose == 2)
+    {
+        //发送目标
+        std::string coord_goal_str = CoordToData(target_coord_);
+        Send(coord_goal_str);
+
+        ROS_INFO("move is write %s", coord_goal_str.c_str());
+
+        //得到一次现在的坐标,得到进度计算的分母
+        std::string re_frist_buf = Recv();
+        data::Coord begin_coord = DataToCoord(re_frist_buf);
+        move_pub_.publish(begin_coord);
+        float progress_overall = float((target_coord_.x + target_coord_.y) - (begin_coord.x + begin_coord.y));
+        //等待结束,移动到目标坐标
+        while (ros::ok && is_open_ && move_stop_ == false)
+        {
+
+            std::string re_buf = Recv();
+
+            if (is_debug_)
+            {
+                // ROS_INFO("RE_BUf is %s", re_buf.c_str());
+            }
+
+            // ROS_INFO("RE_BUf is %s", re_buf.c_str());
+
+
+            data::Coord now_coord = DataToCoord(re_buf);
+            if (now_coord.x == 10 && now_coord.y == 10)
+            {
+                ROS_WARN("coord data is err");
+            }
+            move_pub_.publish(now_coord);
+
+            //判断目标坐标
+            //@note 下位机可以不用频道方向
+
+            if (target_coord_.x == now_coord.x && target_coord_.y == now_coord.y)
+            {
+                ROS_INFO("move to target,x:%d,y:%d", target_coord_.x, target_coord_.y);
+                ROS_INFO("%s FININSH", __FUNCTION__);
+                result.success_flag = true;
+                move_as_.setSucceeded(result);
+                return;
+            }
+            else
+            {
+                // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord.x, now_coord.y, now_coord.pose);
+                feedback.progress = (float)((now_coord.x + now_coord.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
+                move_as_.publishFeedback(feedback);
             }
         }
     }
@@ -293,6 +340,8 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     data::ActionName action_srv;
+    action_srv.request.action_name = target_action_.name;
+    action_srv.request.action_state = target_action_.action_state;
     action_srv.request.is_action = true;
     action_client_.call(action_srv);
 
@@ -300,33 +349,26 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     Send(target_action_.name);
 
     //等待结束
-    while (ros::ok())
+    while (ros::ok() && is_open_ && shop_stop_ == false)
     {
-        if (is_open_)
-        {
-            if (move_stop_ == false)
-            {
-                std::string re_buf_string = Recv();
 
-                if (re_buf_string.substr(0, 6) == "finish")
-                {
-                    ROS_INFO("%s is finish", target_action_.name.c_str());
-                    break;
-                }
-                else
-                {
-                    feedback.progress = re_buf_string;
-                    action_as_.publishFeedback(feedback);
-                }
-            }
-            else
-            {
-                ROS_WARN("shop flag is stop!!!");
-            }
+        std::string re_buf_string = Recv();
+
+        if (re_buf_string.substr(0, 6) == "finish")
+        {
+            ROS_INFO("%s is finish", target_action_.name.c_str());
+            break;
+        }
+        else
+        {
+            feedback.progress = re_buf_string;
+            action_as_.publishFeedback(feedback);
         }
     }
 
     action_srv.request.is_action = false;
+    action_srv.request.action_name = "NONE";
+    // ROS_ERROR("XXX%d", target_action_.action_state);
     switch (target_action_.action_state)
     {
     case 1:
@@ -349,7 +391,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     result.success_flag = true;
     action_as_.setSucceeded(result);
     return;
-}
+} // namespace webserver
 
 //开局函数
 void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
@@ -379,9 +421,15 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
             {
                 break;
             }
+            else if (re_buf[0] == 'R')
+            {
+                ROS_WARN("is read R");
+                data::Coord now_coord = DataToCoord(re_buf);
+                move_pub_.publish(now_coord);
+            }
             else if (re_buf[0] == 'B')
             {
-                ROS_INFO("IN HERE");
+                // ROS_INFO("IN HERE");
                 feedback.begin_flag = true;
                 opening_as_.publishFeedback(feedback);
             }
@@ -398,11 +446,6 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
                 }
                 feedback.progress = "Is set barrier";
                 opening_as_.publishFeedback(feedback);
-            }
-            else if (re_buf[0] == 'R')
-            {
-                data::Coord now_coord = DataToCoord(re_buf);
-                move_pub_.publish(now_coord);
             }
             else
             {

@@ -33,7 +33,7 @@ class GlobalBase : public shop::common::RRTS
 {
 public:
   GlobalBase(std::string name) : common::RRTS(name, 1),
-                                 plan_as_(nh_, "global_plan", boost::bind(&GlobalBase::PlanExecuteCB, this, _1), false)
+                                 plan_as_(nh_, "shop/global_plan", boost::bind(&GlobalBase::PlanExecuteCB, this, _1), false)
   {
     robot1_coord_now_.x = 10;
     robot1_coord_now_.y = 10;

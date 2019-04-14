@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-04-11 23:45:21
+ * @LastEditTime: 2019-04-12 00:43:44
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -125,7 +125,6 @@ public:
     robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
 
     plan_as_.start();
-    ROS_INFO("localplan is done!");
   }
 
   virtual ~LocalBase() = default;
@@ -140,70 +139,19 @@ public:
     //结果
     data::LocalPlanResult result;
 
-    ros::Rate r(1); //10HZ
+    ros::Rate r(2); //10HZ
     if (is_debug_)
     {
-      // ROS_INFO("local plan is run ");
-      // ROS_INFO("plan_function is %d", goal->plan_function);
-      // ROS_INFO("robot_num is %d", goal->robot_num);
     }
 
     if (all_done_ == false)
     {
-      //   if (goal->plan_function == 1) //规划取物
-      //   {
-      //     ROS_INFO("PlanCarry is begin");
-      //     PlanCarry(goal->robot_num);
-      //   }
-      //   else //规划放
-      //   {
-      //     ROS_INFO("PlanPlace is begin");
-      //     int index = 0;
-      //     //确认全部规划好
-      //     for (int8_t i = 0; i < 12; i++)
-      //     {
-      //       auto temp = GetGoods(i);
-      //       ROS_WARN("is %d", temp);
-      //       if (temp == 0)
-      //       {
-      //         index++;
-      //         if (index == 12)
-      //         {
-      //           all_done_ = true;
-      //         }
-      //       }
-      //     }
-      //     PlanPlace(goal->robot_num);
-      //   }
-      // }
-      // else
-      // {
-      //   plan_as_.setPreempted();
-      //   return;
-      // }
-
-      // ROS_INFO("%s FININSH", __FUNCTION__);
-      // result.success_flag = true;
-      // plan_as_.setSucceeded(result);
-      for (int i = 0; i < 12; i++)
+      if (JudgePlanIsDone())
       {
-        int index = 0;
-        auto temp = GetGoods(i);
-        ROS_WARN("is %d", temp);
-        if (temp == 0)
-        {
-          index++;
-          if (index == 12)
-          {
-            all_done_ = true;
-            ROS_INFO("%s is Done", __FUNCTION__);
-            result.success_flag = false;
-            plan_as_.setPreempted(result);
-            return;
-          }
-        }
+        result.success_flag = false;
+        plan_as_.setPreempted(result);
+        return;
       }
-
       if (robot1_action_.is_action == false)
       {
         if (robot1_action_.action_state == 0)
@@ -221,8 +169,14 @@ public:
           ROS_INFO("robot1 PlanPlace is begin");
           PlanPlace(1);
         }
+        r.sleep();
+        if (JudgePlanIsDone())
+        {
+          result.success_flag = false;
+          plan_as_.setPreempted(result);
+          return;
+        }
       }
-      r.sleep();
 
       if (robot2_action_.is_action == false)
       {
@@ -241,8 +195,14 @@ public:
           ROS_INFO("robot2 PlanPlace is begin");
           PlanPlace(2);
         }
+        r.sleep();
+        if (JudgePlanIsDone())
+        {
+          result.success_flag = false;
+          plan_as_.setPreempted(result);
+          return;
+        }
       }
-      r.sleep();
 
       if (robot3_action_.is_action == false)
       {
@@ -261,8 +221,14 @@ public:
           ROS_INFO("robot3 PlanPlace is begin");
           PlanPlace(3);
         }
+        r.sleep();
+        if (JudgePlanIsDone())
+        {
+          result.success_flag = false;
+          plan_as_.setPreempted(result);
+          return;
+        }
       }
-      r.sleep();
 
       if (robot4_action_.is_action == false)
       {
@@ -318,6 +284,28 @@ public:
     }
   }
 
+  bool JudgePlanIsDone(void)
+  {
+    int index = 0;
+    data::LocalPlanResult result;
+
+    for (int i = 0; i < 12; i++)
+    {
+      auto temp = GetGoods(i);
+      // ROS_WARN("is %d", temp);
+      if (temp == 0)
+      {
+        index++;
+        if (index == 12)
+        {
+          all_done_ = true;
+          ROS_INFO("%s is Done", __FUNCTION__);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   // //货物类别
   // enum class GoodsName : int8_t
   // {

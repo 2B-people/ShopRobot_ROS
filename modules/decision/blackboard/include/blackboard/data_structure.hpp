@@ -18,7 +18,7 @@ namespace decision
 //布尔类型
 class BoolDir : public DirBase
 {
-  public:
+public:
     BoolDir(bool initial_data)
         : DirBase(DictionaryType::BOOL), initial_bool_(initial_data)
     {
@@ -52,8 +52,8 @@ class BoolDir : public DirBase
         OpenLock();
     }
 
-  protected:
-  private:
+protected:
+private:
     bool middle_bool_;
     bool initial_bool_;
     bool real_bool_;
@@ -62,10 +62,11 @@ class BoolDir : public DirBase
 // 動作名字
 class ActionNameDir : public DirBase
 {
-  public:
-    ActionNameDir(std::string initial_name,int8_t init_state)
-        : DirBase(DictionaryType::ACTIONNAME),state_(init_state),
-          init_state_(init_state),initial_name_(initial_name), name_(initial_name)
+public:
+    ActionNameDir(std::string initial_name, int8_t init_state)
+        : DirBase(DictionaryType::ACTIONNAME), state_(init_state),
+        is_action_(false),
+          init_state_(init_state), initial_name_(initial_name), name_(initial_name)
     {
     }
     virtual ~ActionNameDir() = default;
@@ -80,12 +81,18 @@ class ActionNameDir : public DirBase
         return state_;
     }
 
-    void Set(std::string set_name,int8_t set_state)
+    bool GetIsAction()
+    {
+        return is_action_;
+    }
+
+    void Set(std::string set_name, int8_t set_state, bool is_action)
     {
         if (flag_)
         {
             name_ = set_name;
             state_ = set_state;
+            is_action_ = is_action;
         }
         else
         {
@@ -97,12 +104,14 @@ class ActionNameDir : public DirBase
     {
         name_ = initial_name_;
         state_ = init_state_;
+        is_action_ = false;
         OpenLock();
     }
 
-  private:
+private:
     int8_t state_;
     int8_t init_state_;
+    bool is_action_;
     std::string name_;
     std::string initial_name_;
 };
@@ -111,9 +120,9 @@ class ActionNameDir : public DirBase
 class PhotoNemberDir : public DirBase
 {
 
-  public:
+public:
     PhotoNemberDir(uint8_t number)
-        : DirBase(DictionaryType::PHOTONEMBER), initial_number_(number), number_(number)
+        : DirBase(DictionaryType::PHOTONEMBER), initial_number_(number), number_(number), is_discern_(false)
     {
     }
     ~PhotoNemberDir() = default;
@@ -123,11 +132,17 @@ class PhotoNemberDir : public DirBase
         return number_;
     }
 
-    void Set(uint8_t number)
+    bool GetDiscern()
+    {
+        return is_discern_;
+    }
+
+    void Set(uint8_t number, bool is_discern)
     {
         if (flag_)
         {
             number_ = number;
+            is_discern_ = is_discern;
         }
         else
         {
@@ -138,18 +153,20 @@ class PhotoNemberDir : public DirBase
     void RepeatInit()
     {
         number_ = initial_number_;
+        is_discern_ = false;
         OpenLock();
     }
 
-  private:
+private:
     uint8_t number_;
     uint8_t initial_number_;
+    bool is_discern_;
 };
 
 //坐标类型
 class CoordinateDir : public DirBase
 {
-  public:
+public:
     CoordinateDir(uint16_t initial_x, uint16_t initial_y, uint8_t initial_pose)
         : DirBase(DictionaryType::COORDINATE), initial_x_(initial_x), initial_y_(initial_y), initial_pose_(initial_pose)
     {
@@ -200,8 +217,8 @@ class CoordinateDir : public DirBase
         real_pose_ = initial_pose_;
     }
 
-  protected:
-  private:
+protected:
+private:
     uint16_t initial_x_;
     uint16_t initial_y_;
     uint16_t initial_pose_;
@@ -243,7 +260,7 @@ enum class GoodsName : int8_t
 
 class GoodsDir : public DirBase
 {
-  public:
+public:
     GoodsDir() : DirBase(DictionaryType::GOODS)
     {
         location_goods_.fill(GoodsName::NONE);
@@ -289,8 +306,8 @@ class GoodsDir : public DirBase
         location_goods_lock_flag_.fill(true);
     }
 
-  protected:
-  private:
+protected:
+private:
     std::array<GoodsName, 12> location_goods_;
     std::array<bool, 12> location_goods_lock_flag_;
 };
@@ -298,7 +315,7 @@ class GoodsDir : public DirBase
 //路障类型
 class RoadblockDir : public DirBase
 {
-  public:
+public:
     RoadblockDir(uint8_t number) : DirBase(DictionaryType::ROADBLOCK)
     {
         roadblock_middle_number_ = number;
@@ -330,8 +347,8 @@ class RoadblockDir : public DirBase
         OpenLock();
     }
 
-  protected:
-  private:
+protected:
+private:
     uint8_t roadblock_middle_number_;
     uint8_t roadblock_true_number_;
     uint8_t roadblock_initial_number_;
@@ -393,7 +410,7 @@ class RoadblockDir : public DirBase
 //设定为true为有货物
 class GoodShelfDir : public DirBase
 {
-  public:
+public:
     GoodShelfDir() : DirBase(DictionaryType::GOODSHELF)
     {
         for (size_t i = 0; i < 12; i++)
@@ -428,7 +445,7 @@ class GoodShelfDir : public DirBase
         OpenLock();
     }
 
-  private:
+private:
     bool goods_shelf_barrier_[12];
 };
 

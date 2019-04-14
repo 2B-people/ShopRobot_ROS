@@ -33,6 +33,7 @@ add_service_files(FILES
                       Roadblock.srv
                       Coordinate.srv
                       ShelfBarrier.srv
+                      PhotoSrv.srv
                  )
 
 add_action_files(FILES

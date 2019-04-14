@@ -44,114 +44,110 @@ public:
   typedef std::shared_ptr<GoalAction> Ptr;
 
   GoalAction(const PrivateBoard::Ptr &blackboard_ptr) : private_blackboard_ptr_(blackboard_ptr),
-                                                        camera_action_clint_("camera_action_server", true),
-                                                        detection_clint_("detection_action_server", true),
-                                                        localplan_clint_("local_plan", true),
-                                                        globalplan_clint_("global_plan", true),
-                                                        robot1_move_action_clint_("robot1_web/move_action", true),
-                                                        robot1_open_action_clint_("robot1_web/opening_action", true),
-                                                        robot1_shop_action_clint_("robot1_web/shop_action", true),
-                                                        robot2_move_action_clint_("robot2_web/move_action", true),
-                                                        robot2_open_action_clint_("robot2_web/opening_action", true),
-                                                        robot2_shop_action_clint_("robot2_web/shop_action", true),
-                                                        robot3_move_action_clint_("robot3_web/move_action", true),
-                                                        robot3_open_action_clint_("robot3_web/opening_action", true),
-                                                        robot3_shop_action_clint_("robot3_web/shop_action", true),
-                                                        robot4_move_action_clint_("robot4_web/move_action", true),
-                                                        robot4_shop_action_clint_("robot4_web/shop_action", true),
-                                                        robot4_open_action_clint_("robot4_web/opening_action", true)
+                                                        camera_action_clint_("shop/camera", true),
+                                                        detection_clint_("shop/detection", true),
+                                                        localplan_clint_("shop/local_plan", true),
+                                                        globalplan_clint_("shop/global_plan", true),
+                                                        robot1_move_action_clint_("shop/robot1/move_action", true),
+                                                        robot1_open_action_clint_("shop/robot1/opening_action", true),
+                                                        robot1_shop_action_clint_("shop/robot1/shop_action", true),
+                                                        robot2_move_action_clint_("shop/robot2/move_action", true),
+                                                        robot2_open_action_clint_("shop/robot2/opening_action", true),
+                                                        robot2_shop_action_clint_("shop/robot2/shop_action", true),
+                                                        robot3_move_action_clint_("shop/robot3/move_action", true),
+                                                        robot3_open_action_clint_("shop/robot3/opening_action", true),
+                                                        robot3_shop_action_clint_("shop/robot3/shop_action", true),
+                                                        robot4_move_action_clint_("shop/robot4/move_action", true),
+                                                        robot4_shop_action_clint_("shop/robot4/shop_action", true),
+                                                        robot4_open_action_clint_("shop/robot4/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
 
     camera_action_clint_.waitForServer();
     detection_clint_.waitForServer();
 
-    // localplan_clint_.waitForServer();
-    // globalplan_clint_.waitForServer();
+    localplan_clint_.waitForServer();
+    globalplan_clint_.waitForServer();
 
-    // robot1_move_action_clint_.waitForServer();
-    // robot1_open_action_clint_.waitForServer();
-    // robot1_shop_action_clint_.waitForServer();
-    // robot2_move_action_clint_.waitForServer();
-    // robot2_open_action_clint_.waitForServer();
-    // robot2_shop_action_clint_.waitForServer();
-    // robot3_move_action_clint_.waitForServer();
-    // robot3_open_action_clint_.waitForServer();
-    // robot3_shop_action_clint_.waitForServer();
+    robot1_move_action_clint_.waitForServer();
+    robot1_open_action_clint_.waitForServer();
+    robot1_shop_action_clint_.waitForServer();
+    robot2_move_action_clint_.waitForServer();
+    robot2_open_action_clint_.waitForServer();
+    robot2_shop_action_clint_.waitForServer();
+    robot3_move_action_clint_.waitForServer();
+    robot3_open_action_clint_.waitForServer();
+    robot3_shop_action_clint_.waitForServer();
     robot4_move_action_clint_.waitForServer();
     robot4_open_action_clint_.waitForServer();
     robot4_shop_action_clint_.waitForServer();
     ROS_INFO(" ALL Action server is started!");
 
-    robot1_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_read");
-    robot2_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_read");
-    robot3_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_read");
-    robot4_target_actionname_read_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_read");
+    robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
+    robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
+    robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
+    robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
 
-    robot1_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_read");
-    robot2_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_read");
-    robot3_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_read");
-    robot4_target_coordinate_read_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_read");
+    robot1_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_write");
+    robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
+    robot3_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
+    robot4_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_write");
     ROS_INFO("ALL Server is started!");
   }
 
   ~GoalAction() = default;
 
-  data::Coord GetTargetCoord(uint8_t robot_num)
+  void SetTargetCoord(uint8_t robot_num, data::Coord target_coord)
   {
     data::Coordinate srv;
-    data::Coord coord;
+    srv.request.x = target_coord.x;
+    srv.request.y = target_coord.y;
     switch (robot_num)
     {
     case 1:
-      robot1_target_coordinate_read_clt_.call(srv);
+      robot1_target_coordinate_write_clt_.call(srv);
       break;
     case 2:
-      robot2_target_coordinate_read_clt_.call(srv);
+      robot2_target_coordinate_write_clt_.call(srv);
       break;
     case 3:
-      robot3_target_coordinate_read_clt_.call(srv);
+      robot3_target_coordinate_wirte_clt_.call(srv);
       break;
     case 4:
-      robot4_target_coordinate_read_clt_.call(srv);
+      robot4_target_coordinate_wirte_clt_.call(srv);
       break;
     default:
       ROS_ERROR("no robot num in %s", __FUNCTION__);
-      coord.x = 10;
-      coord.y = 10;
-      coord.pose = 10;
-      return coord;
+      return;
       break;
     }
-    coord.x = srv.response.x;
-    coord.y = srv.response.y;
-    coord.pose = srv.response.pose;
-    return coord;
+    return;
   }
 
-  std::string GetTargetActionName(uint8_t robot_num)
+  void SetTargetActionName(uint8_t robot_num, std::string set_name)
   {
     data::ActionName srv;
+    srv.request.action_name = set_name;
+    srv.request.action_state = 3;
     switch (robot_num)
     {
     case 1:
-      robot1_target_actionname_read_clt_.call(srv);
+      robot1_target_actionname_write_clt_.call(srv);
       break;
     case 2:
-      robot2_target_actionname_read_clt_.call(srv);
+      robot2_target_actionname_write_clt_.call(srv);
       break;
     case 3:
-      robot3_target_actionname_read_clt_.call(srv);
+      robot3_target_actionname_write_clt_.call(srv);
       break;
     case 4:
-      robot4_target_actionname_read_clt_.call(srv);
+      robot4_target_actionname_write_clt_.call(srv);
       break;
     default:
       ROS_ERROR("no robot in %s ", __FUNCTION__);
-      return "NONE";
       break;
     }
-    return srv.response.action_name;
+    return;
   }
 
   //@brief 发送拍照目标
@@ -171,7 +167,8 @@ public:
     data::DetectionGoal goal;
     goal.image_num = image_num;
     detection_clint_.sendGoal(goal,
-                              DETECTION::SimpleDoneCallback(),
+                              // DETECTION::SimpleDoneCallback(),
+                              boost::bind(&GoalAction::DectionDoneCB, this, _1, _2),
                               DETECTION::SimpleActiveCallback(),
                               DETECTION::SimpleFeedbackCallback());
   }
@@ -194,8 +191,8 @@ public:
     data::GlobalPlanGoal goal;
     goal.do_flag = do_flag;
     globalplan_clint_.sendGoal(goal,
-                                // GLOBALPLANACTION::SimpleDoneCallback(),
-                               boost::bind(&GoalAction::GlobalPlanDoneCB, this, _1,_2),
+                               GLOBALPLANACTION::SimpleDoneCallback(),
+                               //  boost::bind(&GoalAction::GlobalPlanDoneCB, this, _1, _2),
                                GLOBALPLANACTION::SimpleActiveCallback(),
                                GLOBALPLANACTION::SimpleFeedbackCallback());
   }
@@ -638,44 +635,56 @@ private:
   OPENINGCLINT robot4_open_action_clint_;
 
   //server client
-  ros::ServiceClient robot1_target_actionname_read_clt_;
-  ros::ServiceClient robot2_target_actionname_read_clt_;
-  ros::ServiceClient robot3_target_actionname_read_clt_;
-  ros::ServiceClient robot4_target_actionname_read_clt_;
-  ros::ServiceClient robot1_target_coordinate_read_clt_;
-  ros::ServiceClient robot2_target_coordinate_read_clt_;
-  ros::ServiceClient robot3_target_coordinate_read_clt_;
-  ros::ServiceClient robot4_target_coordinate_read_clt_;
+  ros::ServiceClient robot1_target_actionname_write_clt_;
+  ros::ServiceClient robot2_target_actionname_write_clt_;
+  ros::ServiceClient robot3_target_actionname_write_clt_;
+  ros::ServiceClient robot4_target_actionname_write_clt_;
+  ros::ServiceClient robot1_target_coordinate_write_clt_;
+  ros::ServiceClient robot2_target_coordinate_write_clt_;
+  ros::ServiceClient robot3_target_coordinate_wirte_clt_;
+  ros::ServiceClient robot4_target_coordinate_wirte_clt_;
 
-  void GlobalPlanDoneCB(const actionlib::SimpleClientGoalState &state,const data::GlobalPlanResult::ConstPtr &result)
+  // void GlobalPlanDoneCB(const actionlib::SimpleClientGoalState &state, const data::GlobalPlanResult::ConstPtr &result)
+  // {
+  //   data::Coord coord;
+  //   coord.x = result->robot1_coord[0];
+  //   coord.y = result->robot1_coord[1];
+  //   coord.pose = result->robot1_coord[2];
+  //   // private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
+
+  //   coord.x = result->robot2_coord[0];
+  //   coord.y = result->robot2_coord[1];
+  //   coord.pose = result->robot2_coord[2];
+  //   // private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
+
+  //   coord.x = result->robot3_coord[0];
+  //   coord.y = result->robot3_coord[1];
+  //   coord.pose = result->robot3_coord[2];
+  //   // private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
+
+  //   coord.x = result->robot4_coord[0];
+  //   coord.y = result->robot4_coord[1];
+  //   coord.pose = result->robot4_coord[2];
+  //   // private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
+  // }
+
+  void DectionDoneCB(const actionlib::SimpleClientGoalState &state, const data::DetectionResult::ConstPtr &result)
   {
-    data::Coord coord;
-    coord.x = result->robot1_coord[0];
-    coord.y = result->robot1_coord[1];
-    coord.pose = result->robot1_coord[2];
-    // private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
-
-    coord.x = result->robot2_coord[0];
-    coord.y = result->robot2_coord[1];
-    coord.pose = result->robot2_coord[2];
-    // private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
-
-    coord.x = result->robot3_coord[0];
-    coord.y = result->robot3_coord[1];
-    coord.pose = result->robot3_coord[2];
-    // private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
-
-    coord.x = result->robot4_coord[0];
-    coord.y = result->robot4_coord[1];
-    coord.pose = result->robot4_coord[2];
-    // private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
+    if (result->success_flag)
+    {
+      private_blackboard_ptr_->SetBoolValue(false,"opening_flag");
+      ROS_ERROR("IN HERE");
+    }
+    
   }
 
-  void OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)
+  void
+  OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)
   {
     if (feedback->begin_flag == true)
     {
       private_blackboard_ptr_->SetBoolValue(true, "robot2_opening_flag");
+      ROS_WARN("IN HERE");
     }
   }
 
@@ -683,7 +692,8 @@ private:
   {
     if (feedback->begin_flag == true)
     {
-      private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
+      private_blackboard_ptr_->SetBoolValue(true, "robot3_opening_flag");
+      ROS_WARN("IN HERE");
     }
   }
 
@@ -692,10 +702,9 @@ private:
     if (feedback->begin_flag == true)
     {
       private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
+      ROS_WARN("IN HERE");
     }
   }
-
-
 };
 
 } // namespace decision

@@ -10,7 +10,7 @@ from data.msg import CameraGoal
 
 if __name__ == '__main__':
     rospy.init_node('camera_test_client')
-    client = actionlib.SimpleActionClient('camera_action_server', CameraAction)
+    client = actionlib.SimpleActionClient('shop/camera', CameraAction)
     client.wait_for_server()
     goal = CameraGoal
     goal.number = 1

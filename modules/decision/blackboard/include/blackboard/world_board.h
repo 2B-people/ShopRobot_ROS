@@ -18,14 +18,15 @@
 #include <data/Coord.h>
 #include <data/RoadblockMsg.h>
 #include <data/Barrier.h>
+#include <data/Photo.h>
 
+#include <data/PhotoSrv.h>
 #include <data/SetBool.h>
 #include <data/Goods.h>
 #include <data/ActionName.h>
 #include <data/Roadblock.h>
 #include <data/Coordinate.h>
 #include <data/ShelfBarrier.h>
-
 
 namespace shop
 {
@@ -38,7 +39,6 @@ public:
   ~WorldBoard();
   void Run();
 
-
 private:
   ros::NodeHandle nh_;
 
@@ -46,6 +46,8 @@ private:
   // 货物
   ros::Publisher goods_pub_;
   ros::Publisher roadblock_pub_;
+
+  ros::Publisher photo_number_pub_;
 
   //最终坐标
   ros::Publisher robot1_target_coord_pub_;
@@ -65,8 +67,9 @@ private:
   ros::Publisher c_shelf_barrier_pub_;
   ros::Publisher d_shelf_barrier_pub_;
 
-
   //server 服务
+
+  ros::ServiceServer photo_number_write_srv_;
   // 货物
   ros::ServiceServer goods_write_srv_;
   // ros::ServiceServer goods_read_srv_;
@@ -104,6 +107,8 @@ private:
 
   bool is_debug_;
 
+  bool PhotoNumWirteCB(data::PhotoSrv::Request &req, data::PhotoSrv::Response &res);
+
   //货物读写服务
   bool GoodsWirteCB(data::Goods::Request &req, data::Goods::Response &res);
   // bool GoodsReadCB(data::Goods::Request &req, data::Goods::Response &res);
@@ -132,12 +137,12 @@ private:
   bool TargetActionNameWriteCB3(data::ActionName::Request &req, data::ActionName::Response &res);
   bool TargetActionNameWriteCB4(data::ActionName::Request &req, data::ActionName::Response &res);
 
-  // 重构为topic  
+  // 重构为topic
   // bool TargetActionNameReadCB1(data::ActionName::Request &req, data::ActionName::Response &res);
   // bool TargetActionNameReadCB2(data::ActionName::Request &req, data::ActionName::Response &res);
   // bool TargetActionNameReadCB3(data::ActionName::Request &req, data::ActionName::Response &res);
   // bool TargetActionNameReadCB4(data::ActionName::Request &req, data::ActionName::Response &res);
-  
+
   //货架障碍物读写服务
   bool AshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);
   bool BshelfWirteCB(data::ShelfBarrier::Request &req, data::ShelfBarrier::Response &res);

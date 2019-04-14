@@ -76,18 +76,23 @@ class GlobalPlan : public GlobalBase
         }
     }
 
-    queue<Coord> RecordShortestPath(int x, int y, Coord begin, Coord map_path[num_x][num_y])
+    queue<Coord> RecordShortestPath(Coord end, Coord begin, Coord map_path[num_x][num_y])
     {
         queue<Coord> que;
-
-        if (x == begin.first && y == begin.second)
+        if (end.first == begin.first && end.second == begin.second)
         {
+            ROS_WARN("FINALLLLLLLLLLLL");
             que.push(begin);
             return que;
         }
-
+        // ROS_WARN("END:%d, %d", end.first, end.second);
+        // ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
+        int x = end.first, y = end.second;
         Coord local = map_path[x][y];
-        que = RecordShortestPath(local.first, local.second, begin, map_path);
+        // ROS_WARN("LOCAL1:%d, %d", local.first, local.second);
+        local = map_path[end.first][end.first];
+        // ROS_WARN("LOCAL2:%d, %d", local.first, local.second);
+        que = RecordShortestPath(local, begin, map_path);
         que.push(local);
         return que;
     }
@@ -128,17 +133,19 @@ class GlobalPlan : public GlobalBase
         {
             Coord local = que.front();
             que.pop();
-
+            ROS_WARN("START:%d, %d", local.first, local.second);
             int i = 0;
-            for (int i = 0; i < 4; i++)
+            for (i = 0; i < 4; i++)
             {
                 int temp_x = local.first + move_x[i];
                 int temp_y = local.second + move_y[i];
-
+                ROS_WARN("$$$:%d, %d", temp_x, temp_y);
                 if (0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
                 {
-                    que.push(Coord(temp_x, temp_y));
+                    ROS_WARN("&&&:%d, %d", temp_x, temp_y);
+                    que.push(Coord(temp_x, temp_y)); 
                     map_path[temp_x][temp_y] = local;
+                    ROS_INFO("MAP_PATH:%d, %d", map_path[temp_x][temp_y].first, map_path[temp_x][temp_y].second);
                     map[temp_x][temp_y] = 1;
                     if (temp_x == end.first && temp_y == end.second)
                         break;
@@ -148,7 +155,14 @@ class GlobalPlan : public GlobalBase
                 break;
         }
 
-        path = RecordShortestPath(end.first, end.second, begin, map_path);
+        ROS_WARN("kaishijilvlujing");
+        ROS_WARN("END:%d, %d", end.first, end.second);
+        ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
+        int x = end.first, y = end.second;
+        Coord local = map_path[x][y];
+        ROS_WARN("LOCAL:%d, %d", local.first, local.second);
+        ROS_WARN("BBBBB:%d, %d", map_path[begin.first][begin.second].first, map_path[begin.first][begin.second].second);
+        path = RecordShortestPath(end, begin, map_path);
         return path;
     }
 
@@ -263,8 +277,11 @@ class GlobalPlan : public GlobalBase
             queue<Coord> path_1, path_2, path_3, path_4;
 
             ROS_INFO("XXXXX");
-            if(end_1.x != 10 && end_1.y != 10) 
+            if(end_1.x != 10 && end_1.y != 10)
+            {
+                ROS_WARN("TTTTTT");
                 path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
+            } 
             ROS_WARN("path_1 of size:%d", path_1.size());
             if(end_2.x != 10 && end_2.y != 10)
                 path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));

@@ -25,7 +25,8 @@ enum class BehaviorType
     ACTION,       //动作
     PRECONDITION, //初始
     CYCLE,        //循环
-    SUCCESSDO     //子节点成功执行
+    SUCCESSDO,    //子节点成功执行
+    WHILE
 };
 
 //节点运行状态
@@ -54,7 +55,7 @@ enum class AbortType
 
 class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 {
-  public:
+public:
     typedef std::shared_ptr<BehaviorNode> Ptr;
 
     BehaviorNode(std::string name, BehaviorType behavior_type,
@@ -108,7 +109,7 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
         parent_node_ptr_ = parent_node_ptr;
     }
 
-  protected:
+protected:
     std::string name_;
     //类型
     BehaviorType behavior_type_;
@@ -131,13 +132,13 @@ class BehaviorNode : public std::enable_shared_from_this<BehaviorNode>
 // @brief 为虚类,被继承
 class ActionNode : public BehaviorNode
 {
-  public:
+public:
     ActionNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, BehaviorType::ACTION, blackboard_ptr)
     {
     }
     ~ActionNode() = default;
 
-  protected:
+protected:
     virtual void OnInitialize() = 0;
     virtual BehaviorState Update() = 0;
     virtual void OnTerminate(BehaviorState state) = 0;
@@ -152,7 +153,7 @@ class ActionNode : public BehaviorNode
 //装饰即是在子节点的原有逻辑上增添细节(如重复执行子节点，改变子节点返回状态等)
 class DecoratorNode : public BehaviorNode
 {
-  public:
+public:
     DecoratorNode(std::string name, BehaviorType behavior_type, const PrivateBoard::Ptr &blackboard_ptr,
                   const BehaviorNode::Ptr &child_node_ptr = nullptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
                                                                        child_node_ptr_(child_node_ptr) {}
@@ -166,7 +167,7 @@ class DecoratorNode : public BehaviorNode
         child_node_ptr->SetParent(shared_from_this());
     }
 
-  protected:
+protected:
     BehaviorNode::Ptr child_node_ptr_;
 
     virtual void OnInitialize() = 0;
@@ -176,7 +177,7 @@ class DecoratorNode : public BehaviorNode
 
 class SuccessDoNode : public DecoratorNode
 {
-  public:
+public:
     SuccessDoNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
                   const BehaviorNode::Ptr &child_node_ptr = nullptr,
                   std::function<bool()> precondition_function = std::function<bool()>())
@@ -186,7 +187,7 @@ class SuccessDoNode : public DecoratorNode
     }
     virtual ~SuccessDoNode() = default;
 
-  protected:
+protected:
     std::function<bool()> precondition_function_;
     virtual void OnInitialize()
     {
@@ -243,7 +244,7 @@ class SuccessDoNode : public DecoratorNode
 
 class CycleNode : public DecoratorNode
 {
-  public:
+public:
     CycleNode(uint8_t cycle_num, std::string name, const PrivateBoard::Ptr &blackboard_ptr,
               const BehaviorNode::Ptr &child_node_ptr = nullptr)
         : DecoratorNode(name, BehaviorType::CYCLE, blackboard_ptr, child_node_ptr),
@@ -252,7 +253,7 @@ class CycleNode : public DecoratorNode
     }
     virtual ~CycleNode() = default;
 
-  protected:
+protected:
     uint8_t cycle_num_;
     uint8_t count_;
     virtual void OnInitialize()
@@ -307,7 +308,7 @@ class CycleNode : public DecoratorNode
         }
     }
 
-  private:
+private:
 };
 
 // @brief 构造器
@@ -329,7 +330,7 @@ class CycleNode : public DecoratorNode
 //         abort_type: 节点属性
 class PreconditionNode : public DecoratorNode
 {
-  public:
+public:
     PreconditionNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr,
                      const BehaviorNode::Ptr &child_node_ptr = nullptr,
                      std::function<bool()> precondition_function = std::function<bool()>(),
@@ -344,7 +345,7 @@ class PreconditionNode : public DecoratorNode
         return abort_type_;
     }
 
-  protected:
+protected:
     //new 保护措施
     //传一个判断函数进来,可以理解为函数指针
     std::function<bool()> precondition_function_;
@@ -407,7 +408,7 @@ class PreconditionNode : public DecoratorNode
 //复合节点，及一个节点可以有多个子节点
 class CompositeNode : public BehaviorNode
 {
-  public:
+public:
     CompositeNode(std::string name, BehaviorType behavior_type, const PrivateBoard::Ptr &blackboard_ptr) : BehaviorNode::BehaviorNode(name, behavior_type, blackboard_ptr),
                                                                                                            children_node_index_(0)
     {
@@ -444,7 +445,7 @@ class CompositeNode : public BehaviorNode
         return children_node_ptr_.size();
     }
 
-  protected:
+protected:
     //子节点指针向量容器
     std::vector<BehaviorNode::Ptr> children_node_ptr_;
     unsigned int children_node_index_;
@@ -458,7 +459,7 @@ class CompositeNode : public BehaviorNode
 // 选择子节点的某一个执行
 class SelectorNode : public CompositeNode
 {
-  public:
+public:
     SelectorNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr) : CompositeNode::CompositeNode(name, BehaviorType::SELECTOR, blackboard_ptr)
     {
     }
@@ -488,7 +489,7 @@ class SelectorNode : public CompositeNode
         children_node_index_ = children_node_index;
     }
 
-  protected:
+protected:
     std::vector<bool> children_node_reevaluation_;
 
     virtual void OnInitialize()
@@ -518,7 +519,7 @@ class SelectorNode : public CompositeNode
                     {
                         return state;
                     }
-                    
+
                     ++children_node_index_;
                     break;
                 }
@@ -564,18 +565,18 @@ class SelectorNode : public CompositeNode
 // 将其所有子节点依次执行，也就是说当前一个返回“完成”状态后，再运行先一个子节点
 class SequenceNode : public CompositeNode
 {
-  public:
+public:
     SequenceNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr)
         : CompositeNode::CompositeNode(name, BehaviorType::SEQUENCE, blackboard_ptr)
     {
     }
     virtual ~SequenceNode() = default;
 
-  protected:
+protected:
     virtual void OnInitialize()
     {
-        children_node_index_ = 0;
         ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
+        children_node_index_ = 0;
     }
 
     virtual BehaviorState Update()
@@ -628,26 +629,28 @@ class SequenceNode : public CompositeNode
 // 将其所有子节点都运行一遍
 class ParallelNode : public CompositeNode
 {
-  public:
+public:
     ParallelNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr, unsigned int threshold)
         : CompositeNode::CompositeNode(name, BehaviorType::PARALLEL, blackboard_ptr),
           threshold_(threshold), success_count_(0),
-          failure_count_(0)
+          failure_count_(0), failure_index_(0)
     {
     }
     virtual ~ParallelNode() = default;
 
-  protected:
+protected:
     //成员变量
     std::vector<bool> children_node_done_;
     unsigned int success_count_;
     unsigned int failure_count_;
     unsigned int threshold_;
+    unsigned int failure_index_;
     //function
     virtual void OnInitialize()
     {
         failure_count_ = 0;
         success_count_ = 0;
+        failure_index_ = 0;
         //复位
         children_node_done_.clear();
         children_node_done_.resize(children_node_ptr_.size(), false);
@@ -681,8 +684,9 @@ class ParallelNode : public CompositeNode
                     children_node_done_.at(index) = true;
                     //只有当失败节点数量大于
                     if (++failure_count_ >= children_node_ptr_.size() - threshold_)
-                    //0 
+                    //0
                     {
+                        failure_index_ = index;
                         return BehaviorState::FAILURE;
                     }
                 }
@@ -708,10 +712,82 @@ class ParallelNode : public CompositeNode
             ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
             return;
         }
-        // for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
-        // {
-        //     children_node_ptr_.at(index)->Reset();
-        // }
+        for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
+        {
+            children_node_ptr_.at(index)->Reset();
+        }
+    }
+};
+
+// 平行运行节点
+// 将其所有子节点都运行一遍
+class WhileNode : public CompositeNode
+{
+public:
+    WhileNode(std::string name, const PrivateBoard::Ptr &blackboard_ptr)
+        : CompositeNode::CompositeNode(name, BehaviorType::WHILE, blackboard_ptr),
+          threshold_(0), success_count_(0),
+          failure_count_(0), failure_index_(0)
+    {
+    }
+    virtual ~WhileNode() = default;
+
+protected:
+    //成员变量
+    std::vector<bool> children_node_done_;
+    unsigned int success_count_;
+    unsigned int failure_count_;
+    unsigned int threshold_;
+    unsigned int failure_index_;
+    //function
+    virtual void OnInitialize()
+    {
+        failure_count_ = 0;
+        success_count_ = 0;
+        failure_index_ = 0;
+        //复位
+        children_node_done_.clear();
+        children_node_done_.resize(children_node_ptr_.size(), false);
+        ROS_INFO("%s %s", name_.c_str(), __FUNCTION__);
+    }
+    virtual BehaviorState Update()
+    {
+        if (children_node_ptr_.size() == 0)
+        {
+            return BehaviorState::SUCCESS;
+        }
+
+        for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
+        {
+            if (children_node_done_.at(index) == false)
+            {
+                BehaviorState state = children_node_ptr_.at(index)->Run();
+            }
+        }
+        return BehaviorState::RUNNING;
+    }
+    virtual void OnTerminate(BehaviorState state)
+    {
+        switch (state)
+        {
+        case BehaviorState::IDLE:
+            ROS_INFO("%s %s is IDLE", name_.c_str(), __FUNCTION__);
+            break;
+        case BehaviorState::SUCCESS:
+            ROS_INFO("%s %s is SUCCESS", name_.c_str(), __FUNCTION__);
+            break;
+        case BehaviorState::FAILURE:
+            ROS_INFO("%s %s is FAILURE", name_.c_str(), __FUNCTION__);
+            ;
+            break;
+        default:
+            ROS_ERROR("%s %s ERROR", name_.c_str(), __FUNCTION__);
+            return;
+        }
+        for (unsigned int index = 0; index != children_node_ptr_.size(); index++)
+        {
+            children_node_ptr_.at(index)->Reset();
+        }
     }
 };
 

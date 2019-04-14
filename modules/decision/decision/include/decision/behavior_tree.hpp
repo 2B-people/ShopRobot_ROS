@@ -30,7 +30,7 @@ class BehaviorTree
         ros::Rate	r(2);	//10HZ
         while (ros::ok)
         {
-            // r.sleep();
+            r.sleep();
             if (running_)
             {
                 ros::spinOnce();
