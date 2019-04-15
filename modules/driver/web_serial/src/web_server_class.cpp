@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-14 15:17:44
+ * @LastEditTime: 2019-04-15 13:31:56
  */
 #include <web_serial/web_server_class.h>
 
@@ -206,7 +206,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
     if (goal->pose == 1)
     {
-        if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
+
+        if (cmd_coord_.x == 10 || cmd_coord_.y == 10||(now_coord_.x == target_coord_.x && now_coord_.y == target_coord_.y))
         {
             result.success_flag = false;
             move_as_.setPreempted(result);
@@ -336,12 +337,12 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
 
-    ROS_INFO("%s is write action", name_.c_str());
+    ROS_WARN("%s is write action", name_.c_str());
 
     //判断目标的是否能用
     if (target_action_.action_state == 0)
     {
-        ROS_INFO("action state is 0");
+        ROS_WARN("action state is 0");
         result.success_flag = false;
         action_as_.setPreempted(result);
         return;

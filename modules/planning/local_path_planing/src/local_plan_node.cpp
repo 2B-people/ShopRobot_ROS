@@ -20,7 +20,7 @@ typedef pair<int, int> Coord;
 class LocalPlan : public LocalBase
 {
 
-  public:
+public:
     LocalPlan(std::string name)
         : LocalBase::LocalBase(name), INF(999)
     {
@@ -465,7 +465,6 @@ class LocalPlan : public LocalBase
 
             distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
-
             while (que.size())
             {
                 // ROS_INFO("in there");
@@ -499,7 +498,7 @@ class LocalPlan : public LocalBase
                 if (j != 4)
                     break;
             }
-            if(temp_final_distance < final_distance)
+            if (temp_final_distance < final_distance)
             {
                 final_distance = temp_final_distance;
                 final_x = temp_final_x;
@@ -511,7 +510,6 @@ class LocalPlan : public LocalBase
         }
         // ROS_WARN("XXXX:%d", final_distance);
         // ROS_WARN("OOOO:%d, %d", final_x, final_y);
-
         if (is_debug_)
         {
             ROS_INFO("final_x:%d final_y:%d goal_shelf:%d final_action:%d", final_x, final_y, goal_shelf, final_action);
@@ -530,7 +528,7 @@ class LocalPlan : public LocalBase
         vector<int> determined_location;
         vector<int> determined_category;
         int temp_category;
-        int final_x, final_y, final_category, final_location, final_distance=999;
+        int final_x, final_y, final_category, final_location, final_distance = 999;
 
         int index = 0;
         for (int i = 0; i < 12; i++)
@@ -614,7 +612,7 @@ class LocalPlan : public LocalBase
             // ROS_WARN("now_coord is 10 10 is err");
             return;
         }
-        
+
         // ROS_INFO("local plan x:%d y:%d",now_coord.x,now_coord.y);
 
         for (int i = 0; i < determined_coord.size(); i++)
@@ -651,7 +649,7 @@ class LocalPlan : public LocalBase
 
             distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
-            if(now_coord.x == end_x && now_coord.y == end_y)
+            if (now_coord.x == end_x && now_coord.y == end_y)
             {
                 final_x = end_x;
                 final_y = end_y;
@@ -682,7 +680,7 @@ class LocalPlan : public LocalBase
                         {
                             if (distance[end_x][end_y] < temp_final_distance)
                             {
-                                
+
                                 temp_final_distance = distance[end_x][end_y];
                                 temp_final_x = end_x;
                                 temp_final_y = end_y;
@@ -696,7 +694,7 @@ class LocalPlan : public LocalBase
                 if (j != 4)
                     break;
             }
-            if(temp_final_distance < final_distance)
+            if (temp_final_distance < final_distance)
             {
                 final_x = temp_final_x;
                 final_y = temp_final_y;
@@ -725,10 +723,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "P-1");
+                    SetRobotTargetAction(robot_num, "P-1", 2);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "P-2");
+                    SetRobotTargetAction(robot_num, "P-2", 2);
                     break;
                 default:
                     break;
@@ -740,10 +738,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "P-1");
+                    SetRobotTargetAction(robot_num, "P-1", 2);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "P-2");
+                    SetRobotTargetAction(robot_num, "P-2", 2);
                     break;
                 default:
                     break;
@@ -755,10 +753,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "P-1");
+                    SetRobotTargetAction(robot_num, "P-1", 2);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "P-2");
+                    SetRobotTargetAction(robot_num, "P-2", 2);
                     break;
                 default:
                     break;
@@ -770,10 +768,10 @@ class LocalPlan : public LocalBase
                 switch (final_action)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "P-1");
+                    SetRobotTargetAction(robot_num, "P-1", 2);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "P-2");
+                    SetRobotTargetAction(robot_num, "P-2", 2);
                     break;
                 default:
                     break;
@@ -791,40 +789,40 @@ class LocalPlan : public LocalBase
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1");
+                    SetRobotTargetAction(robot_num, "C-1", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2");
+                    SetRobotTargetAction(robot_num, "C-2", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3");
+                    SetRobotTargetAction(robot_num, "C-3", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4");
+                    SetRobotTargetAction(robot_num, "C-4", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5");
+                    SetRobotTargetAction(robot_num, "C-5", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6");
+                    SetRobotTargetAction(robot_num, "C-6", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7");
+                    SetRobotTargetAction(robot_num, "C-7", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8");
+                    SetRobotTargetAction(robot_num, "C-8", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9");
+                    SetRobotTargetAction(robot_num, "C-9", 1);
                     break;
                 case 10:
-                    SetRobotTargetAction(robot_num, "C-10");
+                    SetRobotTargetAction(robot_num, "C-10", 1);
                     break;
                 case 11:
-                    SetRobotTargetAction(robot_num, "C-11");
+                    SetRobotTargetAction(robot_num, "C-11", 1);
                     break;
                 case 12:
-                    SetRobotTargetAction(robot_num, "C-12");
+                    SetRobotTargetAction(robot_num, "C-12", 1);
                     break;
                 default:
                     break;
@@ -838,40 +836,40 @@ class LocalPlan : public LocalBase
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1");
+                    SetRobotTargetAction(robot_num, "C-1", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2");
+                    SetRobotTargetAction(robot_num, "C-2", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3");
+                    SetRobotTargetAction(robot_num, "C-3", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4");
+                    SetRobotTargetAction(robot_num, "C-4", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5");
+                    SetRobotTargetAction(robot_num, "C-5", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6");
+                    SetRobotTargetAction(robot_num, "C-6", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7");
+                    SetRobotTargetAction(robot_num, "C-7", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8");
+                    SetRobotTargetAction(robot_num, "C-8", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9");
+                    SetRobotTargetAction(robot_num, "C-9", 1);
                     break;
                 case 10:
-                    SetRobotTargetAction(robot_num, "C-10");
+                    SetRobotTargetAction(robot_num, "C-10", 1);
                     break;
                 case 11:
-                    SetRobotTargetAction(robot_num, "C-11");
+                    SetRobotTargetAction(robot_num, "C-11", 1);
                     break;
                 case 12:
-                    SetRobotTargetAction(robot_num, "C-12");
+                    SetRobotTargetAction(robot_num, "C-12", 1);
                     break;
                 default:
                     break;
@@ -885,40 +883,40 @@ class LocalPlan : public LocalBase
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1");
+                    SetRobotTargetAction(robot_num, "C-1", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2");
+                    SetRobotTargetAction(robot_num, "C-2", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3");
+                    SetRobotTargetAction(robot_num, "C-3", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4");
+                    SetRobotTargetAction(robot_num, "C-4", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5");
+                    SetRobotTargetAction(robot_num, "C-5", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6");
+                    SetRobotTargetAction(robot_num, "C-6", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7");
+                    SetRobotTargetAction(robot_num, "C-7", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8");
+                    SetRobotTargetAction(robot_num, "C-8", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9");
+                    SetRobotTargetAction(robot_num, "C-9", 1);
                     break;
                 case 10:
-                    SetRobotTargetAction(robot_num, "C-10");
+                    SetRobotTargetAction(robot_num, "C-10", 1);
                     break;
                 case 11:
-                    SetRobotTargetAction(robot_num, "C-11");
+                    SetRobotTargetAction(robot_num, "C-11", 1);
                     break;
                 case 12:
-                    SetRobotTargetAction(robot_num, "C-12");
+                    SetRobotTargetAction(robot_num, "C-12", 1);
                     break;
                 default:
                     break;
@@ -932,40 +930,40 @@ class LocalPlan : public LocalBase
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1");
+                    SetRobotTargetAction(robot_num, "C-1", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2");
+                    SetRobotTargetAction(robot_num, "C-2", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3");
+                    SetRobotTargetAction(robot_num, "C-3", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4");
+                    SetRobotTargetAction(robot_num, "C-4", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5");
+                    SetRobotTargetAction(robot_num, "C-5", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6");
+                    SetRobotTargetAction(robot_num, "C-6", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7");
+                    SetRobotTargetAction(robot_num, "C-7", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8");
+                    SetRobotTargetAction(robot_num, "C-8", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9");
+                    SetRobotTargetAction(robot_num, "C-9", 1);
                     break;
                 case 10:
-                    SetRobotTargetAction(robot_num, "C-10");
+                    SetRobotTargetAction(robot_num, "C-10", 1);
                     break;
                 case 11:
-                    SetRobotTargetAction(robot_num, "C-11");
+                    SetRobotTargetAction(robot_num, "C-11", 1);
                     break;
                 case 12:
-                    SetRobotTargetAction(robot_num, "C-12");
+                    SetRobotTargetAction(robot_num, "C-12", 1);
                     break;
                 default:
                     break;
@@ -1007,7 +1005,7 @@ class LocalPlan : public LocalBase
         }
     }
 
-  private:
+private:
     const int INF;
     int move_x_[4], move_y_[4];
 };

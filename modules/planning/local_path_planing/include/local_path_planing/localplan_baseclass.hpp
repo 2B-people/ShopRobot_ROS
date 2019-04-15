@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-04-12 00:43:44
+ * @LastEditTime: 2019-04-14 20:34:59
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -349,7 +349,8 @@ public:
     srv.request.number = robot_num;
     srv.request.x = x;
     srv.request.y = y;
-    srv.request.pose = pose;
+    srv.request.pose = 10;
+    ROS_WARN("robot%d setx:%d,sety:%d",robot_num,x,y);
     target_coordinate_lock_clt_.call(srv);
     switch (robot_num)
     {
@@ -491,11 +492,12 @@ public:
     }
   }
 
-  void SetRobotTargetAction(int8_t robot_num, std::string action_name)
+  void SetRobotTargetAction(int8_t robot_num, std::string action_name,int8_t action_state)
   {
     data::ActionName srv;
     srv.request.action_name = action_name;
-    ROS_INFO("%d is set %s", robot_num, action_name.c_str());
+    srv.request.action_state = action_state;
+    ROS_WARN("%d is set %s", robot_num, action_name.c_str());
     switch (robot_num)
     {
     case 1:
