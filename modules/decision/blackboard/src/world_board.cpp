@@ -16,9 +16,9 @@ WorldBoard::WorldBoard(std::string name)
     auto robot4_target_coordinate_dir_ptr = std::make_shared<CoordinateDir>(10, 10, 10);
 
     //目标动作
-    auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
-    auto robot2_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
-    auto robot3_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
+    auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
+    auto robot2_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
+    auto robot3_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
     auto robot4_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
 
     //货架障碍物
@@ -70,6 +70,7 @@ WorldBoard::WorldBoard(std::string name)
     robot2_target_actionname_write_srv_ = nh_.advertiseService("shop/robot2/target_actionname_write", &WorldBoard::TargetActionNameWriteCB2, this);
     robot3_target_actionname_write_srv_ = nh_.advertiseService("shop/robot3/target_actionname_write", &WorldBoard::TargetActionNameWriteCB3, this);
     robot4_target_actionname_write_srv_ = nh_.advertiseService("shop/robot4/target_actionname_write", &WorldBoard::TargetActionNameWriteCB4, this);
+
     robot1_target_action_pub_ = nh_.advertise<data::Action>("shop/robot1/target_action", 1);
     robot2_target_action_pub_ = nh_.advertise<data::Action>("shop/robot2/target_action", 1);
     robot3_target_action_pub_ = nh_.advertise<data::Action>("shop/robot3/target_action", 1);
@@ -171,7 +172,6 @@ void WorldBoard::Run()
         coord.x = robot3_coordinate_dir_ptr->GetCoordinateX();
         coord.y = robot3_coordinate_dir_ptr->GetCoordinateY();
         robot3_target_coord_pub_.publish(coord);
-
 
         // 广播action
         action.name = robot1_action_dir_ptr->GetActionName();
@@ -469,9 +469,9 @@ bool WorldBoard::TargetActionNameWriteCB1(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot1_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name, req.action_state,req.is_action);
+    action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
     ROS_INFO("robot1 target action is %s", req.action_name.c_str());
-    res.success_flag;
+    res.success_flag = true;
     return true;
 }
 
@@ -480,9 +480,9 @@ bool WorldBoard::TargetActionNameWriteCB2(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot2_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name, req.action_state,req.is_action);
+    action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
     ROS_INFO("robot2 target action is %s state is %d", req.action_name.c_str(), req.action_state);
-    res.success_flag;
+    res.success_flag = true;
     return true;
 }
 bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::ActionName::Response &res)
@@ -490,9 +490,9 @@ bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot3_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name, req.action_state,req.is_action);
+    action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
     ROS_INFO("robot3 target action is %s", req.action_name.c_str());
-    res.success_flag;
+    res.success_flag = true;
     return true;
 }
 bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::ActionName::Response &res)
@@ -500,9 +500,9 @@ bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::
     auto middle_dirbase_ptr = GetDirPtr("robot4_target_actionname");
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
-    action_dir_ptr->Set(req.action_name, req.action_state,req.is_action);
+    action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
     ROS_INFO("robot4 target action is %s", req.action_name.c_str());
-    res.success_flag;
+    res.success_flag = true;
     return true;
 }
 

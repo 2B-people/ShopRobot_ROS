@@ -499,6 +499,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(5); //10HZ
+    r.sleep();
+    return;
   }
 
   GoalAction::Ptr goalaction_ptr_;
