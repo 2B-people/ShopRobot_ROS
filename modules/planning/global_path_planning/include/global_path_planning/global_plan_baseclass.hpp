@@ -98,16 +98,18 @@ public:
 
     if (goal->do_flag == true)
     {
-      ROS_WARN("in here");
+      ROS_WARN("global plan is run");
       RobotGlobalPlanning();
       auto robot1_coord = GetFinalCoord(1);
-      auto robot2_coord = GetFinalCoord(2);
-      auto robot3_coord = GetFinalCoord(3);
       auto robot4_coord = GetFinalCoord(4);
       robot1_cmd_coord_pub_.publish(robot1_coord);
-      robot2_cmd_coord_pub_.publish(robot2_coord);
-      robot3_cmd_coord_pub_.publish(robot3_coord);
       robot4_cmd_coord_pub_.publish(robot4_coord);
+
+      // four车方案
+      // auto robot2_coord = GetFinalCoord(2);
+      // auto robot3_coord = GetFinalCoord(3);
+      // robot2_cmd_coord_pub_.publish(robot2_coord);
+      // robot3_cmd_coord_pub_.publish(robot3_coord);
     }
     else
     {

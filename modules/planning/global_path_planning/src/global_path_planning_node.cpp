@@ -191,16 +191,16 @@ class GlobalPlan : public GlobalBase
 
         if(end_1.x != 10 && end_1.y != 10)
             path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
-        ROS_WARN("path_1 of size:%d", path_1.size());
+        ROS_WARN("path_1 of size:%d", (int)path_1.size());
         if(end_2.x != 10 && end_2.y != 10)
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
-        ROS_WARN("path_2 of size:%d", path_2.size());
+        ROS_WARN("path_2 of size:%d", (int)path_2.size());
         if(end_3.x != 10 && end_3.y != 10)
             path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
-        ROS_WARN("path_3 of size:%d", path_3.size());
+        ROS_WARN("path_3 of size:%d", (int)path_3.size());
         if(end_4.x != 10 && end_4.y != 10)
             path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
-        ROS_WARN("path_4 of size:%d", path_4.size());
+        ROS_WARN("path_4 of size:%d", (int)path_4.size());
         queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
 
         while (temp_path_1.size())

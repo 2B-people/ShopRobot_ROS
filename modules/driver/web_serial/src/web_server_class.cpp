@@ -1,9 +1,16 @@
 /*
  * @Description: In User Settings Edit
  * @Author: your name
+ * @LastEditors: your name
+ * @Date: 2019-04-17 16:22:43
+ * @LastEditTime: 2019-04-17 16:22:51
+ */
+/*
+ * @Description: In User Settings Edit
+ * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-16 19:24:47
+ * @LastEditTime: 2019-04-17 16:22:52
  */
 #include <web_serial/web_server_class.h>
 
@@ -177,8 +184,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     //结果
     data::MoveResult result;
 
-    ROS_INFO("%s is write move", name_.c_str());
-
     //目标转化为string在发下去
     // coord_goal.x = goal->x;
     // coord_goal.y = goal->y;
@@ -189,6 +194,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
         if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
         {
+            ROS_INFO("%s move is err,cmd is 10",name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             return;
@@ -196,6 +202,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
         if (now_coord_.x == target_coord_.x && now_coord_.y == target_coord_.y)
         {
+            ROS_INFO("%s move is wart for plan",name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             return;
@@ -207,6 +214,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         // action_srv.request.is_action = true;
         // action_client_.call(action_srv);
         //发送目标
+        ROS_INFO("%s is write move", name_.c_str());
         std::string coord_goal_str = CoordToData(cmd_coord_);
         Send(coord_goal_str);
 
@@ -330,8 +338,6 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     data::ShopActionFeedback feedback;
     data::ShopActionResult result;
 
-    ROS_WARN("%s is write action", name_.c_str());
-
     //判断目标的是否能用
     if (target_action_.action_state == 0)
     {
@@ -340,6 +346,8 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         action_as_.setPreempted(result);
         return;
     }
+
+    ROS_WARN("%s is write action", name_.c_str());
 
     // action_srv.request.action_name = target_action_.name;
     // action_srv.request.action_state = target_action_.action_state;
@@ -377,7 +385,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 
     data::ActionName action_srv;
     action_srv.request.is_action = false;
-    action_srv.request.action_name = "NONE";
+    action_srv.request.action_name = target_action_.name;
     // ROS_ERROR("XXX%d", target_action_.action_state);
     switch (target_action_.action_state)
     {
@@ -408,7 +416,6 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 {
     data::OpeningFeedback feedback;
     data::OpeningResult result;
-    ROS_INFO("%s is write Open", name_.c_str());
 
     if (go_flag_)
     {
@@ -417,6 +424,8 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
         opening_as_.setPreempted(result);
         return;
     }
+
+    ROS_INFO("%s is write Open", name_.c_str());
 
     Send("go");
 

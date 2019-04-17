@@ -29,6 +29,8 @@ namespace shop
 {
 namespace decision
 {
+#define FOURCAR 0
+
 typedef actionlib::SimpleActionClient<data::MoveAction> MOVEACTIONCLINT;
 typedef actionlib::SimpleActionClient<data::OpeningAction> OPENINGCLINT;
 typedef actionlib::SimpleActionClient<data::ShopActionAction> SHOPACTION;
@@ -62,25 +64,28 @@ public:
                                                         robot4_open_action_clint_("shop/robot4/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
-
+    //识别用action
     camera_action_clint_.waitForServer();
     detection_clint_.waitForServer();
-
+    //规划用action'
     localplan_clint_.waitForServer();
     globalplan_clint_.waitForServer();
-
+    //两车方案
     robot1_move_action_clint_.waitForServer();
     robot1_open_action_clint_.waitForServer();
     robot1_shop_action_clint_.waitForServer();
+    robot4_move_action_clint_.waitForServer();
+    robot4_open_action_clint_.waitForServer();
+    robot4_shop_action_clint_.waitForServer();
+
+   #if FOURCAR
     robot2_move_action_clint_.waitForServer();
     robot2_open_action_clint_.waitForServer();
     robot2_shop_action_clint_.waitForServer();
     robot3_move_action_clint_.waitForServer();
     robot3_open_action_clint_.waitForServer();
     robot3_shop_action_clint_.waitForServer();
-    robot4_move_action_clint_.waitForServer();
-    robot4_open_action_clint_.waitForServer();
-    robot4_shop_action_clint_.waitForServer();
+  #endif
     ROS_INFO(" ALL Action server is started!");
 
     robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
@@ -673,7 +678,8 @@ private:
     if (result->success_flag)
     {
       private_blackboard_ptr_->SetBoolValue(false,"opening_flag");
-      ROS_ERROR("IN HERE");
+      // debug
+      // ROS_ERROR("IN HERE");
     }
     
   }
@@ -683,7 +689,11 @@ private:
   {
     if (feedback->begin_flag == true)
     {
+      #if FOURCAR
       private_blackboard_ptr_->SetBoolValue(true, "robot2_opening_flag");
+      #else
+      private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
+      #endif 
       ROS_WARN("IN HERE");
     }
   }

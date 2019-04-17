@@ -3,13 +3,13 @@
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 
-  <include file="$(find tools)/launch/web_serial.launch"/>
+  <!-- <include file="$(find tools)/launch/web_serial.launch"/> -->
 
 
-  <!-- <node name="robot4" pkg="web_serial" type="robot4_web_server" output="screen">
-    <param name="addr" value="192.168.31.104" type="str"/>
-    <param name="port" value="1114" type="int"/>
-  </node> -->
+  <node name="robot1" pkg="web_serial" type="robot1_web_server" output="screen">
+    <param name="addr" value="192.168.31.101" type="str"/>
+    <param name="port" value="1111" type="int"/>
+  </node>
   <node name="debug_local_plan" pkg="tools" type="debug_local_plan.py" output="screen">
   </node>
 

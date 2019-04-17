@@ -3,31 +3,35 @@
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 
-  <include file="$(find tools)/launch/web_serial.launch"/>
-  
-  <!-- <node name="camera_node" pkg="camera" type="camera_node.py" output="screen"> 
-    <param name="url/address" value="192.168.31.10" type="str"/>
-    <param name="url/address" value="192.168.31.157" type="str"/>
-    <param name="camera/wirt_time" value="5" type="int"/>
-  </node> -->
-<!-- 如果懶得識別，使用這個 -->
+  <!-- <include file="$(find tools)/launch/web_serial.launch"/> -->
+  <node name="robot1" pkg="web_serial" type="robot1_web_server" output="screen">
+    <param name="addr" value="192.168.31.101" type="str"/>
+    <param name="port" value="1111" type="int"/>
+  </node>
+  <node name="robot4" pkg="web_serial" type="robot4_web_server" output="screen">
+    <param name="addr" value="192.168.31.104" type="str" />
+    <param name="port" value="1114" type="int"/>
+  </node>
+
   <node name="debug_local_plan" pkg="tools" type="debug_local_plan.py" output="screen">
   </node>
 
   <node name="debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
   </node>
 
-  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  <node name="camera_node" pkg="camera" type="camera_node.py" output="screen">
+    <param name="url/address" value="192.168.31.10" type="str"/>
+    <!-- <param name="url/address" value="192.168.31.82" type="str"/> -->
+    <!-- <param name="url/address" value="192.168.31.157" type="str"/> -->
+    <param name="camera/wirt_time" value="5" type="int"/>
   </node>
 
-  <node name="global_path_planing" pkg="global_path_planning" type="global_path_planing" output="screen">
+  <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
   </node>
 
-  <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
+  <!-- <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  </node>
+
+  <node name="global_path_planing" pkg="global_path_planing" type="global_path_planing" output="screen">
   </node> -->
-
-
-  <!-- 测试单独使用 -->
-  <!-- <node name="debug_decision" pkg="decision" type="debug_decision" output="screen"></node> -->
-
 </launch>
