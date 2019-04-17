@@ -79,28 +79,129 @@ class Object_D(object):
                     output_dict['detection_masks'] = output_dict['detection_masks'][0]
         return output_dict
 
+    def get_qualified_num(scores):
+        num = 0
+        for i in range(3):
+            if(scores[i] >= 0.5):
+                num += 1
+        return num
+
     def swap_box(self, boxes, classes, scores):
         result = {}
-
-        num_max = boxes.index(max(boxes))
-        if num_max != 2:
-            boxes[num_max], boxes[2] = boxes[2], boxes[num_max]
-            classes[num_max], classes[2] = classes[2], classes[num_max]
-            scores[num_max], scores[2] = scores[2], scores[num_max]
-
-        num_min = boxes.index(min(boxes))
-        if num_min != 0:
-            boxes[num_min], boxes[0] = boxes[0], boxes[num_min]
-            classes[num_min], classes[0] = classes[0], classes[num_min]
-            scores[num_min], scores[0] = scores[0], scores[num_min]
-
+        boxes = boxes.tolist()
         classes = classes.tolist()
         scores = scores.tolist()
+        num = self.get_qualified_num(scores)
+        if(num == 3 or num == 0):
+            num_max = boxes.index(max(boxes))
+            if num_max != 2:
+                boxes[num_max], boxes[2] = boxes[2], boxes[num_max]
+                classes[num_max], classes[2] = classes[2], classes[num_max]
+                scores[num_max], scores[2] = scores[2], scores[num_max]
 
-        result['classes'] = classes
-        result['scores'] = scores
+            num_min = boxes.index(min(boxes))
+            if num_min != 0:
+                boxes[num_min], boxes[0] = boxes[0], boxes[num_min]
+                classes[num_min], classes[0] = classes[0], classes[num_min]
+                scores[num_min], scores[0] = scores[0], scores[num_min]
 
-        return result
+
+            result['classes'] = classes
+            result['scores'] = scores
+
+            return result
+        elif(num == 2):
+            flag[] = [True, True, True]
+            new_classes[] = [-1, -1, -1]
+            new_scores[] = [-1, -1, -1]
+            for i in range(3):
+                if(scores[i] >= 0.5):
+                    flag[i] = False
+                    if(boxes[i] <= 0.2):
+                        new_classes[0] = classes[i]
+                        new_scores[0] = scores[i]
+                    if(0.3<=boxes[i]<=0.5):
+                        new_classes[1] = classes[i]
+                        new_scores[1] = scores[i]
+                    if(0.6<=boxes[i]):
+                        new_classes[2] = classes[i]
+                        new_scores[2] = scores[i]
+            for i in range(3):
+                if(flag[i]):
+                    for j in range(3):
+                        if(new_classes[j] != -1):
+                            new_classes[j] = classes[i]
+                            new_scores[j] = scores[i]
+
+            result['classes'] = new_classes
+            result['scores'] = new_scores
+
+            return result
+        elif(num == 1):
+            location = -1
+            flag_local = []
+            flag[] = [True, True, True]
+            new_classes[] = [-1, -1, -1]
+            new_scores[] = [-1, -1, -1]
+            for i in range(3):
+                flag[i] = False 
+                if(scores[i]>=0.5):
+                    if(boxes[i] <= 0.2):
+                        new_classes[0] = classes[i]
+                        new_scores[0] = scores[i]
+                        location = 0
+                    if(0.3<=boxes[i]<=0.5):
+                        new_classes[1] = classes[i]
+                        new_scores[1] = scores[i]
+                        location = 1
+                    if(0.6<=boxes[i]):
+                        new_classes[2] = classes[i]
+                        new_scores[2] = scores[i]
+                        location = 2
+            for i in range(3):
+                if(flag[i]):
+                    flag_local.append(i)
+            if(location == 0):
+                if(boxes[flag_local[1]] >= boxes[flag_local[0]]):
+                    new_classes[1] = classes[flag_local[0]]
+                    new_scores[1] = scores[flag_local[0]]
+                    new_classes[2] = classes[flag_local[1]]
+                    new_scores[2] = scores[flag_local[1]]
+                else:
+                    new_classes[1] = classes[flag_local[1]]
+                    new_scores[1] = scores[flag_local[1]]
+                    new_classes[2] = classes[flag_local[0]]
+                    new_scores[2] = scores[flag_local[0]]
+            elif(location == 1):
+                if(boxes[flag_local[1]] >= boxes[flag_local[0]]):
+                    new_classes[0] = classes[flag_local[0]]
+                    new_scores[0] = scores[flag_local[0]]
+                    new_classes[2] = classes[flag_local[1]]
+                    new_scores[2] = scores[flag_local[1]]
+                else:
+                    new_classes[0] = classes[flag_local[1]]
+                    new_scores[0] = scores[flag_local[1]]
+                    new_classes[2] = classes[flag_local[0]]
+                    new_scores[2] = scores[flag_local[0]]
+            elif(location == 2):
+                if(boxes[flag_local[1]] >= boxes[flag_local[0]]):
+                    new_classes[0] = classes[flag_local[0]]
+                    new_scores[0] = scores[flag_local[0]]
+                    new_classes[1] = classes[flag_local[1]]
+                    new_scores[1] = scores[flag_local[1]]
+                else:
+                    new_classes[0] = classes[flag_local[1]]
+                    new_scores[0] = scores[flag_local[1]]
+                    new_classes[1] = classes[flag_local[0]]
+                    new_scores[1] = scores[flag_local[0]]
+            
+            result['classes'] = new_classes
+            result['scores'] = new_scores
+
+            return result
+
+
+
 
     def run_image(self, num):
         name = str(num)
