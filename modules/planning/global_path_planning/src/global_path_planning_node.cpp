@@ -22,9 +22,13 @@ class GlobalPlan : public GlobalBase
   public:
     GlobalPlan(std::string name) : GlobalBase(name), INF(999)
     {
-        plan_flag_1 = plan_flag_2 = plan_flag_3 = plan_flag_4 = 0;
-        arrive_flag_1 = arrive_flag_2 = arrive_flag_3 = arrive_flag_4 = 1;
-        final_coord_1 = final_coord_2 = final_coord_3 =final_coord_4 = Coord(10, 10);
+        // plan_flag_1 = plan_flag_2 = 0
+        // plan_flag_3 = plan_flag_4 = 0;
+        arrive_flag_1 = arrive_flag_2 = true;
+        out_wall = false;
+        // arrive_flag_3 = arrive_flag_4 = 1;
+        final_coord_1 = final_coord_2 = Coord(10, 10);
+        // final_coord_3 = final_coord_4 = Coord(10, 10);
 
 
         int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -41,8 +45,8 @@ class GlobalPlan : public GlobalBase
 
         memcpy(map_1, map, sizeof(map));
         memcpy(map_2, map, sizeof(map));
-        memcpy(map_3, map, sizeof(map));
-        memcpy(map_4, map, sizeof(map));
+        // memcpy(map_3, map, sizeof(map));
+        // memcpy(map_4, map, sizeof(map));
     }
 
     void PositionOfObstacles(int map[num_x][num_y])
@@ -111,13 +115,13 @@ class GlobalPlan : public GlobalBase
         PositionOfObstacles(map);
         auto now_1 = GetNowCoord(1);
         auto now_2 = GetNowCoord(2);
-        auto now_3 = GetNowCoord(3);
-        auto now_4 = GetNowCoord(4);
+        // auto now_3 = GetNowCoord(3);
+        // auto now_4 = GetNowCoord(4);
 
         map[now_1.x][now_1.y] = 1;
         map[now_2.x][now_2.y] = 1;
-        map[now_3.x][now_3.y] = 1;
-        map[now_4.x][now_4.y] = 1;
+        // map[now_3.x][now_3.y] = 1;
+        // map[now_4.x][now_4.y] = 1;
 
         que.push(begin);
         map[begin.first][begin.second] = 1;
@@ -161,9 +165,43 @@ class GlobalPlan : public GlobalBase
         return path;
     }
 
+    queue<Coord> PlanOutWall(Coord begin, int map[num_x][num_y])
+    {
+        queue<Coord> path;
+
+        int move_x[4] = {0, 0, 1, -1}, move_y[4] = {1, -1, 0, 0};
+        for(int i = 0; i<4; i++)
+        {
+            int temp_x = int(begin.first) + move_x[i];
+            int temp_y = int(begin.second) + move_y[i];
+            if(map[temp_x][temp_y] != 1)
+            {
+                path.push(Coord(temp_x, temp_y));
+            }
+        }
+        return path;
+    }
+
+    bool JudgeCoordInWall(Coord local, queue<Coord> path_1)
+    {
+        auto end = GetTargetCoord(2);
+        path_1.push(Coord(end.x, end.y));
+        while(path_1.size())
+        {
+            Coord arrive = path_1.front();
+            path_1.pop();
+            if(int(arrive.first) == int(local.first) && int(arrive.second) == int(local.second))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     void RobotGlobalPlanning(void)
     {      
-        arrive_flag_1 = arrive_flag_2 = arrive_flag_3 = arrive_flag_4 = 1;
+        arrive_flag_1 = arrive_flag_2 = true;
+        // arrive_flag_3 = arrive_flag_4 = 1;
 
         auto now_1 = GetNowCoord(1);
         auto end_1 = GetTargetCoord(1);
@@ -171,23 +209,36 @@ class GlobalPlan : public GlobalBase
         auto now_2 = GetNowCoord(2);
         auto end_2 = GetTargetCoord(2);
 
-        auto now_3 = GetNowCoord(3);
-        auto end_3 = GetTargetCoord(3);
+        // auto now_3 = GetNowCoord(3);
+        // auto end_3 = GetTargetCoord(3);
 
-        auto now_4 = GetNowCoord(4);
-        auto end_4 = GetTargetCoord(4);
+        // auto now_4 = GetNowCoord(4);
+        // auto end_4 = GetTargetCoord(4);
         
         ROS_WARN("1 nowx:%d nowy:%d",now_1.x,now_1.y);
         ROS_WARN("2 nowx:%d nowy:%d",now_2.x,now_2.y);
-        ROS_WARN("3 nowx:%d nowy:%d",now_3.x,now_3.y);
-        ROS_WARN("4 nowx:%d nowy:%d",now_4.x,now_4.y);
+        // ROS_WARN("3 nowx:%d nowy:%d",now_3.x,now_3.y);
+        // ROS_WARN("4 nowx:%d nowy:%d",now_4.x,now_4.y);
 
         ROS_WARN("1 endx:%d endy:%d",end_1.x,end_1.y);
         ROS_WARN("2 endx:%d endy:%d",end_2.x,end_2.y);
-        ROS_WARN("3 endx:%d endy:%d",end_3.x,end_3.y);
-        ROS_WARN("4 endx:%d endy:%d",end_4.x,end_4.y);
+        // ROS_WARN("3 endx:%d endy:%d",end_3.x,end_3.y);
+        // ROS_WARN("4 endx:%d endy:%d",end_4.x,end_4.y);
+        if(out_wall)
+        {
+            if(int(last_coord_2.first) == now_2.x && int(last_coord_2.second) == now_2.y)
+            {
+                out_wall = false;
+            }
+            else
+            {
+                arrive_flag_1 = arrive_flag_2 = false;
+            }
+            
+        }
 
-        queue<Coord> path_1, path_2, path_3, path_4;
+        queue<Coord> path_1, path_2;
+        // queue<Coord> path_3, path_4;
 
         if(end_1.x != 10 && end_1.y != 10)
             path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
@@ -195,58 +246,76 @@ class GlobalPlan : public GlobalBase
         if(end_2.x != 10 && end_2.y != 10)
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
         ROS_WARN("path_2 of size:%d", path_2.size());
-        if(end_3.x != 10 && end_3.y != 10)
-            path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
-        ROS_WARN("path_3 of size:%d", path_3.size());
-        if(end_4.x != 10 && end_4.y != 10)
-            path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
-        ROS_WARN("path_4 of size:%d", path_4.size());
-        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
+        // if(end_3.x != 10 && end_3.y != 10)
+        //     path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
+        // ROS_WARN("path_3 of size:%d", path_3.size());
+        // if(end_4.x != 10 && end_4.y != 10)
+        //     path_4 = PathPlanning(Coord(now_4.x, now_4.y), Coord(end_4.x, end_4.y));
+        // ROS_WARN("path_4 of size:%d", path_4.size());
+        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2; 
+        // queue<Coord> temp_path_3 = path_3, temp_path_4 = path_4;
 
         while (temp_path_1.size())
         {
             Coord local_1 = temp_path_1.front();
             temp_path_1.pop();
-            ROS_INFO("path_1:%d, %d", local_1.first, local_1.second);
+            // ROS_INFO("path_1:%d, %d", local_1.first, local_1.second);
             map_1[int(local_1.first)][int(local_1.second)] = 1;
         }
+        map_1[int(end_1.x)][int(end_1.y)] = 1;
         memcpy(map_2, map_1, sizeof(map_1));
 
         while (temp_path_2.size())
         {
             Coord local_2 = temp_path_2.front();
             temp_path_2.pop();
-            ROS_INFO("path_2:%d, %d", local_2.first, local_2.second);
+            // ROS_INFO("path_2:%d, %d", local_2.first, local_2.second);
             map_2[int(local_2.first)][int(local_2.second)] += 1;
         }
-        memcpy(map_3, map_2, sizeof(map_2));
+        map_2[int(end_2.x)][int(end_2.y)] = 1;
+        temp_path_1 = path_1, temp_path_2 = path_2;
 
-        while (temp_path_3.size())
+        //判断2机器人是否在1机器人所经过的路径上
+        if(out_wall == false)
         {
-            Coord local_3 = temp_path_3.front();
-            temp_path_3.pop();
-            ROS_INFO("path_3:%d, %d", local_3.first, local_3.second);
-            map_3[int(local_3.first)][int(local_3.second)] += 1;
+            temp_path_1.push(Coord(end_1.x, end_1.y));
+            while(temp_path_1.size())
+            {
+                Coord arrive = temp_path_1.front();
+                temp_path_1.pop();
+                if(int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
+                {
+                    arrive_flag_1 = arrive_flag_2 = false;
+
+                    final_coord_1 = Coord(10, 10);
+                    queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
+                    while(out_coord.size())
+                    {
+                        Coord temp_out_coord = out_coord.front();
+                        out_coord.pop();
+                        bool flag = JudgeCoordInWall(temp_out_coord, path_1);
+                        if(flag)
+                        {
+                            final_coord_2 = temp_out_coord;
+                            last_coord_2 = final_coord_2;
+                            break;
+                        }
+                    }
+                    out_wall = true;
+                    break;
+                }
+            }
+            temp_path_1 = path_1;
         }
-        memcpy(map_4, map_3, sizeof(map_3));
 
-        while (temp_path_4.size())
-        {
-            Coord local_4 = temp_path_4.front();
-            temp_path_4.pop();
-            ROS_INFO("path_4:%d, %d", local_4.first, local_4.second);
-            map_4[int(local_4.first)][int(local_4.second)] += 1;
-        }
-        temp_path_1 = path_1, temp_path_2 = path_2, temp_path_3 = path_3, temp_path_4 = path_4;
-
-       
-
-        if (arrive_flag_1)//计算1机器人所停位置
+        //计算1机器人所停位置
+        if (arrive_flag_1)
         {
             final_coord_1 = Coord(end_1.x, end_1.y);
         }
 
-        if (arrive_flag_2)//计算2机器人所停位置
+        //计算2机器人所停位置
+        if (arrive_flag_2)
         {
             Coord last_coord = Coord(10, 10);
             while (1)
@@ -270,61 +339,61 @@ class GlobalPlan : public GlobalBase
             }
         }
 
-        if (arrive_flag_3)//计算3机器人所停位置
-        {
-            Coord last_coord = Coord(10, 10);
-            while (1)
-            {
-                if (temp_path_3.size() == 0)
-                {
-                    final_coord_3.first = end_3.x;
-                    final_coord_3.second = end_3.y;
-                    break;
-                }
+        // if (arrive_flag_3)//计算3机器人所停位置
+        // {
+        //     Coord last_coord = Coord(10, 10);
+        //     while (1)
+        //     {
+        //         if (temp_path_3.size() == 0)
+        //         {
+        //             final_coord_3.first = end_3.x;
+        //             final_coord_3.second = end_3.y;
+        //             break;
+        //         }
                 
-                Coord stop_coord = temp_path_3.front();
+        //         Coord stop_coord = temp_path_3.front();
 
-                if (map_3[int(stop_coord.first)][int(stop_coord.second)] != 1)
-                {
-                    final_coord_3 = last_coord;
-                    break;
-                }
-                last_coord = stop_coord;
-                temp_path_3.pop();
-            }
-        }
+        //         if (map_3[int(stop_coord.first)][int(stop_coord.second)] != 1)
+        //         {
+        //             final_coord_3 = last_coord;
+        //             break;
+        //         }
+        //         last_coord = stop_coord;
+        //         temp_path_3.pop();
+        //     }
+        // }
 
 
-        if (arrive_flag_4)//计算4机器人所停位置
-        {
-            Coord last_coord = Coord(10, 10);
-            while (1)
-            {
+        // if (arrive_flag_4)//计算4机器人所停位置
+        // {
+        //     Coord last_coord = Coord(10, 10);
+        //     while (1)
+        //     {
 
-                if (temp_path_4.size() == 0)
-                {
-                    final_coord_4.first = end_4.x;
-                    final_coord_4.second = end_4.y;
-                    break;
-                }
+        //         if (temp_path_4.size() == 0)
+        //         {
+        //             final_coord_4.first = end_4.x;
+        //             final_coord_4.second = end_4.y;
+        //             break;
+        //         }
 
-                Coord stop_coord = temp_path_4.front();
+        //         Coord stop_coord = temp_path_4.front();
                 
 
-                if (map_4[int(stop_coord.first)][int(stop_coord.second)] != 1)
-                {
-                    final_coord_4 = last_coord;
-                    break;
-                }
-                last_coord = stop_coord;
-                temp_path_4.pop();
-            }
-        }
+        //         if (map_4[int(stop_coord.first)][int(stop_coord.second)] != 1)
+        //         {
+        //             final_coord_4 = last_coord;
+        //             break;
+        //         }
+        //         last_coord = stop_coord;
+        //         temp_path_4.pop();
+        //     }
+        // }
 
         ROS_WARN("final_1:%d, %d", final_coord_1.first, final_coord_1.second);
         ROS_WARN("final_2:%d, %d", final_coord_2.first, final_coord_2.second);
-        ROS_WARN("final_3:%d, %d", final_coord_3.first, final_coord_3.second);
-        ROS_WARN("final_4:%d, %d", final_coord_4.first, final_coord_4.second);
+        // ROS_WARN("final_3:%d, %d", final_coord_3.first, final_coord_3.second);
+        // ROS_WARN("final_4:%d, %d", final_coord_4.first, final_coord_4.second);
         ROS_WARN("FINALY_GLOBAL!!!");
         // for (int i = 0; i < 4; i++) //得到优先级为1的机器人所走过的路径并更新地图
         // {
@@ -1242,18 +1311,18 @@ class GlobalPlan : public GlobalBase
             coord.pose = 5;
             return coord;
             break;
-        case 3:
-            coord.x = final_coord_3.first;
-            coord.y = final_coord_3.second;
-            coord.pose = 5;
-            return coord;
-            break;
-        case 4:
-            coord.x = final_coord_4.first;
-            coord.y = final_coord_4.second;
-            coord.pose = 5;
-            return coord;
-            break;
+        // case 3:
+        //     coord.x = final_coord_3.first;
+        //     coord.y = final_coord_3.second;
+        //     coord.pose = 5;
+        //     return coord;
+        //     break;
+        // case 4:
+        //     coord.x = final_coord_4.first;
+        //     coord.y = final_coord_4.second;
+        //     coord.pose = 5;
+        //     return coord;
+        //     break;
         default:
             break;
         }
@@ -1266,16 +1335,21 @@ class GlobalPlan : public GlobalBase
   private:
     const int INF;
 
-    int plan_flag_1, plan_flag_2, plan_flag_3, plan_flag_4;
-    int arrive_flag_1, arrive_flag_2, arrive_flag_3, arrive_flag_4;
+    // int plan_flag_1, plan_flag_2;
+    // int plan_flag_3, plan_flag_4;
+    bool arrive_flag_1, arrive_flag_2;
+    bool out_wall;
+    // int arrive_flag_3, arrive_flag_4;
 
     int map_1[num_x][num_y];
     int map_2[num_x][num_y];
-    int map_3[num_x][num_y];
-    int map_4[num_x][num_y];
+    // int map_3[num_x][num_y];
+    // int map_4[num_x][num_y];
 
 
-    Coord final_coord_1, final_coord_2, final_coord_3, final_coord_4;
+    Coord final_coord_1, final_coord_2;
+    Coord last_coord_2;
+    // Coord final_coord_3, final_coord_4;
 };
 
 } // namespace pathplan
