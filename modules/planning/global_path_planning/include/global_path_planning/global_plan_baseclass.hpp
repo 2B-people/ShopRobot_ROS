@@ -101,7 +101,7 @@ public:
       ROS_WARN("global plan is run");
       RobotGlobalPlanning();
       auto robot1_coord = GetFinalCoord(1);
-      auto robot4_coord = GetFinalCoord(4);
+      auto robot4_coord = GetFinalCoord(2);
       robot1_cmd_coord_pub_.publish(robot1_coord);
       robot4_cmd_coord_pub_.publish(robot4_coord);
 

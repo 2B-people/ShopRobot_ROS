@@ -82,14 +82,14 @@ class GlobalPlan : public GlobalBase
         queue<Coord> que;
         if (end.first == begin.first && end.second == begin.second)
         {
-            ROS_WARN("FINALLLLLLLLLLLL");
+            // ROS_WARN("FINALLLLLLLLLLLL");
             return que;
         }
         // ROS_WARN("END:%d, %d", end.first, end.second);
         // ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
         int x = end.first, y = end.second;
         Coord local = map_path[x][y];
-        ROS_WARN("LOCAL1:%d, %d", local.first, local.second);
+        // ROS_WARN("LOCAL1:%d, %d", (int)local.first, (int)local.second);
         que = RecordShortestPath(local, begin, map_path);
         que.push(local);
         return que;
@@ -153,7 +153,7 @@ class GlobalPlan : public GlobalBase
                 break;
         }
 
-        ROS_WARN("kaishijilvlujing");
+        // ROS_WARN("kaishijilvlujing");
         // ROS_WARN("END:%d, %d", end.first, end.second);
         // ROS_WARN("BEGIN:%d, %d", begin.first, begin.second);
         // int x = end.first, y = end.second;
@@ -161,7 +161,7 @@ class GlobalPlan : public GlobalBase
         // ROS_WARN("LOCAL:%d, %d", local.first, local.second);
         // ROS_WARN("BBBBB:%d, %d", map_path[begin.first][begin.second].first, map_path[begin.first][begin.second].second);
         path = RecordShortestPath(end, begin, map_path);
-        ROS_WARN("jieshu");
+        // ROS_WARN("jieshu");
         return path;
     }
 
@@ -174,7 +174,7 @@ class GlobalPlan : public GlobalBase
         {
             int temp_x = int(begin.first) + move_x[i];
             int temp_y = int(begin.second) + move_y[i];
-            if(map[temp_x][temp_y] != 1)
+            if(0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
             {
                 path.push(Coord(temp_x, temp_y));
             }
@@ -206,8 +206,8 @@ class GlobalPlan : public GlobalBase
         auto now_1 = GetNowCoord(1);
         auto end_1 = GetTargetCoord(1);
 
-        auto now_2 = GetNowCoord(2);
-        auto end_2 = GetTargetCoord(2);
+        auto now_2 = GetNowCoord(4);
+        auto end_2 = GetTargetCoord(4);
 
         // auto now_3 = GetNowCoord(3);
         // auto end_3 = GetTargetCoord(3);
@@ -242,10 +242,10 @@ class GlobalPlan : public GlobalBase
 
         if(end_1.x != 10 && end_1.y != 10)
             path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
-        ROS_WARN("path_1 of size:%d", (int)path_1.size());
+        // ROS_WARN("path_1 of size:%d", (int)path_1.size());
         if(end_2.x != 10 && end_2.y != 10)
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
-        ROS_WARN("path_2 of size:%d", path_2.size());
+        // ROS_WARN("path_2 of size:%d", (int)path_2.size());
         // if(end_3.x != 10 && end_3.y != 10)
         //     path_3 = PathPlanning(Coord(now_3.x, now_3.y), Coord(end_3.x, end_3.y));
         // ROS_WARN("path_3 of size:%d", path_3.size());

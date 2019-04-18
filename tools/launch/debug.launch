@@ -27,9 +27,9 @@
   <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
   </node>
 
-  <!-- <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
   </node>
 
   <node name="global_path_planing" pkg="global_path_planing" type="global_path_planing" output="screen">
-  </node> -->
+  </node>
 </launch>

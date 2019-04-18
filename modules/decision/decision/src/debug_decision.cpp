@@ -108,9 +108,16 @@ int main(int argc, char **argv)
     robot4_photo_seq_ptr->AddChildren(photo_ptr);
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
 
+    auto robot4_test_success_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 test ptr", blackboard_ptr_,
+                                                                                        robot4_special_move_ptr,
+                                                                                        [&]() {
+                                                                                            blackboard_ptr_->SetBoolValue(false, "opening_flag");
+                                                                                            return true;
+                                                                                        });
+
     auto robot4_photo_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 photo jud", blackboard_ptr_,
-                                                                                   robot4_photo_seq_ptr,
-                                                                                    // robot4_special_move_ptr,
+                                                                                   //robot4_photo_seq_ptr,
+                                                                                   robot4_test_success_done_ptr,
                                                                                    [&]() {
                                                                                        if (blackboard_ptr_->GetBoolValue("robot4_photo_flag") == true)
                                                                                        {
@@ -126,10 +133,10 @@ int main(int argc, char **argv)
     auto open_while_ptr = std::make_shared<shop::decision::WhileNode>("open while", blackboard_ptr_);
     open_while_ptr->AddChildren(distinguish_ptr);
     open_while_ptr->AddChildren(robot1_open_jud_ptr);
-    // open_while_ptr->AddChildren(robot2_open_jud_ptr);
-    // open_while_ptr->AddChildren(robot3_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_photo_jud_ptr);
+    // open_while_ptr->AddChildren(robot2_open_jud_ptr);
+    // open_while_ptr->AddChildren(robot3_open_jud_ptr);
 
     auto open_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("open while jud", blackboard_ptr_,
                                                                                  open_while_ptr,
@@ -148,7 +155,10 @@ int main(int argc, char **argv)
     auto robot1_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot1 carry seq", blackboard_ptr_);
     robot1_carry_seq_ptr->AddChildren(robot1_move_ptr);
     robot1_carry_seq_ptr->AddChildren(robot1_action_ptr);
-
+    auto robot4_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 carry seq", blackboard_ptr_);
+    robot4_carry_seq_ptr->AddChildren(robot4_move_ptr);
+    robot4_carry_seq_ptr->AddChildren(robot4_action_ptr);
+#if 0
     auto robot2_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot2 carry seq", blackboard_ptr_);
     robot2_carry_seq_ptr->AddChildren(robot2_move_ptr);
     robot2_carry_seq_ptr->AddChildren(robot2_action_ptr);
@@ -156,10 +166,7 @@ int main(int argc, char **argv)
     auto robot3_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot3 carry seq", blackboard_ptr_);
     robot3_carry_seq_ptr->AddChildren(robot3_move_ptr);
     robot3_carry_seq_ptr->AddChildren(robot3_action_ptr);
-
-    auto robot4_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 carry seq", blackboard_ptr_);
-    robot4_carry_seq_ptr->AddChildren(robot4_move_ptr);
-    robot4_carry_seq_ptr->AddChildren(robot4_action_ptr);
+#endif
 
     auto plan_seq_ptr = std::make_shared<shop::decision::SequenceNode>("plan seq", blackboard_ptr_);
     plan_seq_ptr->AddChildren(local_plan_ptr);
@@ -168,9 +175,9 @@ int main(int argc, char **argv)
     auto carry_while_ptr = std::make_shared<shop::decision::WhileNode>("carry while", blackboard_ptr_);
     carry_while_ptr->AddChildren(plan_seq_ptr);
     carry_while_ptr->AddChildren(robot1_carry_seq_ptr);
+    carry_while_ptr->AddChildren(robot4_carry_seq_ptr);
     // carry_while_ptr->AddChildren(robot2_carry_seq_ptr);
     // carry_while_ptr->AddChildren(robot3_carry_seq_ptr);
-    carry_while_ptr->AddChildren(robot4_carry_seq_ptr);
 
     auto carrt_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("carry while jud", blackboard_ptr_,
                                                                                   carry_while_ptr,
@@ -191,10 +198,10 @@ int main(int argc, char **argv)
     final_jud_ptr->AddChildren(carrt_while_jud_ptr);
 
     data::Coord coord;
-    coord.x = 4;
-    coord.y = 2;
+    coord.x = 2;
+    coord.y = 5;
     goal_action_ptr->SetTargetCoord(4, coord);
-    goal_action_ptr->SetTargetActionName(4, "T");
+    // goal_action_ptr->SetTargetActionName(4, "T");
     blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
     blackboard_ptr_->SetBoolValue(true, "opening_flag");
 

@@ -10,7 +10,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-17 16:22:52
+ * @LastEditTime: 2019-04-17 21:47:13
  */
 #include <web_serial/web_server_class.h>
 
@@ -22,6 +22,7 @@ namespace webserver
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true), is_debug_(false),
       client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.100"), bind_port_(1111), go_flag_(false),
+      move_flag_(false),
       //atcion初始化
       move_as_(nh_, ("shop/" + name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
       opening_as_(nh_, ("shop/" + name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
@@ -194,15 +195,26 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
         if (cmd_coord_.x == 10 || cmd_coord_.y == 10)
         {
-            ROS_INFO("%s move is err,cmd is 10",name_.c_str());
+            ROS_INFO("%s move is err,cmd is 10", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             return;
         }
-
-        if (now_coord_.x == target_coord_.x && now_coord_.y == target_coord_.y)
+        if (move_flag_ == false)
         {
-            ROS_INFO("%s move is wart for plan",name_.c_str());
+            move_flag_ = true;
+            if (name_ == "robot4")
+            {
+                ROS_INFO("robot4 first in");
+                result.success_flag = true;
+                move_as_.setSucceeded(result);
+                return;
+            }
+        }
+
+        if (move_flag_ == true && now_coord_.x == target_coord_.x && now_coord_.y == target_coord_.y)
+        {
+            ROS_INFO("%s move is wart for plan", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             return;
@@ -259,8 +271,9 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 else
                 {
                     ROS_INFO("%s is waitting other robot", name_.c_str());
-                    std::string coord_goal_str = CoordToData(cmd_coord_);
-                    Send(coord_goal_str);
+                    result.success_flag = false;
+                    move_as_.setPreempted(result);
+                    return;
                 }
             }
             else
@@ -370,7 +383,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         }
         else if (re_buf_string[0] == 'R')
         {
-            ROS_WARN("is read R");
+            // ROS_WARN("is read R");
             now_coord_ = DataToCoord(re_buf_string);
             move_pub_.publish(now_coord_);
         }
@@ -390,12 +403,15 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     switch (target_action_.action_state)
     {
     case 1:
+        ROS_WARN("1");
         action_srv.request.action_state = 2;
         break;
     case 2:
+        ROS_WARN("2");
         action_srv.request.action_state = 1;
         break;
     case 3:
+        ROS_WARN("3");
         action_srv.request.action_state = 1;
         break;
     default:

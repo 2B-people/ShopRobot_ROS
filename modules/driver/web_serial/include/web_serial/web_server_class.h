@@ -67,6 +67,7 @@ private:
   bool shop_stop_;
   bool open_stop_;
   bool go_flag_;
+  bool move_flag_;
 
   //socket
   int client_sockfd_;

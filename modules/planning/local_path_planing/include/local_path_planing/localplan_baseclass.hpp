@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-04-17 15:48:24
+ * @LastEditTime: 2019-04-17 20:45:45
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -177,59 +177,6 @@ public:
           return;
         }
       }
-
-      // if (robot2_action_.is_action == false)
-      // {
-      //   if (robot2_action_.action_state == 0)
-      //   {
-      //     ROS_INFO("robot2 PlanCarry is begin");
-      //     PlanCarry(2);
-      //   }
-      //   if (robot2_action_.action_state == 1)
-      //   {
-      //     ROS_INFO("robot2 PlanCarry is begin");
-      //     PlanCarry(2);
-      //   }
-      //   if (robot2_action_.action_state == 2)
-      //   {
-      //     ROS_INFO("robot2 PlanPlace is begin");
-      //     PlanPlace(2);
-      //   }
-      //   r.sleep();
-      //   if (JudgePlanIsDone())
-      //   {
-      //     result.success_flag = false;
-      //     plan_as_.setPreempted(result);
-      //     return;
-      //   }
-      // }
-
-      // if (robot3_action_.is_action == false)
-      // {
-      //   if (robot3_action_.action_state == 0)
-      //   {
-      //     ROS_INFO("robot3 PlanCarry is begin");
-      //     PlanCarry(3);
-      //   }
-      //   if (robot3_action_.action_state == 1)
-      //   {
-      //     ROS_INFO("robot3 PlanCarry is begin");
-      //     PlanCarry(3);
-      //   }
-      //   if (robot3_action_.action_state == 2)
-      //   {
-      //     ROS_INFO("robot3 PlanPlace is begin");
-      //     PlanPlace(3);
-      //   }
-      //   r.sleep();
-      //   if (JudgePlanIsDone())
-      //   {
-      //     result.success_flag = false;
-      //     plan_as_.setPreempted(result);
-      //     return;
-      //   }
-      // }
-
       if (robot4_action_.is_action == false)
       {
         if (robot4_action_.action_state == 0)
@@ -258,6 +205,58 @@ public:
       result.success_flag = false;
       plan_as_.setPreempted(result);
     }
+
+    // if (robot2_action_.is_action == false)
+    // {
+    //   if (robot2_action_.action_state == 0)
+    //   {
+    //     ROS_INFO("robot2 PlanCarry is begin");
+    //     PlanCarry(2);
+    //   }
+    //   if (robot2_action_.action_state == 1)
+    //   {
+    //     ROS_INFO("robot2 PlanCarry is begin");
+    //     PlanCarry(2);
+    //   }
+    //   if (robot2_action_.action_state == 2)
+    //   {
+    //     ROS_INFO("robot2 PlanPlace is begin");
+    //     PlanPlace(2);
+    //   }
+    //   r.sleep();
+    //   if (JudgePlanIsDone())
+    //   {
+    //     result.success_flag = false;
+    //     plan_as_.setPreempted(result);
+    //     return;
+    //   }
+    // }
+
+    // if (robot3_action_.is_action == false)
+    // {
+    //   if (robot3_action_.action_state == 0)
+    //   {
+    //     ROS_INFO("robot3 PlanCarry is begin");
+    //     PlanCarry(3);
+    //   }
+    //   if (robot3_action_.action_state == 1)
+    //   {
+    //     ROS_INFO("robot3 PlanCarry is begin");
+    //     PlanCarry(3);
+    //   }
+    //   if (robot3_action_.action_state == 2)
+    //   {
+    //     ROS_INFO("robot3 PlanPlace is begin");
+    //     PlanPlace(3);
+    //   }
+    //   r.sleep();
+    //   if (JudgePlanIsDone())
+    //   {
+    //     result.success_flag = false;
+    //     plan_as_.setPreempted(result);
+    //     return;
+    //   }
+    // }
   }
 
   // auto now = GetNowCoord(1);
@@ -350,7 +349,7 @@ public:
     srv.request.x = x;
     srv.request.y = y;
     srv.request.pose = 10;
-    ROS_WARN("robot%d setx:%d,sety:%d",robot_num,x,y);
+    ROS_WARN("robot%d setx:%d,sety:%d", robot_num, x, y);
     target_coordinate_lock_clt_.call(srv);
     switch (robot_num)
     {
@@ -492,7 +491,7 @@ public:
     }
   }
 
-  void SetRobotTargetAction(int8_t robot_num, std::string action_name,int8_t action_state)
+  void SetRobotTargetAction(int8_t robot_num, std::string action_name, int8_t action_state)
   {
     data::ActionName srv;
     srv.request.action_name = action_name;

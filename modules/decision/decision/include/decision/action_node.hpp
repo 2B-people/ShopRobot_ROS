@@ -148,6 +148,7 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    // goalaction_ptr_->SetTargetActionName(robot_num_, "NONE");
   }
 
   // data

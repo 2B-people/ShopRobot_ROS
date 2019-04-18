@@ -470,7 +470,7 @@ bool WorldBoard::TargetActionNameWriteCB1(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
-    ROS_INFO("robot1 target action is %s", req.action_name.c_str());
+    ROS_INFO("robot1 target action is %s state is %d", req.action_name.c_str(), req.action_state);
     res.success_flag = true;
     return true;
 }
@@ -491,7 +491,7 @@ bool WorldBoard::TargetActionNameWriteCB3(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
-    ROS_INFO("robot3 target action is %s", req.action_name.c_str());
+    ROS_INFO("robot3 target action is %s state is %d", req.action_name.c_str(), req.action_state);
     res.success_flag = true;
     return true;
 }
@@ -501,7 +501,7 @@ bool WorldBoard::TargetActionNameWriteCB4(data::ActionName::Request &req, data::
     auto action_dir_ptr = std::dynamic_pointer_cast<ActionNameDir>(middle_dirbase_ptr);
     action_dir_ptr->OpenLock();
     action_dir_ptr->Set(req.action_name, req.action_state, req.is_action);
-    ROS_INFO("robot4 target action is %s", req.action_name.c_str());
+    ROS_INFO("robot4 target action is %s state is %d", req.action_name.c_str(), req.action_state);
     res.success_flag = true;
     return true;
 }
