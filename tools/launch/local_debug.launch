@@ -19,19 +19,19 @@
   <node name="debug_barrier" pkg="tools" type="debug_barrier.py" output="screen">
   </node>
 
-  <node name="camera_node" pkg="camera" type="camera_node.py" output="screen">
+  <!-- <node name="camera_node" pkg="camera" type="camera_node.py" output="screen">
     <param name="url/address" value="192.168.31.10" type="str"/>
-    <!-- <param name="url/address" value="192.168.31.82" type="str"/> -->
-    <!-- <param name="url/address" value="192.168.31.157" type="str"/> -->
+    <param name="url/address" value="192.168.31.82" type="str"/> 
+    <param name="url/address" value="192.168.31.157" type="str"/> 
     <param name="camera/wirt_time" value="5" type="int"/>
-  </node>2
+  </node>2 -->
 
-  <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
-  </node>
+  <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
+  </node>  -->
 
   <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
   </node>
 
   <!-- <node name="global_path_planing" pkg="global_path_planing" type="global_path_planing" output="screen">
-  </node> -->
+  </node>  -->
 </launch>

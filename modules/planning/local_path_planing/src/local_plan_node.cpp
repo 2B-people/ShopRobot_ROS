@@ -446,8 +446,8 @@ public:
             int temp_final_x, temp_final_y;
             int temp_final_action, temp_final_shelf_location;
 
-            int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
@@ -629,8 +629,8 @@ public:
             int temp_final_x, temp_final_y;
             int temp_final_category, temp_final_location;
 
-            int map[num_x][num_y] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                                     {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                                      {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},

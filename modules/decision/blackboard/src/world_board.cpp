@@ -19,7 +19,7 @@ WorldBoard::WorldBoard(std::string name)
     auto robot1_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
     auto robot2_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
     auto robot3_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
-    auto robot4_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 0);
+    auto robot4_target_actionname_dir_ptr = std::make_shared<ActionNameDir>("NONE", 1);
 
     //货架障碍物
     auto a_shelf_barrier_dir_ptr = std::make_shared<GoodShelfDir>();
