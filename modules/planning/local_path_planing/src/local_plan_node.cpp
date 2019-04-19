@@ -994,12 +994,6 @@ public:
         case 4:
             map[5][7] = 1;
             break;
-        case 5:
-            map[1][8] = 1;
-            break;
-        case 6:
-            map[1][5] = 1;
-            break;
         default:
             break;
         }
