@@ -361,7 +361,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     ROS_WARN("%s is write action", name_.c_str());
-
+    
     // action_srv.request.action_name = target_action_.name;
     // action_srv.request.action_state = target_action_.action_state;
     // action_srv.request.is_action = true;
@@ -396,6 +396,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 
     //动作结束可以规划
 
+    
     data::ActionName action_srv;
     action_srv.request.is_action = false;
     action_srv.request.action_name = target_action_.name;

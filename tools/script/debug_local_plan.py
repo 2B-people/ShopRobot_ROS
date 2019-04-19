@@ -20,12 +20,12 @@ if __name__ == "__main__":
     goods_client.call(3, 3, 4)
     goods_client.call(4, 0, 5)
     goods_client.call(5, 0, 6)
-    goods_client.call(6, 0, 0)
-    goods_client.call(7, 0, 0)
-    goods_client.call(8, 0, 0)
-    goods_client.call(9, 0, 0)
-    goods_client.call(10, 0, 0)
-    goods_client.call(11, 0, 0)
+    goods_client.call(6, 0, 7)
+    goods_client.call(7, 0, 8)
+    goods_client.call(8, 0, 9)
+    goods_client.call(9, 0, 10)
+    goods_client.call(10, 0, 11)
+    goods_client.call(11, 0, 12)
     rate = rospy.Rate(1)
     x = 1
     y = 2

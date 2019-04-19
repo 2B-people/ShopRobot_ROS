@@ -109,15 +109,16 @@ int main(int argc, char **argv)
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
 
     auto robot4_test_success_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 test ptr", blackboard_ptr_,
-                                                                                        robot4_special_move_ptr,
+                                                                                        robot4_photo_seq_ptr,
                                                                                         [&]() {
-                                                                                            blackboard_ptr_->SetBoolValue(false, "opening_flag");
+                                                                                            if (blackboard_ptr_->GetBoolValue("robot4_photo_flag") == false)
+                                                                                                blackboard_ptr_->SetBoolValue(false, "opening_flag");
                                                                                             return true;
                                                                                         });
 
     auto robot4_photo_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 photo jud", blackboard_ptr_,
-                                                                                   robot4_photo_seq_ptr,
-                                                                                   //robot4_test_success_done_ptr,
+                                                                                //    robot4_photo_seq_ptr,
+                                                                                   robot4_test_success_done_ptr,
                                                                                    [&]() {
                                                                                        if (blackboard_ptr_->GetBoolValue("robot4_photo_flag") == true)
                                                                                        {

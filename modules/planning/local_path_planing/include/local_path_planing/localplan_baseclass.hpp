@@ -143,6 +143,22 @@ public:
     if (is_debug_)
     {
     }
+    if (robot1_action_.is_action == false)
+    {
+      if (robot1_action_.action_state == 2)
+      {
+        ROS_INFO("robot1 PlanPlace is begin");
+        PlanPlace(1);
+      }
+    }
+    if (robot4_action_.is_action == false)
+    {
+      if (robot4_action_.action_state == 2)
+      {
+        ROS_INFO("robot4 PlanPlace is begin");
+        PlanPlace(4);
+      }
+    }
 
     if (all_done_ == false)
     {
@@ -164,11 +180,6 @@ public:
           ROS_INFO("robot1 PlanCarry is begin");
           PlanCarry(1);
         }
-        if (robot1_action_.action_state == 2)
-        {
-          ROS_INFO("robot1 PlanPlace is begin");
-          PlanPlace(1);
-        }
         r.sleep();
         if (JudgePlanIsDone())
         {
@@ -188,11 +199,6 @@ public:
         {
           ROS_INFO("robot4 PlanCarry is begin");
           PlanCarry(4);
-        }
-        if (robot4_action_.action_state == 2)
-        {
-          ROS_INFO("robot4 PlanPlace is begin");
-          PlanPlace(4);
         }
       }
       ROS_INFO("%s FININSH", __FUNCTION__);
@@ -421,13 +427,13 @@ public:
       action.name = robot1_action_.name;
       break;
     case 2:
-      action.name = robot1_action_.name;
+      action.name = robot2_action_.name;
       break;
     case 3:
-      action.name = robot1_action_.name;
+      action.name = robot3_action_.name;
       break;
     case 4:
-      action.name = robot1_action_.name;
+      action.name = robot4_action_.name;
       break;
     default:
       ROS_ERROR("%s no robot in %s ", name_.c_str(), __FUNCTION__);

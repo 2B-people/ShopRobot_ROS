@@ -68,15 +68,7 @@ public:
         }
 
         GetShelfBarrier(shelves, goal_shelf);
-        // ROS_WARN("XXXX:%d", goal_shelf);
-
-        // for(int i = 0; i<12; i++)
-        // {
-        //     if(shelves[i] == false)
-        //         ROS_WARN("QQQ:0");
-        //     if(shelves[i] == true)
-        //         ROS_WARN("QQQ:1");
-        // }
+       
 
         for (int i = 1; i < 12; i = i + 2)
         {
@@ -498,6 +490,7 @@ public:
                 if (j != 4)
                     break;
             }
+            ROS_WARN("QQQ:%d, %d, %d", temp_final_distance, temp_final_x, temp_final_y);
             if (temp_final_distance < final_distance)
             {
                 final_distance = temp_final_distance;

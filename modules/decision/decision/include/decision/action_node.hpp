@@ -67,7 +67,7 @@ private:
       ROS_INFO("%s %s SUCCESS", name_.c_str(), __FUNCTION__);
       if (move_function_ == 2)
       {
-        // goalaction_ptr_->SetTargetActionName(4, "T");
+        goalaction_ptr_->SetTargetActionName(4, "T");
         ros::Rate r(5); //10HZ
         r.sleep();
       }
@@ -148,7 +148,6 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
-    // goalaction_ptr_->SetTargetActionName(robot_num_, "NONE");
   }
 
   // data
@@ -302,8 +301,8 @@ private:
         break;
       case 4:
         goalaction_ptr_->SetTargetActionName(4, "D");
-        blackboard_ptr_->SetBoolValue(false, "opening_flag");
-        // private_blackboard_ptr_->SetBoolValue(false, "robot4_photo_flag");
+        // blackboard_ptr_->SetBoolValue(false, "opening_flag");
+        private_blackboard_ptr_->SetBoolValue(false, "robot4_photo_flag");
         break;
       default:
         ROS_ERROR("photo number is!!err!");
