@@ -1,5 +1,5 @@
 <launch>
-  <param name="debug" value="true" type="bool"/>
+  <param name="debug" value="false" type="bool"/>
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 
@@ -30,8 +30,8 @@
   <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
   </node>  -->
 
-  <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
-  </node>
+  <!-- <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
+  </node>  -->
 
   <node name="global_path_planing" pkg="global_path_planing" type="global_path_planing" output="screen">
   </node> 

@@ -35,7 +35,7 @@ public:
    * @param thread_num the thread number of callback queue
    * @param name the module name
    */
-  RRTS(std::string name, uint32_t thread_num = 1);
+  RRTS(std::string name, uint32_t thread_num = 3);
 
   /**
    * @brief Start to run the all the callbacks in the queue

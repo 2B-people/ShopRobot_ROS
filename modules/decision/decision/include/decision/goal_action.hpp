@@ -89,13 +89,13 @@ public:
     ROS_INFO(" ALL Action server is started!");
 
     robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
-    robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
-    robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
+    // robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
+    // robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
     robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
 
     robot1_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_write");
-    robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
-    robot3_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
+    // robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
+    // robot3_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
     robot4_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_write");
     ROS_INFO("ALL Server is started!");
   }

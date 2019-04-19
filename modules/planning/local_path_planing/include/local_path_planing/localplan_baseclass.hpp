@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-04-17 20:45:45
+ * @LastEditTime: 2019-04-20 04:50:08
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -89,13 +89,13 @@ public:
     nh_.param("debug", is_debug_, false);
 
     target_robot1_action_sub_ = nh_.subscribe<data::Action>("shop/robot1/target_action", 10, boost::bind(&LocalBase::Robo1ActionCB, this, _1));
-    target_robot2_action_sub_ = nh_.subscribe<data::Action>("shop/robot2/target_action", 10, boost::bind(&LocalBase::Robo2ActionCB, this, _1));
-    target_robot3_action_sub_ = nh_.subscribe<data::Action>("shop/robot3/target_action", 10, boost::bind(&LocalBase::Robo3ActionCB, this, _1));
+    // target_robot2_action_sub_ = nh_.subscribe<data::Action>("shop/robot2/target_action", 10, boost::bind(&LocalBase::Robo2ActionCB, this, _1));
+    // target_robot3_action_sub_ = nh_.subscribe<data::Action>("shop/robot3/target_action", 10, boost::bind(&LocalBase::Robo3ActionCB, this, _1));
     target_robot4_action_sub_ = nh_.subscribe<data::Action>("shop/robot4/target_action", 10, boost::bind(&LocalBase::Robo4ActionCB, this, _1));
 
     robot1_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot1/now_coord", 10, boost::bind(&LocalBase::Robo1CoordNowCB, this, _1));
-    robot2_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot2/now_coord", 10, boost::bind(&LocalBase::Robo2CoordNowCB, this, _1));
-    robot3_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot3/now_coord", 10, boost::bind(&LocalBase::Robo3CoordNowCB, this, _1));
+    // robot2_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot2/now_coord", 10, boost::bind(&LocalBase::Robo2CoordNowCB, this, _1));
+    // robot3_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot3/now_coord", 10, boost::bind(&LocalBase::Robo3CoordNowCB, this, _1));
     robot4_coordinate_now_ = nh_.subscribe<data::Coord>("shop/robot4/now_coord", 10, boost::bind(&LocalBase::Robo4CoordNowCB, this, _1));
 
     a_barrier_sub_ = nh_.subscribe<data::Barrier>("shop/a_barrier", 10, boost::bind(&LocalBase::ABarrierCB, this, _1));
@@ -115,13 +115,13 @@ public:
 
     target_coordinate_lock_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot/coordinate_srv");
     robot1_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_write");
-    robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
-    robot3_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
+    // robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
+    // robot3_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
     robot4_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_write");
 
     robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
-    robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
-    robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
+    // robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
+    // robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
     robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
 
     plan_as_.start();
@@ -134,21 +134,23 @@ public:
 
   void PlanExecuteCB(const data::LocalPlanGoal::ConstPtr &goal)
   {
+    bool flag = false;
     //反馈
     data::LocalPlanFeedback feedback;
     //结果
     data::LocalPlanResult result;
 
     ros::Rate r(2); //10HZ
-    if (is_debug_)
-    {
-    }
+    // if (is_debug_)
+    // {
+    // }
     if (robot1_action_.is_action == false)
     {
       if (robot1_action_.action_state == 2)
       {
         ROS_INFO("robot1 PlanPlace is begin");
         PlanPlace(1);
+        flag = true;
       }
     }
     if (robot4_action_.is_action == false)
@@ -157,7 +159,15 @@ public:
       {
         ROS_INFO("robot4 PlanPlace is begin");
         PlanPlace(4);
+        flag = true;
       }
+    }
+
+    if (flag)
+    {
+      ROS_INFO("%s FININSH", __FUNCTION__);
+      result.success_flag = true;
+      plan_as_.setSucceeded(result);
     }
 
     if (all_done_ == false)

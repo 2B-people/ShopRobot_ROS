@@ -61,21 +61,28 @@ public:
     robot4_target_coord_.pose = 0;
     roadblock_.location_place = 0;
 
+    robot1_coord_.x = 10;
+    robot1_coord_.y = 10;
+    robot1_coord_.pose = 0;
+    robot4_coord_.x = 10;
+    robot4_coord_.y = 10;
+    robot4_coord_.pose = 0;
+
     roadblock_sub_ = nh_.subscribe<data::RoadblockMsg>("shop/roadblock", 10, boost::bind(&GlobalBase::RoadblockCB, this, _1));
 
     robot1_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot1/now_coord", 10, boost::bind(&GlobalBase::Robo1CoordNowCB, this, _1));
-    robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot2/now_coord", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
-    robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot3/now_coord", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
+    // robot2_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot2/now_coord", 10, boost::bind(&GlobalBase::Robo2CoordNowCB, this, _1));
+    // robot3_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot3/now_coord", 10, boost::bind(&GlobalBase::Robo3CoordNowCB, this, _1));
     robot4_coordinate_sub_ = nh_.subscribe<data::Coord>("shop/robot4/now_coord", 10, boost::bind(&GlobalBase::Robo4CoordNowCB, this, _1));
 
     target_robot1_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot1/target_coord", 10, boost::bind(&GlobalBase::Robo1TargetCoordCB, this, _1));
-    target_robot2_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot2/target_coord", 10, boost::bind(&GlobalBase::Robo2TargetCoordCB, this, _1));
-    target_robot3_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot3/target_coord", 10, boost::bind(&GlobalBase::Robo3TargetCoordCB, this, _1));
+    // target_robot2_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot2/target_coord", 10, boost::bind(&GlobalBase::Robo2TargetCoordCB, this, _1));
+    // target_robot3_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot3/target_coord", 10, boost::bind(&GlobalBase::Robo3TargetCoordCB, this, _1));
     target_robot4_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot4/target_coord", 10, boost::bind(&GlobalBase::Robo4TargetCoordCB, this, _1));
 
     robot1_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot1/cmd_coord", 1);
-    robot2_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/cmd_coord", 1);
-    robot3_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot3/cmd_coord", 1);
+    // robot2_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/cmd_coord", 1);
+    // robot3_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot3/cmd_coord", 1);
     robot4_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot4/cmd_coord", 1);
 
     plan_as_.start();
@@ -87,6 +94,17 @@ public:
 
   virtual data::Coord GetFinalCoord(uint8_t robot_num_) = 0;
   virtual void RobotGlobalPlanning(void) = 0;
+  void Run()
+  {
+    ros::Rate r(2); //10HZ
+    while (ros::ok)
+    {
+      ros::spinOnce();
+      robot1_cmd_coord_pub_.publish(robot1_coord_);
+      robot4_cmd_coord_pub_.publish(robot4_coord_);
+      r.sleep();
+    }
+  }
 
   void PlanExecuteCB(const data::GlobalPlanGoal::ConstPtr &goal)
   {
@@ -100,10 +118,8 @@ public:
     {
       ROS_WARN("global plan is run");
       RobotGlobalPlanning();
-      auto robot1_coord = GetFinalCoord(1);
-      auto robot4_coord = GetFinalCoord(2);
-      robot1_cmd_coord_pub_.publish(robot1_coord);
-      robot4_cmd_coord_pub_.publish(robot4_coord);
+      robot1_coord_ = GetFinalCoord(1);
+      robot4_coord_ = GetFinalCoord(2);
 
       // four车方案
       // auto robot2_coord = GetFinalCoord(2);
@@ -167,7 +183,7 @@ public:
       return robot3_target_coord_;
       break;
     case 4:
-      return robot4_target_coord_;      
+      return robot4_target_coord_;
       break;
     default:
       ROS_ERROR("no robot num in %s in %s", __FUNCTION__, name_.c_str());
@@ -176,6 +192,9 @@ public:
   }
 
 protected:
+  data::Coord robot1_coord_;
+  data::Coord robot4_coord_;
+
   data::Coord robot1_coord_now_;
   data::Coord robot2_coord_now_;
   data::Coord robot3_coord_now_;
