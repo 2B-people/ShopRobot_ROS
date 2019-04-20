@@ -27,8 +27,8 @@
     <param name="camera/wirt_time" value="5" type="int"/>
   </node>2
 
-  <!-- <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
-  </node>  -->
+  <node name="distinguish_learn" pkg="distinguish_learn" type="distinguish_learn.py" output="screen">
+  </node> 
 
   <node name="local_path_planing" pkg="local_path_planing" type="local_path_planing" output="screen">
   </node> 
