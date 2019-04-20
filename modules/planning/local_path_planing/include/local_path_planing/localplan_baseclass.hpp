@@ -175,7 +175,7 @@ public:
       if (JudgePlanIsDone())
       {
         result.success_flag = false;
-        plan_as_.setPreempted(result);
+        plan_as_.setSucceeded(result);
         return;
       }
       if (robot1_action_.is_action == false)
@@ -194,7 +194,7 @@ public:
         if (JudgePlanIsDone())
         {
           result.success_flag = false;
-          plan_as_.setPreempted(result);
+          plan_as_.setSucceeded(result);
           return;
         }
       }
@@ -219,7 +219,7 @@ public:
     {
       ROS_INFO("%s is Done", __FUNCTION__);
       result.success_flag = false;
-      plan_as_.setPreempted(result);
+      plan_as_.setSucceeded(result);
     }
 
     // if (robot2_action_.is_action == false)

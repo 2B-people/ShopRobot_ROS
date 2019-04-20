@@ -226,8 +226,12 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         // action_srv.request.is_action = true;
         // action_client_.call(action_srv);
         //发送目标
-        ROS_INFO("%s is write move", name_.c_str());
-        std::string coord_goal_str = CoordToData(cmd_coord_);
+        ROS_INFO("%s is write move x:%d ,y:%d", name_.c_str(),cmd_coord_.x,cmd_coord_.y);
+        data::Coord in_coord;
+        in_coord.x = cmd_coord_.x;
+        in_coord.y = cmd_coord_.y;
+        in_coord.pose = cmd_coord_.pose;
+        std::string coord_goal_str = CoordToData(in_coord);
         Send(coord_goal_str);
 
         // ROS_INFO("move is write %s", coord_goal_str.c_str());
@@ -258,9 +262,9 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
             //判断目标坐标
             //@note 下位机可以不用频道方向
-            if (now_coord_.x == cmd_coord_.x && now_coord_.y == cmd_coord_.y)
+            if (now_coord_.x == in_coord.x && now_coord_.y == in_coord.y)
             {
-                if (target_coord_.x == cmd_coord_.x && target_coord_.y == cmd_coord_.y)
+                if (target_coord_.x == in_coord.x && target_coord_.y == in_coord.y)
                 {
                     ROS_INFO("move to target,x:%d,y:%d", target_coord_.x, target_coord_.y);
                     ROS_INFO("%s FININSH", __FUNCTION__);
