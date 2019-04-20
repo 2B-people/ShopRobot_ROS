@@ -490,7 +490,7 @@ public:
                 if (j != 4)
                     break;
             }
-            ROS_WARN("QQQ:%d, %d, %d", temp_final_distance, temp_final_x, temp_final_y);
+            // ROS_WARN("QQQ:%d, %d, %d", temp_final_distance, temp_final_x, temp_final_y);
             if (temp_final_distance < final_distance)
             {
                 final_distance = temp_final_distance;
