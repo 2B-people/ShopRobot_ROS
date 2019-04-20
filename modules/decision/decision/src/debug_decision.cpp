@@ -6,10 +6,18 @@
 #include <blackboard/black_board.hpp>
 
 #include <data/Coord.h>
+#include <data/RoadblockMsg.h>
 
 //此文件用于debug,
 
 using namespace shop::decision;
+
+int8_t location_place_ = 0;
+
+void RoadCB(const data::RoadblockMsg::ConstPtr &msg)
+{
+    location_place_ = msg->location_place;
+}
 
 int main(int argc, char **argv)
 {
@@ -17,6 +25,8 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     bool is_debug_;
     nh.param("debug", is_debug_, false);
+
+    ros::Subscriber	sub	=	nh.subscribe("shop/roadblock",1,RoadCB);
 
     auto blackboard_ptr_ = std::make_shared<PrivateBoard>();
     auto goal_action_ptr = std::make_shared<GoalAction>(blackboard_ptr_);
@@ -102,11 +112,21 @@ int main(int argc, char **argv)
                                                                                   },
                                                                                   shop::decision::AbortType::LOW_PRIORITY);
 
+      auto set_roadblock_ptr = std::make_shared<shop::decision::PreconditionNode>("set_roadbloack_ptr", blackboard_ptr_,
+                                                                                  robot4_special_action_ptr,
+                                                                                  [&]() {
+                                                                                    std::string name = "O-"+std::to_string(location_place_);
+                                                                                    goal_action_ptr->SetTargetActionName(4,name);
+                                                                                    return true;
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+
     auto robot4_photo_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 photo seq", blackboard_ptr_);
     robot4_photo_seq_ptr->AddChildren(robot4_special_move_ptr);
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
     robot4_photo_seq_ptr->AddChildren(photo_ptr);
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
+    robot4_photo_seq_ptr->AddChildren(set_roadblock_ptr);
 
     auto robot4_test_success_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 test ptr", blackboard_ptr_,
                                                                                         robot4_photo_seq_ptr,

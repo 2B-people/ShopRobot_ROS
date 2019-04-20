@@ -79,15 +79,9 @@ WebServer::WebServer(std::string name)
 
     if (name_ == "robot1")
     {
-        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_wirte");
-    }
-    else if (name_ == "robot2")
-    {
-        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_wirte");
-    }
-    else if (name_ == "robot3")
-    {
-        shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
+        c_shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/C_shelf_barrier_wirte");
+        b_shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/B_shelf_barrier_wirte");
+        d_shelf_barrier_client_ = nh_.serviceClient<data::ShelfBarrier>("shop/D_shelf_barrier_wirte");
     }
     else if (name_ == "robot4")
     {
@@ -226,7 +220,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         // action_srv.request.is_action = true;
         // action_client_.call(action_srv);
         //发送目标
-        ROS_INFO("%s is write move x:%d ,y:%d", name_.c_str(),cmd_coord_.x,cmd_coord_.y);
+        ROS_INFO("%s is write move x:%d ,y:%d", name_.c_str(), cmd_coord_.x, cmd_coord_.y);
         data::Coord in_coord;
         in_coord.x = cmd_coord_.x;
         in_coord.y = cmd_coord_.y;
@@ -365,7 +359,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     ROS_WARN("%s is write action", name_.c_str());
-    
+
     // action_srv.request.action_name = target_action_.name;
     // action_srv.request.action_state = target_action_.action_state;
     // action_srv.request.is_action = true;
@@ -400,7 +394,6 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 
     //动作结束可以规划
 
-    
     data::ActionName action_srv;
     action_srv.request.is_action = false;
     action_srv.request.action_name = target_action_.name;
@@ -473,17 +466,26 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
                 feedback.begin_flag = true;
                 opening_as_.publishFeedback(feedback);
             }
+            else if (re_buf[0] == 'O')
+            {
+                ROS_WARN("IN HERE O");
+                data::Roadblock result;
+                result.request.number = re_buf[1] - '0';
+                roadblock_client_.call(result);
+            }
             else if (re_buf[0] == 'S')
             {
-                data::ShelfBarrier srv = DataToBarrier(re_buf);
-                if (shelf_barrier_client_.call(srv))
-                {
-                    ROS_INFO("shop barrier is wirte!");
-                }
-                else
-                {
-                    ROS_ERROR("failed to call shop barrier board!");
-                }
+                ROS_WARN("IN HERE S");                
+                // data::ShelfBarrier srv = DataToBarrier(re_buf);
+                // if (shelf_barrier_client_.call(srv))
+                // {
+                //     ROS_INFO("shop barrier is wirte!");
+                // }
+                // else
+                // {
+                //     ROS_ERROR("failed to call shop barrier board!");
+                // }
+                DataToBarrier(re_buf);
                 feedback.progress = "Is set barrier";
                 opening_as_.publishFeedback(feedback);
             }
@@ -599,10 +601,142 @@ std::string WebServer::CoordToData(data::Coord temp)
 // @breif data到货框障碍物
 // @pargm 坐标类型
 // @return 货框S
-data::ShelfBarrier WebServer::DataToBarrier(std::string temp)
+void WebServer::DataToBarrier(std::string temp)
 {
-    data::ShelfBarrier ruselt;
-    // ruselt.location = temp[]
+    ROS_WARN("barrier is %s",temp.c_str());
+    int index = temp[1] - '0';
+    data::ShelfBarrier shelf;
+    switch (index)
+    {
+    case 0:
+        shelf.request.location = 0;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 1;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 2;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 3;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        break;
+    case 1:
+        shelf.request.location = 4;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 5;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 6;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 7;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        break;
+    case 2:
+        shelf.request.location = 8;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 9;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 10;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 11;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        d_shelf_barrier_client_.call(shelf);
+        break;
+    case 3:
+        shelf.request.location = 0;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 1;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 2;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 3;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        break;
+    case 4:
+        shelf.request.location = 4;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 5;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 6;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 7;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        break;
+    case 5:
+        shelf.request.location = 8;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 9;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 10;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 11;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        c_shelf_barrier_client_.call(shelf);
+        break;
+    case 6:
+        shelf.request.location = 0;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 1;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 2;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 3;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        break;
+    case 7:
+        shelf.request.location = 4;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 5;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 6;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 7;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        break;
+    case 8:
+        shelf.request.location = 8;
+        shelf.request.shelf_barrier = (bool)(temp[2] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 9;
+        shelf.request.shelf_barrier = (bool)(temp[3] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 10;
+        shelf.request.shelf_barrier = (bool)(temp[4] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        shelf.request.location = 11;
+        shelf.request.shelf_barrier = (bool)(temp[5] - '0');
+        b_shelf_barrier_client_.call(shelf);
+        break;
+    default:
+        break;
+    }
 }
 bool WebServer::Send(std::string temp)
 {

@@ -82,6 +82,7 @@ private:
   data::Coord target_coord_;
   data::Coord cmd_coord_;
   data::Action target_action_;
+
   // ros
   ros::NodeHandle nh_;
   //action
@@ -90,7 +91,9 @@ private:
   OPENINGACTIONSERVER opening_as_;
   //service
   ros::ServiceClient roadblock_client_;
-  ros::ServiceClient shelf_barrier_client_;
+  ros::ServiceClient c_shelf_barrier_client_;
+  ros::ServiceClient b_shelf_barrier_client_;
+  ros::ServiceClient d_shelf_barrier_client_;
   ros::ServiceClient action_client_;
   //publish
   ros::Publisher move_pub_;
@@ -115,7 +118,7 @@ private:
   void TargetActionCB(const data::Action::ConstPtr &msg);
 
   data::Coord DataToCoord(std::string buf);
-  data::ShelfBarrier DataToBarrier(std::string temp);
+  void DataToBarrier(std::string temp);
   std::string CoordToData(data::Coord temp);
 
   bool Send(std::string temp);
