@@ -66,7 +66,7 @@ public:
     ROS_INFO("Waiting for action server to start");
     //识别用action
     camera_action_clint_.waitForServer();
-    // detection_clint_.waitForServer();
+    detection_clint_.waitForServer();
     //规划用action'
     localplan_clint_.waitForServer();
     globalplan_clint_.waitForServer();

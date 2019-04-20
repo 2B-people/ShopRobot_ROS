@@ -281,21 +281,21 @@ class GlobalPlan : public GlobalBase
             path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
             path_1.push(Coord(end_1.x, end_1.y));
         }
-        ROS_WARN("size of path1:%d", path_1.size());
+        ROS_WARN("size of path1:%d", (int)path_1.size());
         if(end_2.x != 10 && end_2.y != 10)
         {
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
             path_2.push(Coord(end_2.x, end_2.y));
 
         }
-        ROS_WARN("size of path2:%d", path_2.size());
+        ROS_WARN("size of path2:%d", (int)path_2.size());
         queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2; 
 
         while (temp_path_1.size())
         {
             Coord local_1 = temp_path_1.front();
             temp_path_1.pop();
-            ROS_WARN("Coord 1:%d, %d", local_1.first, local_1.second);
+            ROS_WARN("Coord 1:%d, %d", (int)local_1.first, (int)local_1.second);
             map_1[int(local_1.first)][int(local_1.second)] += 1;
         }
         memcpy(map_2, map_1, sizeof(map_1));
@@ -341,7 +341,7 @@ class GlobalPlan : public GlobalBase
                 {
                     arrive_flag_1 = arrive_flag_2 = false;
 
-                    final_coord_1 = Coord(now_1.x, now_2.y);
+                    final_coord_1 = Coord(now_1.x, now_1.y);
                     queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
                     while(out_coord.size())
                     {

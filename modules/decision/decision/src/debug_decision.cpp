@@ -137,8 +137,8 @@ int main(int argc, char **argv)
                                                                                         });
 
     auto robot4_photo_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 photo jud", blackboard_ptr_,
-                                                                                //    robot4_photo_seq_ptr,
-                                                                                   robot4_test_success_done_ptr,
+                                                                                   robot4_photo_seq_ptr,
+                                                                                //    robot4_test_success_done_ptr,
                                                                                    [&]() {
                                                                                        if (blackboard_ptr_->GetBoolValue("robot4_photo_flag") == true)
                                                                                        {
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
                                                                                    shop::decision::AbortType::LOW_PRIORITY);
 
     auto open_while_ptr = std::make_shared<shop::decision::WhileNode>("open while", blackboard_ptr_);
-    // open_while_ptr->AddChildren(distinguish_ptr);
+    open_while_ptr->AddChildren(distinguish_ptr);
     open_while_ptr->AddChildren(robot1_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_photo_jud_ptr);

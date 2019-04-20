@@ -35,6 +35,7 @@ class Camera(object):
             if count == self.delay_time:
                 name = str(num)
                 image = cv2.flip(image, 0)
+                image = cv2.flip(image, 1)
                 cv2.imwrite(self.path+'/image' + name + '.jpg', image)
                 break
             cv2.waitKey(1)
