@@ -33,3 +33,7 @@ add_executable(debug_decision src/debug_decision.cpp)
 add_dependencies(debug_decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(debug_decision PRIVATE  ${catkin_LIBRARIES})
 
+add_executable(test_behavior src/test_behavior.cpp)
+add_dependencies(test_behavior  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(test_behavior PRIVATE  ${catkin_LIBRARIES})
+

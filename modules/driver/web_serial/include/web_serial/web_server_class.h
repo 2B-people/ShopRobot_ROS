@@ -45,6 +45,7 @@ namespace shop
 {
 namespace webserver
 {
+
 #define BUFF_MAX 9
 
 typedef actionlib::SimpleActionServer<data::MoveAction> MOVEACTIONSERVER;
@@ -68,8 +69,14 @@ private:
   bool open_stop_;
   bool go_flag_;
   bool move_flag_;
-
+  bool is_run_action_;
+  bool is_finish_;
+  bool is_begin_;
+  bool wifi_err_;
   //socket
+  uint64_t is_recv_;
+  uint64_t last_recv_;
+  int failure_index_;
   int client_sockfd_;
   int server_sockfd_;
   int bind_port_;
@@ -82,6 +89,8 @@ private:
   data::Coord target_coord_;
   data::Coord cmd_coord_;
   data::Action target_action_;
+
+  std::thread *read_thread_;
 
   // ros
   ros::NodeHandle nh_;
@@ -103,6 +112,8 @@ private:
   ros::Subscriber move_cmd_sub_;
   ros::Subscriber action_sub_;
 
+  ros::Timer time_cb_;
+
   //function
   bool InitWeb();
   void MoveExecuteCB(const data::MoveGoal::ConstPtr &goal);
@@ -121,8 +132,11 @@ private:
   void DataToBarrier(std::string temp);
   std::string CoordToData(data::Coord temp);
 
+  void ReceiveLoop(void);
+  void ReInitWeb(const	ros::TimerEvent &event);
+
   bool Send(std::string temp);
-  std::string Recv(void);
+  std::string Recv(int *status);
 };
 
 } // namespace webserver

@@ -58,7 +58,7 @@ public:
         vector<Coord> determined_location;
         vector<int> determined_action;
         vector<int> determined_shelf_location;
-        int final_x, final_y, final_distance = 999;
+        int final_x , final_y, final_distance = 999;
         int final_action, final_shelf_location;
 
         auto goal_shelf = GetNowToShelf(robot_num);
@@ -505,8 +505,8 @@ public:
         // ROS_WARN("OOOO:%d, %d", final_x, final_y);
         if (is_debug_)
         {
-            ROS_INFO("final_x:%d final_y:%d goal_shelf:%d final_action:%d", final_x, final_y, goal_shelf, final_action);
         }
+        ROS_INFO("final_x:%d final_y:%d goal_shelf:%d final_action:%d", final_x, final_y, goal_shelf, final_action);
 
         TransmissonMessageToRobot(1, robot_num, int16_t(final_x), int16_t(final_y), 0, 0, goal_shelf,
                                   final_action);
@@ -698,8 +698,8 @@ public:
         }
         if (is_debug_)
         {
-            ROS_INFO("x:%d y:%d final_category:%d final_location:%d", final_x, final_y, final_category, final_location);
         }
+        ROS_INFO("x:%d y:%d final_category:%d final_location:%d", final_x, final_y, final_category, final_location);
 
         TransmissonMessageToRobot(2, robot_num, int16_t(final_x), int16_t(final_y), final_location, final_category);
         SetGoodsNONE(int8_t(final_location));

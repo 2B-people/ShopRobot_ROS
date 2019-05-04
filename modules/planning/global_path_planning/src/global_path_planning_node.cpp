@@ -40,7 +40,7 @@ class GlobalPlan : public GlobalBase
             map[8][4] = 1;
             break;
         case 3:
-            map[8][8] = 11;
+            map[8][8] = 1;
             break;
         case 4:
             map[5][7] = 1;
@@ -89,9 +89,20 @@ class GlobalPlan : public GlobalBase
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
         PositionOfObstacles(map);
-        // auto now_1 = GetNowCoord(1);
-        // auto now_2 = GetNowCoord(2);
+        auto now_1 = GetNowCoord(1);
+        auto now_2 = GetNowCoord(2);
 
+        auto end_1 = GetTargetCoord(1);
+        auto end_2 = GetTargetCoord(2);
+        if(end_2.x != now_1.x || end_2.y != now_1.y)
+        {
+            map[now_1.x][now_1.y] = 1;
+            
+        }
+        if(end_1.x != now_2.x || end_1.y != now_2.y)
+        {
+            map[now_2.x][now_2.y] = 1;
+        }
         // map[now_1.x][now_1.y] = 1;
         // map[now_2.x][now_2.y] = 1;
 

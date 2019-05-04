@@ -79,6 +79,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
+    return;
   }
 
   int8_t robot_num_;
@@ -148,6 +151,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
+    return;
   }
 
   // data
@@ -222,6 +228,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
+    return;
   }
 
   std::string flag_name_;
@@ -317,7 +326,7 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
-    ros::Rate r(5); //10HZ
+    ros::Rate r(2); //10HZ
     r.sleep();
     return;
   }
@@ -379,6 +388,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
+    return;
   }
   uint8_t robot_num_;
   bool goal_flag_;
@@ -440,6 +452,9 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
+    return;
   }
   uint8_t robot_num_;
   bool goal_flag_;
@@ -500,7 +515,7 @@ private:
       ROS_ERROR("%s is err", name_.c_str());
       return;
     }
-    ros::Rate r(5); //10HZ
+    ros::Rate r(2); //10HZ
     r.sleep();
     return;
   }

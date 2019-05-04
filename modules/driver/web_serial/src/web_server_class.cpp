@@ -7,10 +7,10 @@
  */
 /*
  * @Description: In User Settings Edit
- * @Author: your name
+ * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-17 21:47:13
+ * @LastEditTime: 2019-04-29 15:35:12
  */
 #include <web_serial/web_server_class.h>
 
@@ -22,7 +22,7 @@ namespace webserver
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true), is_debug_(false),
       client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.100"), bind_port_(1111), go_flag_(false),
-      move_flag_(false),
+      move_flag_(false), is_recv_(0), last_recv_(0), wifi_err_(false),
       //atcion初始化
       move_as_(nh_, ("shop/" + name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
       opening_as_(nh_, ("shop/" + name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
@@ -33,6 +33,10 @@ WebServer::WebServer(std::string name)
     is_open_ = true;
     move_stop_ = false;
     shop_stop_ = false;
+
+    is_run_action_ = false;
+    is_finish_ = false;
+    is_begin_ = false;
 
     now_coord_.x = 10;
     now_coord_.y = 10;
@@ -50,6 +54,8 @@ WebServer::WebServer(std::string name)
     target_action_.is_action = false;
     target_action_.action_state = 0;
 
+    failure_index_ = 0;
+
     memset(&my_addr_, 0, sizeof(my_addr_)); //数据初始化--清零
 
     ROS_INFO("%s is begin", name_.c_str());
@@ -66,8 +72,8 @@ WebServer::WebServer(std::string name)
 
     //publish init
     move_pub_ = nh_.advertise<data::Coord>("shop/" + name_ + "/now_coord", 1);
-
     move_pub_.publish(now_coord_);
+
     //subscribe init
     move_target_sub_ = nh_.subscribe<data::Coord>("shop/" + name_ + "/target_coord", 10, boost::bind(&WebServer::TargetCoordCB, this, _1));
     move_cmd_sub_ = nh_.subscribe<data::Coord>("shop/" + name_ + "/cmd_coord", 10, boost::bind(&WebServer::CmdCoordCB, this, _1));
@@ -85,11 +91,14 @@ WebServer::WebServer(std::string name)
     }
     else if (name_ == "robot4")
     {
+        
     }
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
     action_as_.registerPreemptCallback(boost::bind(&WebServer::ShopPreemptCB, this));
     opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
+
+    time_cb_ = nh_.createTimer(ros::Duration(1.0), boost::bind(&WebServer::ReInitWeb, this, _1));
 
     //action open
     move_as_.start();
@@ -101,6 +110,7 @@ WebServer::WebServer(std::string name)
     {
         exit(-1);
     }
+
     Send("I");
 }
 
@@ -111,6 +121,11 @@ WebServer::~WebServer()
     shop_stop_ = true;
     // ROS_INFO("%s is destrust", name_.c_str());
     /*关闭套接字*/
+    if (read_thread_ != nullptr)
+    {
+        read_thread_->join();
+        delete read_thread_;
+    }
     close(client_sockfd_);
     close(server_sockfd_);
 }
@@ -119,8 +134,10 @@ WebServer::~WebServer()
 void WebServer::Run(void)
 {
     ros::AsyncSpinner async_spinner(thread_num_);
+    read_thread_ = new std::thread(boost::bind(&WebServer::ReceiveLoop, this));
     async_spinner.start();
     ros::waitForShutdown();
+    
     // while (ros::ok)
     // {
     //     ros::spinOnce();
@@ -171,6 +188,103 @@ bool WebServer::InitWeb()
     return true;
 }
 
+void WebServer::ReInitWeb(const ros::TimerEvent &event)
+{
+    if (go_flag_)
+    {
+        if (last_recv_ == is_recv_)
+        {
+            failure_index_++;
+            ROS_ERROR("in here");
+        }
+        else
+        {
+            failure_index_ = 0;
+            ROS_ERROR("in here2");
+        }
+        last_recv_ = is_recv_;
+
+        if (failure_index_ == 5)
+        {
+            wifi_err_ = true;
+            ROS_ERROR("%s wifi is err ,in restart", name_.c_str());
+            int index = 0;
+            close(client_sockfd_);
+            close(server_sockfd_);
+            while (ros::ok)
+            {
+                if (InitWeb() == false)
+                {
+                    index++;
+                    if (index == 10)
+                    {
+                        ROS_ERROR("%scan't restart wifi", name_.c_str());
+                        exit(-1);
+                    }
+                    ros::Rate r(2); //10HZ
+                    r.sleep();
+                }
+                else
+                {
+                    ROS_ERROR("%s restart wifi is success", name_.c_str());
+                    ros::Duration(2.0).sleep();
+                    break;
+                }
+            }
+            wifi_err_ = false;
+            failure_index_ = 0;
+        }
+    }
+}
+
+void WebServer::ReceiveLoop(void)
+{
+    ROS_INFO("ReceiveLoop is ready!");
+
+    std::string re_buf_string;
+    int status = 0;
+
+    while (is_open_ && ros::ok())
+    {
+        if (wifi_err_ == false)
+        {
+            re_buf_string = Recv(&status);
+
+            if (re_buf_string.substr(0, 6) == "finish")
+            {
+                ROS_INFO("is finish");
+                if (is_run_action_)
+                {
+                    is_finish_ = true;
+                }
+            }
+            else if (re_buf_string[0] == 'R')
+            {
+                now_coord_ = DataToCoord(re_buf_string);
+                move_pub_.publish(now_coord_);
+            }
+            else if (re_buf_string[0] == 'B')
+            {
+                ROS_INFO("IN HERE B");
+                is_begin_ = true;
+            }
+            else if (re_buf_string[0] == 'O')
+            {
+                ROS_WARN("IN HERE O");
+                ROS_WARN("is read %s", re_buf_string.c_str());
+                data::Roadblock result;
+                result.request.number = re_buf_string[1] - '0';
+                roadblock_client_.call(result);
+            }
+            else if (re_buf_string[0] == 'S')
+            {
+                ROS_WARN("IN HERE S");
+                DataToBarrier(re_buf_string);
+            }
+        }
+    }
+}
+
 //移动的回调函数
 void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 {
@@ -178,11 +292,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     data::MoveFeedback feedback;
     //结果
     data::MoveResult result;
-
-    //目标转化为string在发下去
-    // coord_goal.x = goal->x;
-    // coord_goal.y = goal->y;
-    // coord_goal.pose = 5;
 
     if (goal->pose == 1)
     {
@@ -205,46 +314,38 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 return;
             }
         }
-
-        if (move_flag_ == true && now_coord_.x == target_coord_.x && now_coord_.y == target_coord_.y)
+        if (cmd_coord_.x == now_coord_.x && cmd_coord_.y == now_coord_.y)
         {
-            ROS_INFO("%s move is wart for plan", name_.c_str());
+            ROS_INFO("%s move is wart plan", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             return;
         }
 
-        // data::ActionName action_srv;
-        // action_srv.request.action_name = target_action_.name;
-        // action_srv.request.action_state = target_action_.action_state;
-        // action_srv.request.is_action = true;
-        // action_client_.call(action_srv);
         //发送目标
         ROS_INFO("%s is write move x:%d ,y:%d", name_.c_str(), cmd_coord_.x, cmd_coord_.y);
         data::Coord in_coord;
         in_coord.x = cmd_coord_.x;
         in_coord.y = cmd_coord_.y;
-        in_coord.pose = cmd_coord_.pose;
+        in_coord.pose = 5;
         std::string coord_goal_str = CoordToData(in_coord);
         Send(coord_goal_str);
 
         // ROS_INFO("move is write %s", coord_goal_str.c_str());
-
-        //得到一次现在的坐标,得到进度计算的分母
-        std::string re_frist_buf = Recv();
-        now_coord_ = DataToCoord(re_frist_buf);
-        move_pub_.publish(now_coord_);
-        float progress_overall = float((target_coord_.x + target_coord_.y) - (now_coord_.x + now_coord_.y));
         while (ros::ok && is_open_ && move_stop_ == false)
         {
-            std::string re_buf = Recv();
-
-            if (is_debug_)
+            if (wifi_err_ == true)
             {
-                // ROS_INFO("RE_BUf is %s", re_buf.c_str());
+                while (ros::ok)
+                {
+                    if (wifi_err_ == false)
+                    {
+                        Send(coord_goal_str);
+                        break;
+                    }
+                }
             }
 
-            now_coord_ = DataToCoord(re_buf);
             if (now_coord_.x >= 10 || now_coord_.y >= 10)
             {
                 ROS_WARN("coord data is err");
@@ -252,7 +353,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 move_as_.setPreempted(result);
                 return;
             }
-            move_pub_.publish(now_coord_);
 
             //判断目标坐标
             //@note 下位机可以不用频道方向
@@ -277,7 +377,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             else
             {
                 // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord_.x, now_coord_.y, now_coord_.pose);
-                feedback.progress = (float)((now_coord_.x + now_coord_.y) - (now_coord_.x + now_coord_.y)) / progress_overall;
+                feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
         }
@@ -285,43 +385,33 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     else if (goal->pose == 2)
     {
         //发送目标
-
-        //存在bug
-        // data::ActionName action_srv;
-        // action_srv.request.action_name = target_action_.name;
-        // action_srv.request.action_state = target_action_.action_state;
-        // action_srv.request.is_action = true;
-        // action_client_.call(action_srv);
-
         std::string coord_goal_str = CoordToData(target_coord_);
         Send(coord_goal_str);
 
         ROS_INFO("move is write %s", coord_goal_str.c_str());
 
-        //得到一次现在的坐标,得到进度计算的分母
-        std::string re_frist_buf = Recv();
-        data::Coord begin_coord = DataToCoord(re_frist_buf);
-        move_pub_.publish(begin_coord);
-        float progress_overall = float((target_coord_.x + target_coord_.y) - (begin_coord.x + begin_coord.y));
+        float progress_overall = 0.0;
         //等待结束,移动到目标坐标
         while (ros::ok && is_open_ && move_stop_ == false)
         {
 
-            std::string re_buf = Recv();
-
-            if (is_debug_)
+            if (wifi_err_ == true)
             {
-                // ROS_INFO("RE_BUf is %s", re_buf.c_str());
+                while (ros::ok)
+                {
+                    if (wifi_err_ == false)
+                    {
+                        Send(coord_goal_str);
+                        break;
+                    }
+                }
             }
 
             // ROS_INFO("RE_BUf is %s", re_buf.c_str());
-
-            now_coord_ = DataToCoord(re_buf);
             if (now_coord_.x == 10 && now_coord_.y == 10)
             {
                 ROS_WARN("coord data is err");
             }
-            move_pub_.publish(now_coord_);
 
             //判断目标坐标
             //@note 下位机可以不用频道方向
@@ -336,18 +426,28 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             else
             {
                 // ROS_INFO("read x:%d,y:%d,pose:%d", now_coord_.x, now_coord_.y, now_coord_.pose);
-                feedback.progress = (float)((now_coord_.x + now_coord_.y) - (begin_coord.x + begin_coord.y)) / progress_overall;
+                feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
         }
     }
 }
-
 //shopatcion的回调函数
 void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
 {
+    //feedback
     data::ShopActionFeedback feedback;
+    //result
     data::ShopActionResult result;
+
+    //name is none
+    if (target_action_.name == "NONE")
+    {
+        ROS_WARN("action name is NONE");
+        result.success_flag = false;
+        action_as_.setPreempted(result);
+        return;
+    }
 
     //判断目标的是否能用
     if (target_action_.action_state == 0)
@@ -359,41 +459,35 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     ROS_WARN("%s is write action", name_.c_str());
-
-    // action_srv.request.action_name = target_action_.name;
-    // action_srv.request.action_state = target_action_.action_state;
-    // action_srv.request.is_action = true;
-    // action_client_.call(action_srv);
+    std::string temp = target_action_.name;
+    ROS_WARN("target action is %s", temp.c_str());
 
     //发送此次的目标
-    Send(target_action_.name);
+    Send(temp);
+    is_run_action_ = true;
 
     //等待结束
     while (ros::ok() && is_open_ && shop_stop_ == false)
     {
-
-        std::string re_buf_string = Recv();
-
-        if (re_buf_string.substr(0, 6) == "finish")
+        if (wifi_err_ == true)
         {
-            ROS_INFO("%s is finish", target_action_.name.c_str());
+            while (ros::ok)
+            {
+                if (wifi_err_ == false)
+                {
+                    Send(temp);
+                    break;
+                }
+            }
+        }
+        if (is_finish_)
+        {
+            is_finish_ = false;
             break;
-        }
-        else if (re_buf_string[0] == 'R')
-        {
-            // ROS_WARN("is read R");
-            now_coord_ = DataToCoord(re_buf_string);
-            move_pub_.publish(now_coord_);
-        }
-        else
-        {
-            feedback.progress = re_buf_string;
-            action_as_.publishFeedback(feedback);
         }
     }
 
     //动作结束可以规划
-
     data::ActionName action_srv;
     action_srv.request.is_action = false;
     action_srv.request.action_name = target_action_.name;
@@ -401,15 +495,12 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     switch (target_action_.action_state)
     {
     case 1:
-        ROS_WARN("1");
         action_srv.request.action_state = 2;
         break;
     case 2:
-        ROS_WARN("2");
         action_srv.request.action_state = 1;
         break;
     case 3:
-        ROS_WARN("3");
         action_srv.request.action_state = 1;
         break;
     default:
@@ -417,9 +508,11 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         break;
     }
 
+    is_run_action_ = false;
     action_client_.call(action_srv);
 
     ROS_INFO("%s FININSH", __FUNCTION__);
+
     result.success_flag = true;
     action_as_.setSucceeded(result);
     return;
@@ -433,7 +526,7 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 
     if (go_flag_)
     {
-        ROS_ERROR("this is bug!");
+        // ROS_ERROR("this is bug!");
         result.success_flag = false;
         opening_as_.setPreempted(result);
         return;
@@ -443,62 +536,26 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 
     Send("go");
 
-    while (ros::ok())
-    {
-        if (is_open_)
-        {
+    is_run_action_ = true;
 
-            std::string re_buf = Recv();
-            // ROS_INFO("%s", re_buf.c_str());
-            if (re_buf.substr(0, 6) == "finish")
-            {
-                break;
-            }
-            else if (re_buf[0] == 'R')
-            {
-                ROS_WARN("is read R");
-                now_coord_ = DataToCoord(re_buf);
-                move_pub_.publish(now_coord_);
-            }
-            else if (re_buf[0] == 'B')
-            {
-                // ROS_INFO("IN HERE");
-                feedback.begin_flag = true;
-                opening_as_.publishFeedback(feedback);
-            }
-            else if (re_buf[0] == 'O')
-            {
-                ROS_WARN("IN HERE O");
-                data::Roadblock result;
-                result.request.number = re_buf[1] - '0';
-                roadblock_client_.call(result);
-            }
-            else if (re_buf[0] == 'S')
-            {
-                ROS_WARN("IN HERE S");                
-                // data::ShelfBarrier srv = DataToBarrier(re_buf);
-                // if (shelf_barrier_client_.call(srv))
-                // {
-                //     ROS_INFO("shop barrier is wirte!");
-                // }
-                // else
-                // {
-                //     ROS_ERROR("failed to call shop barrier board!");
-                // }
-                DataToBarrier(re_buf);
-                feedback.progress = "Is set barrier";
-                opening_as_.publishFeedback(feedback);
-            }
-            else
-            {
-                feedback.progress = re_buf;
-                opening_as_.publishFeedback(feedback);
-            }
+    while (ros::ok() && is_open_)
+    {
+        if (is_finish_)
+        {
+            is_finish_ = false;
+            break;
+        }
+        if (is_begin_)
+        {
+            is_begin_ = false;
+            feedback.begin_flag = true;
+            opening_as_.publishFeedback(feedback);
         }
     }
 
-    go_flag_ = true;
+    is_run_action_ = false;
     result.success_flag = true;
+    go_flag_ = true;
     opening_as_.setSucceeded(result);
     return;
 }
@@ -506,27 +563,24 @@ void WebServer::OpeningExecuteCB(const data::OpeningGoal::ConstPtr &goal)
 //移动抢占中断回调函数
 void WebServer::MovePreemptCB()
 {
-
     if (move_as_.isActive())
     {
         Send("S");
         while (ros::ok)
         {
-            std::string re_buf = Recv();
-            data::Coord stop_now_coord_ = DataToCoord(re_buf);
-            if (now_coord_.pose == 1 && stop_now_coord_.x == now_coord_.x + 1 && stop_now_coord_.y == now_coord_.y)
+            if (now_coord_.pose == 1 && now_coord_.x == now_coord_.x + 1 && now_coord_.y == now_coord_.y)
             {
                 break;
             }
-            else if (now_coord_.pose == 2 && stop_now_coord_.x == now_coord_.x && stop_now_coord_.y == now_coord_.y + 1)
+            else if (now_coord_.pose == 2 && now_coord_.x == now_coord_.x && now_coord_.y == now_coord_.y + 1)
             {
                 break;
             }
-            else if (now_coord_.pose == 3 && stop_now_coord_.x == now_coord_.x - 1 && stop_now_coord_.y == now_coord_.y)
+            else if (now_coord_.pose == 3 && now_coord_.x == now_coord_.x - 1 && now_coord_.y == now_coord_.y)
             {
                 break;
             }
-            else if (now_coord_.pose == 4 && stop_now_coord_.x == now_coord_.x && stop_now_coord_.y == now_coord_.y - 1)
+            else if (now_coord_.pose == 4 && now_coord_.x == now_coord_.x && now_coord_.y == now_coord_.y - 1)
             {
                 break;
             }
@@ -576,9 +630,9 @@ data::Coord WebServer::DataToCoord(std::string buf)
     else
     {
         ROS_WARN("data err!is %s", buf.c_str());
-        rul_coord.x = 10;
-        rul_coord.y = 10;
-        rul_coord.pose = 10;
+        rul_coord.x = now_coord_.x;
+        rul_coord.y = now_coord_.x;
+        rul_coord.pose = now_coord_.pose;
         return rul_coord;
     }
 }
@@ -597,140 +651,138 @@ std::string WebServer::CoordToData(data::Coord temp)
     return temp_str;
 }
 
-// TODO !!!
 // @breif data到货框障碍物
-// @pargm 坐标类型
-// @return 货框S
+// @pargm data
 void WebServer::DataToBarrier(std::string temp)
 {
-    ROS_WARN("barrier is %s",temp.c_str());
+    ROS_WARN("barrier is %s", temp.c_str());
     int index = temp[1] - '0';
     data::ShelfBarrier shelf;
     switch (index)
     {
     case 0:
-        shelf.request.location = 0;
+        shelf.request.location = 1;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 1;
+        shelf.request.location = 0;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 2;
+        shelf.request.location = 3;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 3;
+        shelf.request.location = 2;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         d_shelf_barrier_client_.call(shelf);
         break;
     case 1:
-        shelf.request.location = 4;
+        shelf.request.location = 5;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 5;
+        shelf.request.location = 4;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 6;
+        shelf.request.location = 7;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 7;
+        shelf.request.location = 6;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         d_shelf_barrier_client_.call(shelf);
         break;
     case 2:
-        shelf.request.location = 8;
+        shelf.request.location = 9;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 9;
+        shelf.request.location = 8;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 10;
+        shelf.request.location = 11;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         d_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 11;
+        shelf.request.location = 10;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         d_shelf_barrier_client_.call(shelf);
         break;
     case 3:
-        shelf.request.location = 0;
+        shelf.request.location = 1;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 1;
+        shelf.request.location = 0;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 2;
+        shelf.request.location = 3;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 3;
+        shelf.request.location = 2;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         c_shelf_barrier_client_.call(shelf);
         break;
     case 4:
-        shelf.request.location = 4;
+        shelf.request.location = 5;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 5;
+        shelf.request.location = 4;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 6;
+        shelf.request.location = 7;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 7;
+        shelf.request.location = 6;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         c_shelf_barrier_client_.call(shelf);
         break;
     case 5:
-        shelf.request.location = 8;
+        shelf.request.location = 9;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 9;
+        shelf.request.location = 8;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 10;
+        shelf.request.location = 11;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         c_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 11;
+        shelf.request.location = 10;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         c_shelf_barrier_client_.call(shelf);
         break;
     case 6:
-        shelf.request.location = 0;
+        shelf.request.location = 1;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 1;
+        shelf.request.location = 0;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 2;
+        shelf.request.location = 3;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 3;
+        shelf.request.location = 2;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         b_shelf_barrier_client_.call(shelf);
         break;
     case 7:
-        shelf.request.location = 4;
+        shelf.request.location = 5;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 5;
+        shelf.request.location = 4;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 6;
+        shelf.request.location = 7;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 7;
+        shelf.request.location = 6;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         b_shelf_barrier_client_.call(shelf);
         break;
     case 8:
-        shelf.request.location = 8;
+        shelf.request.location = 9;
         shelf.request.shelf_barrier = (bool)(temp[2] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 9;
+        shelf.request.location = 8;
         shelf.request.shelf_barrier = (bool)(temp[3] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 10;
+        shelf.request.location = 11;
         shelf.request.shelf_barrier = (bool)(temp[4] - '0');
         b_shelf_barrier_client_.call(shelf);
-        shelf.request.location = 11;
+        shelf.request.location = 10;
         shelf.request.shelf_barrier = (bool)(temp[5] - '0');
         b_shelf_barrier_client_.call(shelf);
         break;
@@ -748,14 +800,19 @@ bool WebServer::Send(std::string temp)
 
     send(client_sockfd_, (char *)str_.c_str(), BUFF_MAX, 0);
 }
-std::string WebServer::Recv(void)
+std::string WebServer::Recv(int *status)
 {
     std::string temp;
     char re_frist_buf[BUFF_MAX];
     while (1)
     {
         memset(re_frist_buf, '\0', BUFF_MAX);
-        recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
+        *status = recv(client_sockfd_, &re_frist_buf, BUFF_MAX, 0);
+        is_recv_++;
+        if (status < 0)
+        {
+            return "ERR";
+        }
         if (is_debug_)
         {
             ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
@@ -780,7 +837,7 @@ void WebServer::TargetCoordCB(const data::Coord::ConstPtr &msg)
 {
     target_coord_.x = msg->x;
     target_coord_.y = msg->y;
-    target_coord_.pose = msg->pose;
+    target_coord_.pose = 5;
 }
 void WebServer::CmdCoordCB(const data::Coord::ConstPtr &msg)
 {

@@ -3,7 +3,7 @@
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-28 21:02:38
- * @LastEditTime: 2019-04-20 04:50:08
+ * @LastEditTime: 2019-04-23 18:47:42
  */
 #ifndef LOCALPLAN_BASECLASS_H
 #define LOCALPLAN_BASECLASS_H
@@ -513,7 +513,7 @@ public:
     srv.request.action_name = action_name;
     srv.request.action_state = action_state;
     srv.request.is_action = true;
-    ROS_WARN("%d is set %s", robot_num, action_name.c_str());
+    ROS_WARN("%d's action set %s", robot_num, action_name.c_str());
     switch (robot_num)
     {
     case 1:

@@ -63,7 +63,5 @@ class Timer(object):
         if self.verbose:
             print ('elapsed time: ',self.msecs,'ms')
 
-
-len('cpp&c')
-len('py')
-len('web')
+if __name__ == "__main__":
+    len('cpp&c')

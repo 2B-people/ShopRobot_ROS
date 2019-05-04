@@ -53,21 +53,15 @@ public:
                                                         robot1_move_action_clint_("shop/robot1/move_action", true),
                                                         robot1_open_action_clint_("shop/robot1/opening_action", true),
                                                         robot1_shop_action_clint_("shop/robot1/shop_action", true),
-                                                        robot2_move_action_clint_("shop/robot2/move_action", true),
-                                                        robot2_open_action_clint_("shop/robot2/opening_action", true),
-                                                        robot2_shop_action_clint_("shop/robot2/shop_action", true),
-                                                        robot3_move_action_clint_("shop/robot3/move_action", true),
-                                                        robot3_open_action_clint_("shop/robot3/opening_action", true),
-                                                        robot3_shop_action_clint_("shop/robot3/shop_action", true),
                                                         robot4_move_action_clint_("shop/robot4/move_action", true),
                                                         robot4_shop_action_clint_("shop/robot4/shop_action", true),
                                                         robot4_open_action_clint_("shop/robot4/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
-    //识别用action
+    // 识别用action
     camera_action_clint_.waitForServer();
     detection_clint_.waitForServer();
-    //规划用action'
+    // 规划用action'
     localplan_clint_.waitForServer();
     globalplan_clint_.waitForServer();
     //两车方案
@@ -78,24 +72,12 @@ public:
     robot4_open_action_clint_.waitForServer();
     robot4_shop_action_clint_.waitForServer();
 
-   #if FOURCAR
-    robot2_move_action_clint_.waitForServer();
-    robot2_open_action_clint_.waitForServer();
-    robot2_shop_action_clint_.waitForServer();
-    robot3_move_action_clint_.waitForServer();
-    robot3_open_action_clint_.waitForServer();
-    robot3_shop_action_clint_.waitForServer();
-  #endif
     ROS_INFO(" ALL Action server is started!");
 
     robot1_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot1/target_actionname_write");
-    // robot2_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot2/target_actionname_write");
-    // robot3_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot3/target_actionname_write");
     robot4_target_actionname_write_clt_ = nh_.serviceClient<data::ActionName>("shop/robot4/target_actionname_write");
 
     robot1_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot1/target_coordinate_write");
-    // robot2_target_coordinate_write_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot2/target_coordinate_write");
-    // robot3_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot3/target_coordinate_write");
     robot4_target_coordinate_wirte_clt_ = nh_.serviceClient<data::Coordinate>("shop/robot4/target_coordinate_write");
     ROS_INFO("ALL Server is started!");
   }
@@ -107,16 +89,11 @@ public:
     data::Coordinate srv;
     srv.request.x = target_coord.x;
     srv.request.y = target_coord.y;
+    srv.request.pose = 5;
     switch (robot_num)
     {
     case 1:
       robot1_target_coordinate_write_clt_.call(srv);
-      break;
-    case 2:
-      robot2_target_coordinate_write_clt_.call(srv);
-      break;
-    case 3:
-      robot3_target_coordinate_wirte_clt_.call(srv);
       break;
     case 4:
       robot4_target_coordinate_wirte_clt_.call(srv);
@@ -139,12 +116,6 @@ public:
     case 1:
       robot1_target_actionname_write_clt_.call(srv);
       break;
-    case 2:
-      robot2_target_actionname_write_clt_.call(srv);
-      break;
-    case 3:
-      robot3_target_actionname_write_clt_.call(srv);
-      break;
     case 4:
       robot4_target_actionname_write_clt_.call(srv);
       break;
@@ -152,6 +123,8 @@ public:
       ROS_ERROR("no robot in %s ", __FUNCTION__);
       break;
     }
+    ros::Rate r(2); //10HZ
+    r.sleep();
     return;
   }
 
@@ -217,18 +190,6 @@ public:
                                          MOVEACTIONCLINT::SimpleActiveCallback(),
                                          MOVEACTIONCLINT::SimpleFeedbackCallback());
       break;
-    case 2:
-      robot2_move_action_clint_.sendGoal(goal,
-                                         MOVEACTIONCLINT::SimpleDoneCallback(),
-                                         MOVEACTIONCLINT::SimpleActiveCallback(),
-                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
-      break;
-    case 3:
-      robot3_move_action_clint_.sendGoal(goal,
-                                         MOVEACTIONCLINT::SimpleDoneCallback(),
-                                         MOVEACTIONCLINT::SimpleActiveCallback(),
-                                         MOVEACTIONCLINT::SimpleFeedbackCallback());
-      break;
     case 4:
       robot4_move_action_clint_.sendGoal(goal,
                                          MOVEACTIONCLINT::SimpleDoneCallback(),
@@ -251,18 +212,6 @@ public:
     {
     case 1:
       robot1_shop_action_clint_.sendGoal(goal,
-                                         SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(),
-                                         SHOPACTION::SimpleFeedbackCallback());
-      break;
-    case 2:
-      robot2_shop_action_clint_.sendGoal(goal,
-                                         SHOPACTION::SimpleDoneCallback(),
-                                         SHOPACTION::SimpleActiveCallback(),
-                                         SHOPACTION::SimpleFeedbackCallback());
-      break;
-    case 3:
-      robot3_shop_action_clint_.sendGoal(goal,
                                          SHOPACTION::SimpleDoneCallback(),
                                          SHOPACTION::SimpleActiveCallback(),
                                          SHOPACTION::SimpleFeedbackCallback());
@@ -294,18 +243,6 @@ public:
                                          OPENINGCLINT::SimpleActiveCallback(),
                                          boost::bind(&GoalAction::OpeningFB1, this, _1));
       break;
-    case 2:
-      robot2_open_action_clint_.sendGoal(goal,
-                                         OPENINGCLINT::SimpleDoneCallback(),
-                                         OPENINGCLINT::SimpleActiveCallback(),
-                                         boost::bind(&GoalAction::OpeningFB2, this, _1));
-      break;
-    case 3:
-      robot3_open_action_clint_.sendGoal(goal,
-                                         OPENINGCLINT::SimpleDoneCallback(),
-                                         OPENINGCLINT::SimpleActiveCallback(),
-                                         boost::bind(&GoalAction::OpeningFB3, this, _1));
-      break;
     case 4:
       robot4_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
@@ -327,14 +264,6 @@ public:
       robot1_move_action_clint_.cancelGoal();
       ROS_INFO("robot1 is cancel!");
       break;
-    case 2:
-      robot2_move_action_clint_.cancelGoal();
-      ROS_INFO("robot2 is cancel!");
-      break;
-    case 3:
-      robot3_move_action_clint_.cancelGoal();
-      ROS_INFO("robot3 is cancel!");
-      break;
     case 4:
       robot4_move_action_clint_.cancelGoal();
       ROS_INFO("robot3 is cancel!");
@@ -354,14 +283,6 @@ public:
       robot1_shop_action_clint_.cancelGoal();
       ROS_INFO("robot1 is cancel!");
       break;
-    case 2:
-      robot2_shop_action_clint_.cancelGoal();
-      ROS_INFO("robot2 is cancel!");
-      break;
-    case 3:
-      robot3_shop_action_clint_.cancelGoal();
-      ROS_INFO("robot3 is cancel!");
-      break;
     case 4:
       robot4_shop_action_clint_.cancelGoal();
       ROS_INFO("robot3 is cancel!");
@@ -380,12 +301,6 @@ public:
     {
     case 1:
       state = robot1_move_action_clint_.getState();
-      break;
-    case 2:
-      state = robot2_move_action_clint_.getState();
-      break;
-    case 3:
-      state = robot3_move_action_clint_.getState();
       break;
     case 4:
       state = robot4_move_action_clint_.getState();
@@ -426,12 +341,6 @@ public:
     case 1:
       state = robot1_shop_action_clint_.getState();
       break;
-    case 2:
-      state = robot2_shop_action_clint_.getState();
-      break;
-    case 3:
-      state = robot3_shop_action_clint_.getState();
-      break;
     case 4:
       state = robot4_shop_action_clint_.getState();
       break;
@@ -470,12 +379,6 @@ public:
     {
     case 1:
       state = robot1_open_action_clint_.getState();
-      break;
-    case 2:
-      state = robot2_open_action_clint_.getState();
-      break;
-    case 3:
-      state = robot3_open_action_clint_.getState();
       break;
     case 4:
       state = robot4_open_action_clint_.getState();
@@ -626,14 +529,6 @@ private:
   MOVEACTIONCLINT robot1_move_action_clint_;
   OPENINGCLINT robot1_open_action_clint_;
   SHOPACTION robot1_shop_action_clint_;
-  //robot2
-  MOVEACTIONCLINT robot2_move_action_clint_;
-  OPENINGCLINT robot2_open_action_clint_;
-  SHOPACTION robot2_shop_action_clint_;
-  //robot3
-  MOVEACTIONCLINT robot3_move_action_clint_;
-  OPENINGCLINT robot3_open_action_clint_;
-  SHOPACTION robot3_shop_action_clint_;
   //robot4
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
@@ -641,12 +536,9 @@ private:
 
   //server client
   ros::ServiceClient robot1_target_actionname_write_clt_;
-  ros::ServiceClient robot2_target_actionname_write_clt_;
-  ros::ServiceClient robot3_target_actionname_write_clt_;
   ros::ServiceClient robot4_target_actionname_write_clt_;
+
   ros::ServiceClient robot1_target_coordinate_write_clt_;
-  ros::ServiceClient robot2_target_coordinate_write_clt_;
-  ros::ServiceClient robot3_target_coordinate_wirte_clt_;
   ros::ServiceClient robot4_target_coordinate_wirte_clt_;
 
   // void GlobalPlanDoneCB(const actionlib::SimpleClientGoalState &state, const data::GlobalPlanResult::ConstPtr &result)
@@ -677,42 +569,17 @@ private:
   {
     if (result->success_flag)
     {
-      private_blackboard_ptr_->SetBoolValue(false,"opening_flag");
+      private_blackboard_ptr_->SetBoolValue(false, "opening_flag");
       // debug
       // ROS_ERROR("IN HERE");
     }
-    
   }
 
-  void
-  OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)
-  {
-    if (feedback->begin_flag == true)
-    {
-      #if FOURCAR
-      private_blackboard_ptr_->SetBoolValue(true, "robot2_opening_flag");
-      #else
-      private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
-      #endif 
-      ROS_WARN("IN HERE");
-    }
-  }
-
-  void OpeningFB2(const data::OpeningFeedback::ConstPtr &feedback)
-  {
-    if (feedback->begin_flag == true)
-    {
-      private_blackboard_ptr_->SetBoolValue(true, "robot3_opening_flag");
-      ROS_WARN("IN HERE");
-    }
-  }
-
-  void OpeningFB3(const data::OpeningFeedback::ConstPtr &feedback)
+  void OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)
   {
     if (feedback->begin_flag == true)
     {
       private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
-      ROS_WARN("IN HERE");
     }
   }
 };
