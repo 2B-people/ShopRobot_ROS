@@ -12,9 +12,17 @@
 #include <data/Coord.h>
 #include <data/RoadblockMsg.h>
 
-//此文件用于debug,
-
 using namespace shop::decision;
+
+#define DOONCE(func, flag) \
+    {                      \
+        if (flag == false) \
+        {                  \
+            func;          \
+            flag = true;   \
+        }                  \
+    }
+
 void Command();
 char command = '0';
 
@@ -41,9 +49,9 @@ int main(int argc, char **argv)
     auto robot1_action_ptr = std::make_shared<shop::decision::ShopAction>(1, 0, "robot1 shop", blackboard_ptr_, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, 0, "robot4 shop", blackboard_ptr_, goal_action_ptr);
 
-    auto test_seq_ptr = std::make_shared<shop::decision::SequenceNode>("test seq", blackboard_ptr_);
+    // auto test_seq_ptr = std::make_shared<shop::decision::SequenceNode>("test seq", blackboard_ptr_);
     // test_seq_ptr->AddChildren(robot4_move_ptr);
-    test_seq_ptr->AddChildren(robot4_action_ptr);
+    // test_seq_ptr->AddChildren(robot4_action_ptr);
 
     data::Coord coord;
     coord.x = 1;
@@ -51,6 +59,7 @@ int main(int argc, char **argv)
     goal_action_ptr->SetTargetActionName(4, "NONE");
     auto command_thread = std::thread(Command);
     ros::Rate rate(10);
+    bool is_run = false;
     while (ros::ok)
     {
         robot4_cmd_coord_pub_.publish(coord);
@@ -84,6 +93,12 @@ int main(int argc, char **argv)
             goal_action_ptr->SetTargetCoord(4, coord);
             command = '0';
             break;
+        case 'j':
+            robot4_move_ptr->Run();
+            break;
+        case 'k':
+            robot4_action_ptr->Run();
+            break;
         case 27:
             if (command_thread.joinable())
             {
@@ -93,7 +108,22 @@ int main(int argc, char **argv)
         default:
             break;
         }
-        test_seq_ptr->Run();
+
+        // move test is done
+        if (robot4_move_ptr->GetBehaviorState() == BehaviorState::SUCCESS)
+        {
+            robot4_move_ptr->Reset();
+            command = '0';
+        }
+
+        // action test is done
+        if (robot4_action_ptr->GetBehaviorState() == BehaviorState::SUCCESS)
+        {
+            robot4_action_ptr->Reset();
+            goal_action_ptr->SetTargetActionName(4, "NONE");
+            command = '0';
+        }
+
         rate.sleep();
     }
 }
@@ -108,13 +138,16 @@ void Command()
         std::cout << "> ";
         std::cout << "1:p-2" << std::endl;
         std::cout << "2:c-1" << std::endl;
-        std::cout << "3:coord.x+1" << std::endl;
-        std::cout << "4:coord.y+1" << std::endl;
+        std::cout << "W:coord.x+1 ,S:coord.x-1" << std::endl;
+        std::cout << "A:coord.y+1 ,D:coord.y-1" << std::endl;
+        std::cout << "J:To robot move" << std::endl;
+        std::cout << "K:To robot action" << std::endl;
         std::cout << "esc: exit program" << std::endl;
         std::cout << "**************************************" << std::endl;
 
         std::cin >> command;
-        if (command != '1' && command != '2' && command != '3' && command != '4' && command != '5' && command != '6' && command != 27)
+
+        if (command != '1' && command != '2' && command != 'w' && command != 'a' && command != 'd' && command != 's'&& command != 'j'&& command != 'k' && command != 27)
         {
             std::cout << "please input again!" << std::endl;
             std::cout << "> ";

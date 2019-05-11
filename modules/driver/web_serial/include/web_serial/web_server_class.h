@@ -73,7 +73,9 @@ private:
   bool is_finish_;
   bool is_begin_;
   bool wifi_err_;
+  bool is_move_;
   //socket
+  socklen_t sin_size_;
   uint64_t is_recv_;
   uint64_t last_recv_;
   int failure_index_;
