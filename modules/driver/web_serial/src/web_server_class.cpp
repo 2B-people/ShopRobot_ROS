@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-11 14:39:24
+ * @LastEditTime: 2019-05-12 00:09:23
  */
 #include <web_serial/web_server_class.h>
 
@@ -138,10 +138,11 @@ void WebServer::Run(void)
     while (ros::ok)
     {
         ros::spinOnce();
-        if (failure_index_ == 10)
+        if (failure_index_ == 8)
         {
-            close(client_sockfd_);
+            wifi_err_ = true;
 
+            close(client_sockfd_);
             ros::Duration(0.5).sleep();
 
             if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size_)) < 0)
@@ -271,6 +272,14 @@ void WebServer::ReceiveLoop(void)
                 DataToBarrier(re_buf_string);
             }
         }
+        else
+        {
+            while (1)
+            {
+                if (wifi_err_ == false)
+                    break;
+            }
+        }
     }
 }
 
@@ -315,6 +324,15 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             return;
         }
 
+        if (wifi_err_ == true)
+        {
+            ROS_INFO("wifi is err", name_.c_str());
+            result.success_flag = false;
+            move_as_.setPreempted(result);
+            is_move_ = false;
+            return;
+        }
+
         //发送目标
         ROS_INFO("%s is write move x:%d ,y:%d", name_.c_str(), cmd_coord_.x, cmd_coord_.y);
         data::Coord in_coord;
@@ -333,7 +351,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 {
                     if (wifi_err_ == false)
                     {
-                        Send(coord_goal_str);
+                        // Send(coord_goal_str);
                         break;
                     }
                 }
@@ -385,7 +403,10 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         Send(coord_goal_str);
 
         ROS_INFO("move is write %s", coord_goal_str.c_str());
-
+        data::Coord last_coord;
+        int index = 0;
+        last_coord.x = now_coord_.x;
+        last_coord.y = now_coord_.y;
         float progress_overall = 0.0;
         //等待结束,移动到目标坐标
         while (ros::ok && is_open_ && move_stop_ == false)
@@ -426,6 +447,24 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
+
+            if (last_coord.x != now_coord_.x || last_coord.y != now_coord_.y)
+            {
+                index = 0;
+                last_coord.x = now_coord_.x;
+                last_coord.y = now_coord_.y;
+            }
+            else
+            {
+                index++;
+            }
+
+            if (index == 20)
+            {
+                Send(coord_goal_str);
+                index = 0;
+            }
+            ros::Duration(0.1).sleep();
         }
     }
 }
@@ -455,6 +494,14 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         return;
     }
 
+    if (wifi_err_ == false)
+    {
+        ROS_WARN("wifi is err");
+        result.success_flag = false;
+        action_as_.setPreempted(result);
+        return;
+    }
+
     ROS_WARN("%s is write action", name_.c_str());
     std::string temp = target_action_.name;
     ROS_WARN("target action is %s", temp.c_str());
@@ -462,6 +509,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     //发送此次的目标
     Send(temp);
     is_run_action_ = true;
+    uint32_t index = 0;
 
     //等待结束
     while (ros::ok() && is_open_ && shop_stop_ == false)
@@ -472,16 +520,28 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             {
                 if (wifi_err_ == false)
                 {
-                    Send(temp);
+                    // Send(temp);
                     break;
                 }
             }
+            break;
         }
         if (is_finish_)
         {
             is_finish_ = false;
             break;
         }
+        else
+        {
+            index++;
+        }
+        if (index == 400)
+        {
+            Send(temp);
+            index = 0;
+        }
+
+        ros::Duration(0.1).sleep();
     }
 
     //动作结束可以规划

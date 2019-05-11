@@ -70,7 +70,7 @@ int main(int argc, char **argv)
             command = '0';
             break;
         case '2':
-            goal_action_ptr->SetTargetActionName(4, "C-1");
+            goal_action_ptr->SetTargetActionName(4, "C-01");
             command = '0';
             break;
         case 'w':
@@ -99,6 +99,9 @@ int main(int argc, char **argv)
         case 'k':
             robot4_action_ptr->Run();
             break;
+        case 'l':
+            robot4_opening_ptr->Run();
+            break;
         case 27:
             if (command_thread.joinable())
             {
@@ -123,6 +126,13 @@ int main(int argc, char **argv)
             goal_action_ptr->SetTargetActionName(4, "NONE");
             command = '0';
         }
+        if (robot4_opening_ptr->GetBehaviorState() == BehaviorState::SUCCESS)
+        {
+            robot4_opening_ptr->Reset();
+            command = '0';
+
+        }
+        
 
         rate.sleep();
     }
@@ -147,7 +157,7 @@ void Command()
 
         std::cin >> command;
 
-        if (command != '1' && command != '2' && command != 'w' && command != 'a' && command != 'd' && command != 's'&& command != 'j'&& command != 'k' && command != 27)
+        if (command != '1' && command != '2' && command != 'w' && command != 'a' && command != 'd' && command != 's'&& command != 'j'&& command != 'k'&& command != 'l' && command != 27)
         {
             std::cout << "please input again!" << std::endl;
             std::cout << "> ";
