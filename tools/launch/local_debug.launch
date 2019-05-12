@@ -1,5 +1,5 @@
 <launch>
-  <param name="debug" value="true" type="bool"/>
+  <param name="debug" value="false" type="bool"/>
 
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>
 

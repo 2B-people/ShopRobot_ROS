@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-12 00:09:23
+ * @LastEditTime: 2019-05-12 23:05:20
  */
 #include <web_serial/web_server_class.h>
 
@@ -141,7 +141,7 @@ void WebServer::Run(void)
         if (failure_index_ == 8)
         {
             wifi_err_ = true;
-
+            ROS_ERROR("wifi is done!");
             close(client_sockfd_);
             ros::Duration(0.5).sleep();
 
@@ -149,7 +149,8 @@ void WebServer::Run(void)
             {
                 ROS_ERROR("%s accept error", name_.c_str());
             }
-            ROS_INFO("recv accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+            ROS_WARN("recv accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+            wifi_err_ = false;
         }
     }
 }
@@ -216,12 +217,12 @@ void WebServer::ReInitWeb(const ros::TimerEvent &event)
     if (last_recv_ == is_recv_)
     {
         failure_index_++;
-        ROS_ERROR("%s in here", name_.c_str());
+        //ROS_ERROR("%s in here", name_.c_str());
     }
     else
     {
         failure_index_ = 0;
-        ROS_ERROR("%s in here2", name_.c_str());
+        //ROS_ERROR("%s in here2", name_.c_str());
     }
 
     last_recv_ = is_recv_;
@@ -326,7 +327,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
 
         if (wifi_err_ == true)
         {
-            ROS_INFO("wifi is err", name_.c_str());
+            ROS_INFO("%s wifi is err", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
             is_move_ = false;
@@ -398,6 +399,16 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     }
     else if (goal->pose == 2)
     {
+        
+        if (wifi_err_ == true)
+        {
+            ROS_INFO("%s wifi is err", name_.c_str());
+            result.success_flag = false;
+            move_as_.setPreempted(result);
+            is_move_ = false;
+            return;
+        }        
+        
         //发送目标
         std::string coord_goal_str = CoordToData(target_coord_);
         Send(coord_goal_str);
@@ -411,7 +422,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         //等待结束,移动到目标坐标
         while (ros::ok && is_open_ && move_stop_ == false)
         {
-
             if (wifi_err_ == true)
             {
                 while (ros::ok)
@@ -494,7 +504,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         return;
     }
 
-    if (wifi_err_ == false)
+    if (wifi_err_ == true)
     {
         ROS_WARN("wifi is err");
         result.success_flag = false;
@@ -870,7 +880,7 @@ std::string WebServer::Recv(int *status)
         {
             return "ERR";
         }
-        ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        // ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
 
         temp = re_frist_buf;
 
