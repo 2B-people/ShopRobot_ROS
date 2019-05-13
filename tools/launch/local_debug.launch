@@ -20,10 +20,10 @@
   </node> -->
 
   <node name="camera_node" pkg="camera" type="camera_node.py" output="screen">
-    <!-- <param name="url/address" value="192.168.31.10" type="str"/> -->
+    <param name="url/address" value="192.168.31.10" type="str"/>
     <!-- <param name="url/address" value="192.168.31.82" type="str"/>  -->
     <!-- <param name="url/address" value="192.168.31.158" type="str"/>  -->
-    <param name="url/address" value="192.168.31.195" type="str"/>
+    <!-- <param name="url/address" value="192.168.31.195" type="str"/> -->
     <param name="camera/wirt_time" value="5" type="int"/>
   </node>
 

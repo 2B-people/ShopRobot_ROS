@@ -192,7 +192,7 @@ class GlobalPlan : public GlobalBase
                 map2[7][5] += 1;
             }
             if(int(now1.first) == 5 && int(now1.second) == 7)
-            {
+            { 
                 map2[4][7] += 1;
                 map2[6][7] += 1;
 

@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-12 23:05:20
+ * @LastEditTime: 2019-05-13 21:41:58
  */
 #include <web_serial/web_server_class.h>
 
@@ -107,7 +107,7 @@ WebServer::WebServer(std::string name)
     {
         exit(-1);
     }
-    time_cb_ = nh_.createTimer(ros::Duration(0.5), boost::bind(&WebServer::ReInitWeb, this, _1));
+    time_cb_ = nh_.createTimer(ros::Duration(1), boost::bind(&WebServer::ReInitWeb, this, _1));
     Send("I");
 }
 
@@ -348,14 +348,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         {
             if (wifi_err_ == true)
             {
-                while (ros::ok)
-                {
-                    if (wifi_err_ == false)
-                    {
-                        // Send(coord_goal_str);
-                        break;
-                    }
-                }
+                ROS_INFO("%s wifi is err", name_.c_str());
+                result.success_flag = false;
+                move_as_.setPreempted(result);
+                is_move_ = false;
+                return;
             }
 
             if (now_coord_.x >= 10 || now_coord_.y >= 10)
@@ -365,6 +362,14 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 move_as_.setPreempted(result);
                 is_move_ = false;
                 return;
+            }
+            if (in_coord.x != cmd_coord_.x || in_coord.y != cmd_coord_.y)
+            {
+                in_coord.x = cmd_coord_.x;
+                in_coord.y = cmd_coord_.y;
+                in_coord.pose = 5;
+                std::string coord_goal_str = CoordToData(in_coord);
+                Send(coord_goal_str);
             }
 
             //判断目标坐标
@@ -399,7 +404,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     }
     else if (goal->pose == 2)
     {
-        
+
         if (wifi_err_ == true)
         {
             ROS_INFO("%s wifi is err", name_.c_str());
@@ -407,8 +412,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             move_as_.setPreempted(result);
             is_move_ = false;
             return;
-        }        
-        
+        }
+
         //发送目标
         std::string coord_goal_str = CoordToData(target_coord_);
         Send(coord_goal_str);
@@ -424,16 +429,13 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         {
             if (wifi_err_ == true)
             {
-                while (ros::ok)
-                {
-                    if (wifi_err_ == false)
-                    {
-                        Send(coord_goal_str);
-                        break;
-                    }
-                }
+                ROS_INFO("%s wifi is err", name_.c_str());
+                result.success_flag = false;
+                move_as_.setPreempted(result);
+                is_move_ = false;
+                return;
             }
-
+            
             // ROS_INFO("RE_BUf is %s", re_buf.c_str());
             if (now_coord_.x == 10 && now_coord_.y == 10)
             {
@@ -526,16 +528,12 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     {
         if (wifi_err_ == true)
         {
-            while (ros::ok)
-            {
-                if (wifi_err_ == false)
-                {
-                    // Send(temp);
-                    break;
-                }
-            }
-            break;
+            ROS_WARN("wifi is err");
+            result.success_flag = false;
+            action_as_.setPreempted(result);
+            return;
         }
+
         if (is_finish_)
         {
             is_finish_ = false;
@@ -545,7 +543,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         {
             index++;
         }
-        if (index == 400)
+        if (index == 150)
         {
             Send(temp);
             index = 0;
@@ -880,7 +878,10 @@ std::string WebServer::Recv(int *status)
         {
             return "ERR";
         }
-        // ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        if (is_debug_)
+        {
+            ROS_WARN("%s is recv %s", name_.c_str(), re_frist_buf);
+        }
 
         temp = re_frist_buf;
 
