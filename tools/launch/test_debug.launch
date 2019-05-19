@@ -4,12 +4,7 @@
   <node name="world_board_node" pkg="blackboard" type="world_board_node" output="screen"></node>  
 
   <node name="robot4" pkg="web_serial" type="robot4_web_server" output="screen">
-<<<<<<< HEAD
     <param name="addr" value="192.168.31.66" type="str" />
     <param name="port" value="1111" type="int"/>
-=======
-    <param name="addr" value="192.168.31.157" type="str" />
-    <param name="port" value="1113" type="int"/>
->>>>>>> 64d16c537146adf870acb8660a028fe38e633919
   </node>
 </launch>
