@@ -361,7 +361,8 @@ class GlobalPlan : public GlobalBase
         }
         create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
         
-        if(create_path_flag)
+        ROS_WARN("create_path_flag:%d", create_path_flag);
+        if(create_path_flag != 0)
         {
             CreatePath(create_path_flag, map_2);
         }
