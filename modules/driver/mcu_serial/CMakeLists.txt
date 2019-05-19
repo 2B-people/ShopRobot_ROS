@@ -12,17 +12,25 @@ find_package(catkin REQUIRED COMPONENTS
   common
   data
   roscpp
-  #serial
+  serial
   std_msgs
+  actionlib
+
 )
+  catkin_package(
+    INCLUDE_DIRS include
+    CATKIN_DEPENDS roscpp 
+  )
 
-# catkin_package()
+include_directories(include)
+include_directories( ${catkin_INCLUDE_DIRS})
 
-# include_directories(include)
-# include_directories( ${catkin_INCLUDE_DIRS})
+add_executable(mcu_serial_test src/mcu_serial_test.cpp)
+target_link_libraries(mcu_serial_test  ${catkin_LIBRARIES} )
 
-# add_executable(mcu_serial_test src/mcu_serial_test.cpp)
-# target_link_libraries(mcu_serial_test  ${catkin_LIBRARIES} )
+add_executable(box_serial_node src/box_serial_node.cpp)
+add_dependencies(box_serial_node rrts ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(box_serial_node  rrts ${catkin_LIBRARIES} )
 
 # add_executable(mcu_serial_node src/mcu_serial_node.cpp )
 # add_dependencies(mcu_serial_node rrts ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
