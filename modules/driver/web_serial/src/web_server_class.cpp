@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-13 21:41:58
+ * @LastEditTime: 2019-05-16 21:52:35
  */
 #include <web_serial/web_server_class.h>
 
@@ -246,6 +246,7 @@ void WebServer::ReceiveLoop(void)
                 ROS_INFO("is finish");
                 if (is_run_action_)
                 {
+                    ROS_WARN("in here");
                     is_finish_ = true;
                 }
             }
@@ -534,7 +535,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
             return;
         }
 
-        if (is_finish_)
+        if (is_finish_ == true)
         {
             is_finish_ = false;
             break;

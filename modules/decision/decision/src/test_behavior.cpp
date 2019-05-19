@@ -141,6 +141,14 @@ int main(int argc, char **argv)
             goal_action_ptr->SetTargetCoord(4, coord);
             command = '0';
             break;
+        case 'i':
+            goal_action_ptr->SetTargetActionName(4, "T");
+            command = '0';
+            break;
+        case 'u':
+            goal_action_ptr->SetTargetActionName(4, "D");
+            command = '0';
+            break;
         case 'j':
             robot4_move_ptr->Run();
             break;
@@ -206,6 +214,8 @@ void Command()
         std::cout << "=:c-10" << std::endl;
         std::cout << "`:c-11" << std::endl;
         std::cout << "]:c-12" << std::endl;
+        std::cout << "i:T" << std::endl;
+        std::cout << "u:D" << std::endl;
         std::cout << "W:coord.x+1 ,S:coord.x-1" << std::endl;
         std::cout << "A:coord.y+1 ,D:coord.y-1" << std::endl;
         std::cout << "J:To robot move" << std::endl;
