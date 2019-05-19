@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, 0, "robot4 shop", blackboard_ptr_, goal_action_ptr);
 
     auto test_seq_ptr = std::make_shared<shop::decision::SequenceNode>("test seq", blackboard_ptr_);
-    // test_seq_ptr->AddChildren(robot4_move_ptr);
+    test_seq_ptr->AddChildren(robot4_move_ptr);
     test_seq_ptr->AddChildren(robot4_action_ptr);
 
     data::Coord coord;
@@ -108,8 +108,7 @@ void Command()
         std::cout << "> ";
         std::cout << "1:p-2" << std::endl;
         std::cout << "2:c-1" << std::endl;
-        std::cout << "3:coord.x+1" << std::endl;
-        std::cout << "4:coord.y+1" << std::endl;
+        std::cout << "fanxianjian kou " << std::endl;
         std::cout << "esc: exit program" << std::endl;
         std::cout << "**************************************" << std::endl;
 

@@ -58,16 +58,16 @@ public:
                                                         robot4_open_action_clint_("shop/robot4/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
-    // 识别用action
-    camera_action_clint_.waitForServer();
-    detection_clint_.waitForServer();
-    // 规划用action'
-    localplan_clint_.waitForServer();
-    globalplan_clint_.waitForServer();
+    // // 识别用action
+    // camera_action_clint_.waitForServer();
+    // detection_clint_.waitForServer();
+    // // 规划用action'
+    // localplan_clint_.waitForServer();
+    // globalplan_clint_.waitForServer();
     //两车方案
-    robot1_move_action_clint_.waitForServer();
-    robot1_open_action_clint_.waitForServer();
-    robot1_shop_action_clint_.waitForServer();
+    // robot1_move_action_clint_.waitForServer();
+    // robot1_open_action_clint_.waitForServer();
+    // robot1_shop_action_clint_.waitForServer();
     robot4_move_action_clint_.waitForServer();
     robot4_open_action_clint_.waitForServer();
     robot4_shop_action_clint_.waitForServer();
