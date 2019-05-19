@@ -782,31 +782,31 @@ public:
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1", 1);
+                    SetRobotTargetAction(robot_num, "C-01", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2", 1);
+                    SetRobotTargetAction(robot_num, "C-02", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3", 1);
+                    SetRobotTargetAction(robot_num, "C-03", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4", 1);
+                    SetRobotTargetAction(robot_num, "C-04", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5", 1);
+                    SetRobotTargetAction(robot_num, "C-05", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6", 1);
+                    SetRobotTargetAction(robot_num, "C-06", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7", 1);
+                    SetRobotTargetAction(robot_num, "C-07", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8", 1);
+                    SetRobotTargetAction(robot_num, "C-08", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9", 1);
+                    SetRobotTargetAction(robot_num, "C-09", 1);
                     break;
                 case 10:
                     SetRobotTargetAction(robot_num, "C-10", 1);
@@ -829,31 +829,31 @@ public:
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1", 1);
+                    SetRobotTargetAction(robot_num, "C-01", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2", 1);
+                    SetRobotTargetAction(robot_num, "C-02", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3", 1);
+                    SetRobotTargetAction(robot_num, "C-03", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4", 1);
+                    SetRobotTargetAction(robot_num, "C-04", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5", 1);
+                    SetRobotTargetAction(robot_num, "C-05", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6", 1);
+                    SetRobotTargetAction(robot_num, "C-06", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7", 1);
+                    SetRobotTargetAction(robot_num, "C-07", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8", 1);
+                    SetRobotTargetAction(robot_num, "C-08", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9", 1);
+                    SetRobotTargetAction(robot_num, "C-09", 1);
                     break;
                 case 10:
                     SetRobotTargetAction(robot_num, "C-10", 1);
@@ -876,31 +876,31 @@ public:
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1", 1);
+                    SetRobotTargetAction(robot_num, "C-01", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2", 1);
+                    SetRobotTargetAction(robot_num, "C-02", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3", 1);
+                    SetRobotTargetAction(robot_num, "C-03", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4", 1);
+                    SetRobotTargetAction(robot_num, "C-04", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5", 1);
+                    SetRobotTargetAction(robot_num, "C-05", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6", 1);
+                    SetRobotTargetAction(robot_num, "C-06", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7", 1);
+                    SetRobotTargetAction(robot_num, "C-07", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8", 1);
+                    SetRobotTargetAction(robot_num, "C-08", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9", 1);
+                    SetRobotTargetAction(robot_num, "C-09", 1);
                     break;
                 case 10:
                     SetRobotTargetAction(robot_num, "C-10", 1);
@@ -923,31 +923,31 @@ public:
                 switch (final_category)
                 {
                 case 1:
-                    SetRobotTargetAction(robot_num, "C-1", 1);
+                    SetRobotTargetAction(robot_num, "C-01", 1);
                     break;
                 case 2:
-                    SetRobotTargetAction(robot_num, "C-2", 1);
+                    SetRobotTargetAction(robot_num, "C-02", 1);
                     break;
                 case 3:
-                    SetRobotTargetAction(robot_num, "C-3", 1);
+                    SetRobotTargetAction(robot_num, "C-03", 1);
                     break;
                 case 4:
-                    SetRobotTargetAction(robot_num, "C-4", 1);
+                    SetRobotTargetAction(robot_num, "C-04", 1);
                     break;
                 case 5:
-                    SetRobotTargetAction(robot_num, "C-5", 1);
+                    SetRobotTargetAction(robot_num, "C-05", 1);
                     break;
                 case 6:
-                    SetRobotTargetAction(robot_num, "C-6", 1);
+                    SetRobotTargetAction(robot_num, "C-06", 1);
                     break;
                 case 7:
-                    SetRobotTargetAction(robot_num, "C-7", 1);
+                    SetRobotTargetAction(robot_num, "C-07", 1);
                     break;
                 case 8:
-                    SetRobotTargetAction(robot_num, "C-8", 1);
+                    SetRobotTargetAction(robot_num, "C-08", 1);
                     break;
                 case 9:
-                    SetRobotTargetAction(robot_num, "C-9", 1);
+                    SetRobotTargetAction(robot_num, "C-09", 1);
                     break;
                 case 10:
                     SetRobotTargetAction(robot_num, "C-10", 1);

@@ -55,13 +55,14 @@ public:
                                                         robot1_shop_action_clint_("shop/robot1/shop_action", true),
                                                         robot4_move_action_clint_("shop/robot4/move_action", true),
                                                         robot4_shop_action_clint_("shop/robot4/shop_action", true),
-                                                        robot4_open_action_clint_("shop/robot4/opening_action", true)
+                                                        robot4_open_action_clint_("shop/robot4/opening_action", true),
+                                                        opencar_open_clint_("shop/shop/opencar/opening_action",true)
   {
     ROS_INFO("Waiting for action server to start");
     // // 识别用action
     // camera_action_clint_.waitForServer();
     // detection_clint_.waitForServer();
-    // // 规划用action'
+    // // 规划用action
     // localplan_clint_.waitForServer();
     // globalplan_clint_.waitForServer();
     //两车方案
@@ -533,6 +534,8 @@ private:
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
   OPENINGCLINT robot4_open_action_clint_;
+  //opencar open 
+  OPENINGCLINT opencar_open_clint_;
 
   //server client
   ros::ServiceClient robot1_target_actionname_write_clt_;

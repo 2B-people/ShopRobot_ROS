@@ -83,16 +83,32 @@ int main(int argc, char **argv)
                                                                                 [&]() {
                                                                                     std::string name = "O-" + std::to_string(location_place_);
                                                                                     goal_action_ptr->SetTargetActionName(4, name);
+                                                                                    blackboard_ptr_->SetBoolValue(true,"set_roadblock_flag");
                                                                                     return true;
                                                                                 },
                                                                                 shop::decision::AbortType::LOW_PRIORITY);
+
+    auto  set_roadblock_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 set roadblock jud", blackboard_ptr_,
+                                                                                  set_roadblock_ptr,
+                                                                                  [&]() {
+                                                                                      if (blackboard_ptr_->GetBoolValue("robot4_opening_flag") == false&
+                                                                                          blackboard_ptr_->GetBoolValue("set_roadblock_flag") == false  )
+                                                                                      {
+                                                                                          return true;
+                                                                                      }
+                                                                                      else
+                                                                                      {
+                                                                                          return false;
+                                                                                      }
+                                                                                  },
+                                                                                  shop::decision::AbortType::LOW_PRIORITY);
 
     auto robot4_photo_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 photo seq", blackboard_ptr_);
     robot4_photo_seq_ptr->AddChildren(robot4_special_move_ptr);
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
     robot4_photo_seq_ptr->AddChildren(photo_ptr);
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
-    robot4_photo_seq_ptr->AddChildren(set_roadblock_ptr);
+    robot4_photo_seq_ptr->AddChildren(set_roadblock_jud_ptr);
 
     auto robot4_test_success_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 test ptr", blackboard_ptr_,
                                                                                         robot4_photo_seq_ptr,
@@ -121,7 +137,9 @@ int main(int argc, char **argv)
     open_while_ptr->AddChildren(distinguish_ptr);
     open_while_ptr->AddChildren(robot1_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_open_jud_ptr);
+    // open_while_ptr->AddChildren(set_roadblock_jud_ptr);
     open_while_ptr->AddChildren(robot4_photo_jud_ptr);
+
 
     auto open_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("open while jud", blackboard_ptr_,
                                                                                  open_while_ptr,

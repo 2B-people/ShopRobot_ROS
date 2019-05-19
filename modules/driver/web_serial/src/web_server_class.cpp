@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-04-29 15:35:12
+ * @LastEditTime: 2019-05-16 21:52:35
  */
 #include <web_serial/web_server_class.h>
 
@@ -22,7 +22,7 @@ namespace webserver
 WebServer::WebServer(std::string name)
     : common::RRTS(name, 3), is_open_(false), move_stop_(true), shop_stop_(true), is_debug_(false),
       client_sockfd_(0), server_sockfd_(0), server_addr_("192.168.31.100"), bind_port_(1111), go_flag_(false),
-      move_flag_(false), is_recv_(0), last_recv_(0), wifi_err_(false),
+      move_flag_(false), is_recv_(0), last_recv_(0), wifi_err_(false), is_move_(false),
       //atcion初始化
       move_as_(nh_, ("shop/" + name + "/move_action"), boost::bind(&WebServer::MoveExecuteCB, this, _1), false),
       opening_as_(nh_, ("shop/" + name + "/opening_action"), boost::bind(&WebServer::OpeningExecuteCB, this, _1), false),
@@ -91,14 +91,11 @@ WebServer::WebServer(std::string name)
     }
     else if (name_ == "robot4")
     {
-        
     }
     //action 绑定抢断函数
     move_as_.registerPreemptCallback(boost::bind(&WebServer::MovePreemptCB, this));
     action_as_.registerPreemptCallback(boost::bind(&WebServer::ShopPreemptCB, this));
     opening_as_.registerPreemptCallback(boost::bind(&WebServer::OpenPreemptCB, this));
-
-    time_cb_ = nh_.createTimer(ros::Duration(1.0), boost::bind(&WebServer::ReInitWeb, this, _1));
 
     //action open
     move_as_.start();
@@ -110,7 +107,7 @@ WebServer::WebServer(std::string name)
     {
         exit(-1);
     }
-
+    time_cb_ = nh_.createTimer(ros::Duration(1), boost::bind(&WebServer::ReInitWeb, this, _1));
     Send("I");
 }
 
@@ -135,14 +132,27 @@ void WebServer::Run(void)
 {
     ros::AsyncSpinner async_spinner(thread_num_);
     read_thread_ = new std::thread(boost::bind(&WebServer::ReceiveLoop, this));
-    async_spinner.start();
-    ros::waitForShutdown();
-    
-    // while (ros::ok)
-    // {
-    //     ros::spinOnce();
-    //     move_pub_.publish(now_coord_);
-    // }
+    // async_spinner.start();
+    // ros::waitForShutdown();
+
+    while (ros::ok)
+    {
+        ros::spinOnce();
+        if (failure_index_ == 8)
+        {
+            wifi_err_ = true;
+            ROS_ERROR("wifi is done!");
+            close(client_sockfd_);
+            ros::Duration(0.5).sleep();
+
+            if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size_)) < 0)
+            {
+                ROS_ERROR("%s accept error", name_.c_str());
+            }
+            ROS_WARN("recv accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+            wifi_err_ = false;
+        }
+    }
 }
 
 void WebServer::Stop()
@@ -162,79 +172,60 @@ void WebServer::Resume()
 //socket 初始化
 bool WebServer::InitWeb()
 {
-    socklen_t sin_size;
 
     my_addr_.sin_family = AF_INET;                              //设置为IP通信
     my_addr_.sin_addr.s_addr = inet_addr(server_addr_.c_str()); //服务器IP地址--允许连接到所有本地地址上
     my_addr_.sin_port = htons(bind_port_);                      //服务器端口号
 
-    /*创建客户端套接字--IPv4协议，面向连接通信，TCP协议*/
-    if ((client_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+    /*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
+    if ((server_sockfd_ = socket(PF_INET, SOCK_STREAM, 0)) < 0)
     {
-
         ROS_ERROR("%s socket error", name_.c_str());
         return false;
     }
 
     /*将套接字绑定到服务器的网络地址上*/
-    if (connect(client_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
+    if (bind(server_sockfd_, (struct sockaddr *)&my_addr_, sizeof(struct sockaddr)) < 0)
     {
-        ROS_ERROR("%s connect error", name_.c_str());
+        ROS_ERROR("%s bind error", name_.c_str());
         return false;
     }
 
-    ROS_WARN("is to server/n");
+    /*监听连接请求--监听队列长度为10*/
+    if (listen(server_sockfd_, 10) < 0)
+    {
+        ROS_ERROR("%s listen error", name_.c_str());
+        return false;
+    };
 
+    sin_size_ = sizeof(struct sockaddr_in);
+
+    /*等待客户端连接请求到达*/
+    //@breif accept为,要一直等待阻塞型
+    if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size_)) < 0)
+    {
+        ROS_ERROR("%s accept error", name_.c_str());
+        return false;
+    }
+    ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+    //send(client_sockfd_, "Welcome to shop ros server!!", 21, 0); //发送欢迎信息
     return true;
 }
 
 void WebServer::ReInitWeb(const ros::TimerEvent &event)
 {
-    if (go_flag_)
+    if (last_recv_ == is_recv_)
     {
-        if (last_recv_ == is_recv_)
-        {
-            failure_index_++;
-            ROS_ERROR("in here");
-        }
-        else
-        {
-            failure_index_ = 0;
-            ROS_ERROR("in here2");
-        }
-        last_recv_ = is_recv_;
-
-        if (failure_index_ == 5)
-        {
-            wifi_err_ = true;
-            ROS_ERROR("%s wifi is err ,in restart", name_.c_str());
-            int index = 0;
-            close(client_sockfd_);
-            close(server_sockfd_);
-            while (ros::ok)
-            {
-                if (InitWeb() == false)
-                {
-                    index++;
-                    if (index == 10)
-                    {
-                        ROS_ERROR("%scan't restart wifi", name_.c_str());
-                        exit(-1);
-                    }
-                    ros::Rate r(2); //10HZ
-                    r.sleep();
-                }
-                else
-                {
-                    ROS_ERROR("%s restart wifi is success", name_.c_str());
-                    ros::Duration(2.0).sleep();
-                    break;
-                }
-            }
-            wifi_err_ = false;
-            failure_index_ = 0;
-        }
+        failure_index_++;
+        //ROS_ERROR("%s in here", name_.c_str());
     }
+    else
+    {
+        failure_index_ = 0;
+        //ROS_ERROR("%s in here2", name_.c_str());
+    }
+
+    last_recv_ = is_recv_;
 }
 
 void WebServer::ReceiveLoop(void)
@@ -255,6 +246,7 @@ void WebServer::ReceiveLoop(void)
                 ROS_INFO("is finish");
                 if (is_run_action_)
                 {
+                    ROS_WARN("in here");
                     is_finish_ = true;
                 }
             }
@@ -282,6 +274,14 @@ void WebServer::ReceiveLoop(void)
                 DataToBarrier(re_buf_string);
             }
         }
+        else
+        {
+            while (1)
+            {
+                if (wifi_err_ == false)
+                    break;
+            }
+        }
     }
 }
 
@@ -293,6 +293,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     //结果
     data::MoveResult result;
 
+    is_move_ = true;
     if (goal->pose == 1)
     {
 
@@ -301,6 +302,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             ROS_INFO("%s move is err,cmd is 10", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
+            is_move_ = false;
             return;
         }
         if (move_flag_ == false)
@@ -311,6 +313,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 ROS_INFO("robot4 first in");
                 result.success_flag = true;
                 move_as_.setSucceeded(result);
+                is_move_ = false;
                 return;
             }
         }
@@ -319,6 +322,16 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             ROS_INFO("%s move is wart plan", name_.c_str());
             result.success_flag = false;
             move_as_.setPreempted(result);
+            is_move_ = false;
+            return;
+        }
+
+        if (wifi_err_ == true)
+        {
+            ROS_INFO("%s wifi is err", name_.c_str());
+            result.success_flag = false;
+            move_as_.setPreempted(result);
+            is_move_ = false;
             return;
         }
 
@@ -336,14 +349,11 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         {
             if (wifi_err_ == true)
             {
-                while (ros::ok)
-                {
-                    if (wifi_err_ == false)
-                    {
-                        Send(coord_goal_str);
-                        break;
-                    }
-                }
+                ROS_INFO("%s wifi is err", name_.c_str());
+                result.success_flag = false;
+                move_as_.setPreempted(result);
+                is_move_ = false;
+                return;
             }
 
             if (now_coord_.x >= 10 || now_coord_.y >= 10)
@@ -351,7 +361,16 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 ROS_WARN("coord data is err");
                 result.success_flag = false;
                 move_as_.setPreempted(result);
+                is_move_ = false;
                 return;
+            }
+            if (in_coord.x != cmd_coord_.x || in_coord.y != cmd_coord_.y)
+            {
+                in_coord.x = cmd_coord_.x;
+                in_coord.y = cmd_coord_.y;
+                in_coord.pose = 5;
+                std::string coord_goal_str = CoordToData(in_coord);
+                Send(coord_goal_str);
             }
 
             //判断目标坐标
@@ -364,6 +383,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                     ROS_INFO("%s FININSH", __FUNCTION__);
                     result.success_flag = true;
                     move_as_.setSucceeded(result);
+                    is_move_ = false;
                     return;
                 }
                 else
@@ -371,6 +391,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                     ROS_INFO("%s is waitting other robot", name_.c_str());
                     result.success_flag = false;
                     move_as_.setPreempted(result);
+                    is_move_ = false;
                     return;
                 }
             }
@@ -384,29 +405,38 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
     }
     else if (goal->pose == 2)
     {
+
+        if (wifi_err_ == true)
+        {
+            ROS_INFO("%s wifi is err", name_.c_str());
+            result.success_flag = false;
+            move_as_.setPreempted(result);
+            is_move_ = false;
+            return;
+        }
+
         //发送目标
         std::string coord_goal_str = CoordToData(target_coord_);
         Send(coord_goal_str);
 
         ROS_INFO("move is write %s", coord_goal_str.c_str());
-
+        data::Coord last_coord;
+        int index = 0;
+        last_coord.x = now_coord_.x;
+        last_coord.y = now_coord_.y;
         float progress_overall = 0.0;
         //等待结束,移动到目标坐标
         while (ros::ok && is_open_ && move_stop_ == false)
         {
-
             if (wifi_err_ == true)
             {
-                while (ros::ok)
-                {
-                    if (wifi_err_ == false)
-                    {
-                        Send(coord_goal_str);
-                        break;
-                    }
-                }
+                ROS_INFO("%s wifi is err", name_.c_str());
+                result.success_flag = false;
+                move_as_.setPreempted(result);
+                is_move_ = false;
+                return;
             }
-
+            
             // ROS_INFO("RE_BUf is %s", re_buf.c_str());
             if (now_coord_.x == 10 && now_coord_.y == 10)
             {
@@ -421,6 +451,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 ROS_INFO("%s FININSH", __FUNCTION__);
                 result.success_flag = true;
                 move_as_.setSucceeded(result);
+                is_move_ = false;
                 return;
             }
             else
@@ -429,6 +460,24 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
+
+            if (last_coord.x != now_coord_.x || last_coord.y != now_coord_.y)
+            {
+                index = 0;
+                last_coord.x = now_coord_.x;
+                last_coord.y = now_coord_.y;
+            }
+            else
+            {
+                index++;
+            }
+
+            if (index == 20)
+            {
+                Send(coord_goal_str);
+                index = 0;
+            }
+            ros::Duration(0.1).sleep();
         }
     }
 }
@@ -458,6 +507,14 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
         return;
     }
 
+    if (wifi_err_ == true)
+    {
+        ROS_WARN("wifi is err");
+        result.success_flag = false;
+        action_as_.setPreempted(result);
+        return;
+    }
+
     ROS_WARN("%s is write action", name_.c_str());
     std::string temp = target_action_.name;
     ROS_WARN("target action is %s", temp.c_str());
@@ -465,26 +522,35 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     //发送此次的目标
     Send(temp);
     is_run_action_ = true;
+    uint32_t index = 0;
 
     //等待结束
     while (ros::ok() && is_open_ && shop_stop_ == false)
     {
         if (wifi_err_ == true)
         {
-            while (ros::ok)
-            {
-                if (wifi_err_ == false)
-                {
-                    Send(temp);
-                    break;
-                }
-            }
+            ROS_WARN("wifi is err");
+            result.success_flag = false;
+            action_as_.setPreempted(result);
+            return;
         }
-        if (is_finish_)
+
+        if (is_finish_ == true)
         {
             is_finish_ = false;
             break;
         }
+        else
+        {
+            index++;
+        }
+        if (index == 150)
+        {
+            Send(temp);
+            index = 0;
+        }
+
+        ros::Duration(0.1).sleep();
     }
 
     //动作结束可以规划
