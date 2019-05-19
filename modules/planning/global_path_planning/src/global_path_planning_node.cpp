@@ -169,77 +169,120 @@ class GlobalPlan : public GlobalBase
         return true;
     }
 
-    void SetUpGrabObstacles(int flag, Coord now1, Coord now2, int map1[num_x][num_y], int map2[num_x][num_y])
+    int SetUpGrabObstacles(int flag, Coord now1, Coord now2, int map1[num_x][num_y], int map2[num_x][num_y])
     {
+        int create_flag = 0;
         if(flag == 1)
         {
-            if((int(now1.first) == 3 && int(now1.second) == 2) || (int(now1.first) == 5 && int(now1.second) == 2))
-                map2[4][2] += 1;
-            if((int(now1.first) == 7 && int(now1.second) == 3) || (int(now1.first) == 7 && int(now1.second) == 5))
-                map2[7][4] += 1;
-            if((int(now1.first) == 6 && int(now1.second) == 7) || (int(now1.first) == 4 && int(now1.second) == 7))
-                map2[5][7] += 1;
-            if((int(now1.first) == 2 && int(now1.second) == 6) || (int(now1.first) == 2 && int(now1.second) == 4))
-                map2[2][5] += 1;
-            if(int(now1.first) == 4 && int(now1.second) == 2)
+            if((int(now1.first) == 4 && int(now1.second) == 2) || (int(now1.first) == 3 && int(now1.second) == 2) || (int(now1.first) == 5 && int(now1.second) == 2))
             {
+                map2[4][2] += 1;
                 map2[3][2] += 1;
                 map2[5][2] += 1;
+                // create_flag = 1;
             }
-            if(int(now1.first) == 7 && int(now1.second) == 4)
+            if((int(now1.first) == 7 && int(now1.second) == 4) || (int(now1.first) == 7 && int(now1.second) == 3) || (int(now1.first) == 7 && int(now1.second) == 5))
             {
+                map2[7][4] += 1;
                 map2[7][3] += 1;
                 map2[7][5] += 1;
+                // create_flag = 2;
             }
-            if(int(now1.first) == 5 && int(now1.second) == 7)
-            { 
+            if((int(now1.first) == 5 && int(now1.second) == 7) || (int(now1.first) == 6 && int(now1.second) == 7) || (int(now1.first) == 4 && int(now1.second) == 7))
+            {
+                map2[5][7] += 1;
                 map2[4][7] += 1;
                 map2[6][7] += 1;
-
+                // create_flag = 3;
             }
-            if(int(now1.first) == 2 && int(now1.second) == 5)
+            if((int(now1.first) == 2 && int(now1.second) == 5) || (int(now1.first) == 2 && int(now1.second) == 6) || (int(now1.first) == 2 && int(now1.second) == 4))
             {
+                map2[2][5] += 1;
                 map2[2][4] += 1;
                 map2[2][6] += 1;
+                // create_flag = 4;
             }
         }
         else if(flag == 2)
         {
-            if((int(now2.first) == 3 && int(now2.second) == 2) || (int(now2.first) == 5 && int(now2.second) == 2))
-                map1[4][2] += 1;
-            if((int(now2.first) == 7 && int(now2.second) == 3) || (int(now2.first) == 7 && int(now2.second) == 5))
-                map1[7][4] += 1;
-            if((int(now2.first) == 6 && int(now2.second) == 7) || (int(now2.first) == 4 && int(now2.second) == 7))
-                map1[5][7] += 1;
-            if((int(now2.first) == 2 && int(now2.second) == 6) || (int(now2.first) == 2 && int(now2.second) == 4))
-                map1[2][5] += 1;
-            if(int(now2.first) == 4 && int(now2.second) == 2)
+            if((int(now2.first) == 4 && int(now2.second) == 2) || (int(now2.first) == 3 && int(now2.second) == 2) || (int(now2.first) == 5 && int(now2.second) == 2))
             {
                 map1[3][2] += 1;
                 map1[5][2] += 1;
+                map1[4][2] += 1;
+                create_flag = 1;
             }
-            if(int(now2.first) == 7 && int(now2.second) == 4)
+            if((int(now2.first) == 7 && int(now2.second) == 4) || (int(now2.first) == 7 && int(now2.second) == 3) || (int(now2.first) == 7 && int(now2.second) == 5))
             {
                 map1[7][3] += 1;
                 map1[7][5] += 1;
-
+                map1[7][4] += 1;
+                create_flag = 2;
             }
-            if(int(now2.first) == 5 && int(now2.second) == 7)
+            if((int(now2.first) == 5 && int(now2.second) == 7) || (int(now2.first) == 6 && int(now2.second) == 7) || (int(now2.first) == 4 && int(now2.second) == 7))
             {
                 map1[4][7] += 1;
                 map1[6][7] += 1;
-
+                map1[5][7] += 1;
+                create_flag = 3;
             }
-            if(int(now2.first) == 2 && int(now2.second) == 5)
+            if((int(now2.first) == 2 && int(now2.second) == 5) || (int(now2.first) == 2 && int(now2.second) == 6) || (int(now2.first) == 2 && int(now2.second) == 4))
             {
                 map1[2][4] += 1;
                 map1[2][6] += 1;
+                map1[2][5] += 1;
+                create_flag = 4;
             }
         }
+        return create_flag;
     }
 
+    void CreatePath(int create_flag, int map2[num_x][num_y])
+    {
+        if(create_flag == 1)
+        {
+            if(map2[3][2] >= 2)
+                map2[3][2] -= 1;
+            if(map2[4][2] >= 2)
+                map2[4][2] -= 1;
+            if(map2[5][2] >= 2)
+                map2[5][2] -= 1;
+        }
+
+        if(create_flag == 2)
+        {
+            if(map2[7][3] >= 2)
+                map2[7][3] -= 1;
+            if(map2[7][4] >= 2)
+                map2[7][4] -= 1;
+            if(map2[7][5] >= 2)
+                map2[7][5] -= 1;
+        }
+
+        if(create_flag == 3)
+        {
+            if(map2[4][7] >= 2)
+                map2[4][7] -= 1;
+            if(map2[3][7] >= 2)
+                map2[3][7] -= 1;
+            if(map2[5][7] >= 2)
+                map2[5][7] -= 1;
+        }
+
+        if(create_flag == 4)
+        {
+            if(map2[2][4] >= 2)
+                map2[2][4] -= 1;
+            if(map2[2][5] >= 2)
+                map2[2][5] -= 1;
+            if(map2[2][6] >= 2)
+                map2[2][6] -= 1;
+        }
+    }
     void RobotGlobalPlanning(void)
-    {      
+    {    
+        int create_path_flag;
+
         arrive_flag_1 = arrive_flag_2 = true;
         int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -292,16 +335,13 @@ class GlobalPlan : public GlobalBase
             path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
             path_1.push(Coord(end_1.x, end_1.y));
         }
-        ROS_WARN("size of path1:%d", (int)path_1.size());
         if(end_2.x != 10 && end_2.y != 10)
         {
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
             path_2.push(Coord(end_2.x, end_2.y));
-
         }
-        ROS_WARN("size of path2:%d", (int)path_2.size());
+        
         queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2; 
-
         while (temp_path_1.size())
         {
             Coord local_1 = temp_path_1.front();
@@ -310,8 +350,8 @@ class GlobalPlan : public GlobalBase
             map_1[int(local_1.first)][int(local_1.second)] += 1;
         }
         memcpy(map_2, map_1, sizeof(map_1));
-
-        SetUpGrabObstacles(2, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+        create_path_flag = SetUpGrabObstacles(2, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+        
         while (temp_path_2.size())
         {
             Coord local_2 = temp_path_2.front();
@@ -319,10 +359,14 @@ class GlobalPlan : public GlobalBase
             ROS_WARN("Coord 2:%d, %d", local_2.first, local_2.second);
             map_2[int(local_2.first)][int(local_2.second)] += 1;
         }
-        SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+        create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+        
+        if(create_path_flag)
+        {
+            CreatePath(create_path_flag, map_2);
+        }
+
         temp_path_1 = path_1, temp_path_2 = path_2;
-
-
         //打印1 2 车路径所经过的路线
         while (temp_path_1.size())
         {

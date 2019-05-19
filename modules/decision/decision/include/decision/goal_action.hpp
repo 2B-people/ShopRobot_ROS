@@ -65,7 +65,7 @@ public:
     // // 规划用action
     // localplan_clint_.waitForServer();
     // globalplan_clint_.waitForServer();
-    // //两车方案
+    //两车方案
     // robot1_move_action_clint_.waitForServer();
     // robot1_open_action_clint_.waitForServer();
     // robot1_shop_action_clint_.waitForServer();
