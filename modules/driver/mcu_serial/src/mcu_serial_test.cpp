@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <serial/serial.h>
 
-#define USBPIN "/dev/ttyUSB0"
+#define USBPIN "/dev/car"
 #define USBBT 115200
 
 serial::Serial ser;

@@ -56,7 +56,7 @@ public:
                                                         robot4_move_action_clint_("shop/robot4/move_action", true),
                                                         robot4_shop_action_clint_("shop/robot4/shop_action", true),
                                                         robot4_open_action_clint_("shop/robot4/opening_action", true),
-                                                        opencar_open_clint_("shop/shop/opencar/opening_action",true)
+                                                        opencar_open_clint_("shop/opencar/opening_action", true)
   {
     ROS_INFO("Waiting for action server to start");
     // // 识别用action
@@ -244,6 +244,12 @@ public:
                                          OPENINGCLINT::SimpleActiveCallback(),
                                          boost::bind(&GoalAction::OpeningFB1, this, _1));
       break;
+    case 3:
+      opencar_open_clint_.sendGoal(goal,
+                                   //OPENINGCLINT::SimpleDoneCallback(),
+                                   boost::bind(&GoalAction::OpenCarDoneCB, this, _1, _2),
+                                   OPENINGCLINT::SimpleActiveCallback(),
+                                   OPENINGCLINT::SimpleFeedbackCallback());
     case 4:
       robot4_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
@@ -534,7 +540,7 @@ private:
   MOVEACTIONCLINT robot4_move_action_clint_;
   SHOPACTION robot4_shop_action_clint_;
   OPENINGCLINT robot4_open_action_clint_;
-  //opencar open 
+  //opencar open
   OPENINGCLINT opencar_open_clint_;
 
   //server client
@@ -544,29 +550,11 @@ private:
   ros::ServiceClient robot1_target_coordinate_write_clt_;
   ros::ServiceClient robot4_target_coordinate_wirte_clt_;
 
-  // void GlobalPlanDoneCB(const actionlib::SimpleClientGoalState &state, const data::GlobalPlanResult::ConstPtr &result)
-  // {
-  //   data::Coord coord;
-  //   coord.x = result->robot1_coord[0];
-  //   coord.y = result->robot1_coord[1];
-  //   coord.pose = result->robot1_coord[2];
-  //   // private_blackboard_ptr_->SetCoordValue(1, coord.x, coord.y, coord.pose);
 
-  //   coord.x = result->robot2_coord[0];
-  //   coord.y = result->robot2_coord[1];
-  //   coord.pose = result->robot2_coord[2];
-  //   // private_blackboard_ptr_->SetCoordValue(2, coord.x, coord.y, coord.pose);
-
-  //   coord.x = result->robot3_coord[0];
-  //   coord.y = result->robot3_coord[1];
-  //   coord.pose = result->robot3_coord[2];
-  //   // private_blackboard_ptr_->SetCoordValue(3, coord.x, coord.y, coord.pose);
-
-  //   coord.x = result->robot4_coord[0];
-  //   coord.y = result->robot4_coord[1];
-  //   coord.pose = result->robot4_coord[2];
-  //   // private_blackboard_ptr_->SetCoordValue(4, coord.x, coord.y, coord.pose);
-  // }
+  void OpenCarDoneCB(const actionlib::SimpleClientGoalState &state, const data::OpeningResult::ConstPtr &result)
+  {
+    private_blackboard_ptr_->SetBoolValue(true,"robot1_opening_flag");
+  }
 
   void DectionDoneCB(const actionlib::SimpleClientGoalState &state, const data::DetectionResult::ConstPtr &result)
   {

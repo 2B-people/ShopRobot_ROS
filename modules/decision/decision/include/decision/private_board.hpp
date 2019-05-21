@@ -45,6 +45,9 @@ public:
 
     auto set_roadblock_flag_ptr = std::make_shared<BoolDir>(false);
     AddDataIntoWorld("set_roadblock_flag", set_roadblock_flag_ptr);
+
+    auto car_opening_flag_ptr = std::make_shared<BoolDir>(false);
+    AddDataIntoWorld("car_opening_flag", car_opening_flag_ptr);
   }
 
   ~PrivateBoard() = default;
