@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     auto robot1_action_ptr = std::make_shared<shop::decision::ShopAction>(1, 0, "robot1 shop", blackboard_ptr_, goal_action_ptr);
     auto robot4_action_ptr = std::make_shared<shop::decision::ShopAction>(4, 0, "robot4 shop", blackboard_ptr_, goal_action_ptr);
 
-    // auto test_seq_ptr = std::make_shared<shop::decision::SequenceNode>("test seq", blackboard_ptr_);
-    // test_seq_ptr->AddChildren(robot4_move_ptr);
-    // test_seq_ptr->AddChildren(robot4_action_ptr);
+    auto test_seq_ptr = std::make_shared<shop::decision::SequenceNode>("test seq", blackboard_ptr_);
+    test_seq_ptr->AddChildren(robot4_move_ptr);
+    test_seq_ptr->AddChildren(robot4_action_ptr);
 
     data::Coord coord;
     coord.x = 1;
