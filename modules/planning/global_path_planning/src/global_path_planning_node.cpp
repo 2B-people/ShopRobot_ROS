@@ -293,7 +293,7 @@ class GlobalPlan : public GlobalBase
                                  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};              
         PositionOfObstacles(map);
         int map_1[num_x][num_y], map_2[num_x][num_y];
 
@@ -341,7 +341,9 @@ class GlobalPlan : public GlobalBase
             path_2.push(Coord(end_2.x, end_2.y));
         }
         
-        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2; 
+        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2;
+
+        //设置单车地图 
         while (temp_path_1.size())
         {
             Coord local_1 = temp_path_1.front();
@@ -349,6 +351,7 @@ class GlobalPlan : public GlobalBase
             ROS_WARN("Coord 1:%d, %d", (int)local_1.first, (int)local_1.second);
             map_1[int(local_1.first)][int(local_1.second)] += 1;
         }
+
         memcpy(map_2, map_1, sizeof(map_1));
         create_path_flag = SetUpGrabObstacles(2, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
         
@@ -360,7 +363,8 @@ class GlobalPlan : public GlobalBase
             map_2[int(local_2.first)][int(local_2.second)] += 1;
         }
         create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
-        
+        //　结束设置地图
+
         ROS_WARN("create_path_flag:%d", create_path_flag);
         if(create_path_flag != 0)
         {
