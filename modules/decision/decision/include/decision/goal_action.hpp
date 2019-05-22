@@ -69,9 +69,9 @@ public:
     // robot1_move_action_clint_.waitForServer();
     // robot1_open_action_clint_.waitForServer();
     // robot1_shop_action_clint_.waitForServer();
-    robot4_move_action_clint_.waitForServer();
-    robot4_open_action_clint_.waitForServer();
-    robot4_shop_action_clint_.waitForServer();
+    // robot4_move_action_clint_.waitForServer();
+    // robot4_open_action_clint_.waitForServer();
+    // robot4_shop_action_clint_.waitForServer();
 
     ROS_INFO(" ALL Action server is started!");
 
@@ -381,11 +381,14 @@ public:
   BehaviorState GetOpenBehaviorState(int8_t robot_num)
   {
     actionlib::SimpleClientGoalState state(actionlib::SimpleClientGoalState::ACTIVE);
-
+    // ROS_INFO("%d in",robot_num);
     switch (robot_num)
     {
     case 1:
       state = robot1_open_action_clint_.getState();
+      break;
+    case 3:
+      state = opencar_open_clint_.getState();
       break;
     case 4:
       state = robot4_open_action_clint_.getState();
@@ -550,10 +553,11 @@ private:
   ros::ServiceClient robot1_target_coordinate_write_clt_;
   ros::ServiceClient robot4_target_coordinate_wirte_clt_;
 
-
   void OpenCarDoneCB(const actionlib::SimpleClientGoalState &state, const data::OpeningResult::ConstPtr &result)
   {
-    private_blackboard_ptr_->SetBoolValue(true,"robot1_opening_flag");
+    // ROS_INFO("aaaa");
+    private_blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
+    private_blackboard_ptr_->SetBoolValue(true, "car_opening_flag");
   }
 
   void DectionDoneCB(const actionlib::SimpleClientGoalState &state, const data::DetectionResult::ConstPtr &result)

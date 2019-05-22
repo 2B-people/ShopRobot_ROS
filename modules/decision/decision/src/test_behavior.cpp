@@ -39,6 +39,8 @@ int main(int argc, char **argv)
 
     auto robot1_opening_ptr = std::make_shared<shop::decision::OpenAction>(1, "robot1 opening", blackboard_ptr_, goal_action_ptr);
     auto robot4_opening_ptr = std::make_shared<shop::decision::OpenAction>(4, "robot4 opening", blackboard_ptr_, goal_action_ptr);
+    
+    auto car_opening_ptr = std::make_shared<shop::decision::OpenAction>(3, "car opening", blackboard_ptr_, goal_action_ptr);
 
     auto robot1_move_ptr = std::make_shared<shop::decision::MoveAction>(1, 1, "robot1 move", blackboard_ptr_, goal_action_ptr);
     auto robot4_move_ptr = std::make_shared<shop::decision::MoveAction>(4, 1, "robot4 move", blackboard_ptr_, goal_action_ptr);
@@ -158,6 +160,9 @@ int main(int argc, char **argv)
         case 'l':
             robot4_opening_ptr->Run();
             break;
+        case 'o':
+            car_opening_ptr->Run();
+            break;
         case 27:
             if (command_thread.joinable())
             {
@@ -187,6 +192,12 @@ int main(int argc, char **argv)
             robot4_opening_ptr->Reset();
             command = '0';
         }
+        if (car_opening_ptr->GetBehaviorState() == BehaviorState::SUCCESS)
+        {
+            car_opening_ptr->Reset();
+            command = '0';
+        }
+        
 
         rate.sleep();
     }
