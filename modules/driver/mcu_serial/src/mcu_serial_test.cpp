@@ -38,6 +38,10 @@ int main(int argc, char *argv[])
 
   uint8_t send_msg = 0x0a;
   ser.write(&send_msg, 1);
+  ser.write(&send_msg, 1);
+  ser.write(&send_msg, 1);
+  ser.write(&send_msg, 1);
+  ser.write(&send_msg, 1);
   ROS_INFO("is send");
 
   while (1)
@@ -46,9 +50,10 @@ int main(int argc, char *argv[])
     {
       uint8_t hand;
       ser.read(&hand, 1);
+        ROS_INFO("read : %d", hand);
       if (hand == 0x0b)
       {
-        ROS_INFO("read : %d", hand);
+        ROS_INFO("done!");
       }
       ros::spinOnce();
     }
