@@ -7,10 +7,12 @@ namespace mcu_serial
 
 BoxSerial::BoxSerial(std::string name) : common::RRTS(name, 1), is_open_(false)
 , opening_as_(nh_, ("shop/opencar/opening_action"), boost::bind(&BoxSerial::OpeningExecuteCB, this, _1), false)
+,mcu_port_("/dev/car")
 {
     // ros::NodeHandle nh_private_("~");
     is_open_ = true;
     initSerial();
+    opening_as_.start();
 }
 
 BoxSerial::~BoxSerial()
@@ -21,7 +23,7 @@ BoxSerial::~BoxSerial()
 void BoxSerial::initSerial()
 {
     ser_.setPort(mcu_port_);
-    ser_.setBaudrate(mcu_baudrate_);
+    ser_.setBaudrate(115200);
     serial::Timeout to = serial::Timeout::simpleTimeout(1000);
     ser_.setTimeout(to);
     ser_.open();
