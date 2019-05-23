@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-23 22:29:30
+ * @LastEditTime: 2019-05-23 22:36:40
  */
 #include <web_serial/web_server_class.h>
 
@@ -489,16 +489,6 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 index = 0;
                 last_coord.x = now_coord_.x;
                 last_coord.y = now_coord_.y;
-            }
-            else
-            {
-                index++;
-            }
-
-            if (index == 20)
-            {
-                Send(coord_goal_str);
-                index = 0;
             }
             ros::Duration(0.1).sleep();
         }
