@@ -81,27 +81,27 @@ int main(int argc, char **argv)
     auto set_roadblock_ptr = std::make_shared<shop::decision::PreconditionNode>("set_roadbloack_ptr", blackboard_ptr_,
                                                                                 robot4_special_action_ptr,
                                                                                 [&]() {
+                                                                                    ros::Duration(0.5).sleep();
                                                                                     std::string name = "O-" + std::to_string(location_place_);
                                                                                     goal_action_ptr->SetTargetActionName(4, name);
-                                                                                    blackboard_ptr_->SetBoolValue(true,"set_roadblock_flag");
+                                                                                    blackboard_ptr_->SetBoolValue(true, "set_roadblock_flag");
                                                                                     return true;
                                                                                 },
                                                                                 shop::decision::AbortType::LOW_PRIORITY);
 
-    auto  set_roadblock_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 set roadblock jud", blackboard_ptr_,
-                                                                                  set_roadblock_ptr,
-                                                                                  [&]() {
-                                                                                      if (blackboard_ptr_->GetBoolValue("robot4_opening_flag") == false&
-                                                                                          blackboard_ptr_->GetBoolValue("set_roadblock_flag") == false  )
-                                                                                      {
-                                                                                          return true;
-                                                                                      }
-                                                                                      else
-                                                                                      {
-                                                                                          return false;
-                                                                                      }
-                                                                                  },
-                                                                                  shop::decision::AbortType::LOW_PRIORITY);
+    auto set_roadblock_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 set roadblock jud", blackboard_ptr_,
+                                                                                    set_roadblock_ptr,
+                                                                                    [&]() {
+                                                                                        if (blackboard_ptr_->GetBoolValue("robot1_opening_flag") == false)
+                                                                                        {
+                                                                                            return true;
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            return false;
+                                                                                        }
+                                                                                    },
+                                                                                    shop::decision::AbortType::LOW_PRIORITY);
 
     auto robot4_photo_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot4 photo seq", blackboard_ptr_);
     robot4_photo_seq_ptr->AddChildren(robot4_special_move_ptr);
@@ -139,7 +139,6 @@ int main(int argc, char **argv)
     open_while_ptr->AddChildren(robot4_open_jud_ptr);
     // open_while_ptr->AddChildren(set_roadblock_jud_ptr);
     open_while_ptr->AddChildren(robot4_photo_jud_ptr);
-
 
     auto open_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("open while jud", blackboard_ptr_,
                                                                                  open_while_ptr,
@@ -195,7 +194,7 @@ int main(int argc, char **argv)
     coord.y = 2;
     goal_action_ptr->SetTargetCoord(4, coord);
     goal_action_ptr->SetTargetActionName(4, "T");
-    blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
+    blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
     blackboard_ptr_->SetBoolValue(true, "opening_flag");
 
     auto sh = BehaviorTree(final_jud_ptr, 10);

@@ -11,6 +11,7 @@
 #include <common/main_interface.h>
 
 #include <data/Coord.h>
+#include <data/Action.h>
 #include <data/RoadblockMsg.h>
 
 #include <data/SetBool.h>
@@ -61,6 +62,14 @@ public:
     robot4_target_coord_.pose = 0;
     roadblock_.location_place = 0;
 
+    robot4_action_.name = "NONE";
+    robot4_action_.is_action = false;
+    robot4_action_.action_state = 1;
+
+    robot1_action_.name = "NONE";
+    robot1_action_.is_action = false;
+    robot1_action_.action_state = 1;
+
     robot1_coord_.x = 10;
     robot1_coord_.y = 10;
     robot1_coord_.pose = 0;
@@ -79,6 +88,9 @@ public:
     // target_robot2_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot2/target_coord", 10, boost::bind(&GlobalBase::Robo2TargetCoordCB, this, _1));
     // target_robot3_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot3/target_coord", 10, boost::bind(&GlobalBase::Robo3TargetCoordCB, this, _1));
     target_robot4_coord_sub_ = nh_.subscribe<data::Coord>("shop/robot4/target_coord", 10, boost::bind(&GlobalBase::Robo4TargetCoordCB, this, _1));
+
+    robot1_action_sub_ = nh_.subscribe<data::Action>("shop/robot1/target_action", 10, boost::bind(&GlobalBase::Robo1ActionCB, this, _1));
+    robot4_action_sub_ = nh_.subscribe<data::Action>("shop/robot4/target_action", 10, boost::bind(&GlobalBase::Robo4ActionCB, this, _1));
 
     robot1_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot1/cmd_coord", 1);
     // robot2_cmd_coord_pub_ = nh_.advertise<data::Coord>("shop/robot2/cmd_coord", 1);
@@ -140,6 +152,28 @@ public:
     return;
   }
 
+  data::Action GetAction(uint8_t robot_num)
+  {
+    data::Action err_action;
+    err_action.name = "NONE";
+    err_action.is_action = false;
+    err_action.action_state = 1;
+    switch (robot_num)
+    {
+    case 1:
+      return robot1_action_;
+      break;
+    case 2:
+      return robot4_action_;
+      break;
+
+    default:
+      ROS_ERROR("no robot num in %s in %s", __FUNCTION__, name_.c_str());
+      return err_action;
+      break;
+    }
+  }
+
   // auto now = GetNowCoord(1);
   // x = now.x;
   data::Coord GetNowCoord(uint8_t robot_num)
@@ -195,6 +229,9 @@ protected:
   data::Coord robot1_coord_;
   data::Coord robot4_coord_;
 
+  data::Action robot1_action_;
+  data::Action robot4_action_;
+
   data::Coord robot1_coord_now_;
   data::Coord robot2_coord_now_;
   data::Coord robot3_coord_now_;
@@ -204,6 +241,9 @@ protected:
   data::Coord robot2_target_coord_;
   data::Coord robot3_target_coord_;
   data::Coord robot4_target_coord_;
+
+  ros::Subscriber robot1_action_sub_;
+  ros::Subscriber robot4_action_sub_;
 
   data::RoadblockMsg roadblock_;
 
@@ -278,6 +318,22 @@ protected:
     robot4_target_coord_.x = msg->x;
     robot4_target_coord_.y = msg->y;
     robot4_target_coord_.pose = msg->pose;
+  }
+
+  void Robo1ActionCB(const data::Action::ConstPtr &msg)
+  {
+    robot1_action_.name = msg->name;
+    robot1_action_.is_action = msg->is_action;
+    robot1_action_.action_state = msg->action_state;
+    //ROS_INFO("%s %d %d", robot1_action_.name.c_str(), robot1_action_.is_action, robot1_action_.action_state);
+  }
+
+  void Robo4ActionCB(const data::Action::ConstPtr &msg)
+  {
+    robot4_action_.name = msg->name;
+    robot4_action_.is_action = msg->is_action;
+    robot4_action_.action_state = msg->action_state;
+    //ROS_INFO("%s %d %d", robot4_action_.name.c_str(), robot4_action_.is_action, robot4_action_.action_state);
   }
 
   void RoadblockCB(const data::RoadblockMsg::ConstPtr &msg)

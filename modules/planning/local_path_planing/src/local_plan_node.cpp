@@ -58,7 +58,7 @@ public:
         vector<Coord> determined_location;
         vector<int> determined_action;
         vector<int> determined_shelf_location;
-        int final_x , final_y, final_distance = 999;
+        int final_x, final_y, final_distance = 999;
         int final_action, final_shelf_location;
 
         auto goal_shelf = GetNowToShelf(robot_num);
@@ -68,7 +68,6 @@ public:
         }
 
         GetShelfBarrier(shelves, goal_shelf);
-       
 
         for (int i = 1; i < 12; i = i + 2)
         {
@@ -527,7 +526,7 @@ public:
         for (int i = 0; i < 12; i++)
         {
             temp_category = GetGoods(int8_t(i));
-            // ROS_INFO("local plan:%d goods is%d",i,temp_category);
+            ROS_INFO("local plan:%d goods is%d",i,temp_category);
             if (temp_category != 0)
             {
                 switch (i + 1)
@@ -592,7 +591,6 @@ public:
                     determined_location.push_back(i + 1);
                     determined_category.push_back(temp_category);
                     break;
-
                 default:
                     break;
                 }
@@ -606,7 +604,7 @@ public:
             return;
         }
 
-        // ROS_INFO("local plan x:%d y:%d",now_coord.x,now_coord.y);
+        ROS_INFO("local plan x:%d y:%d",now_coord.x,now_coord.y);
 
         for (int i = 0; i < determined_coord.size(); i++)
         {
@@ -642,6 +640,8 @@ public:
 
             distance[(int)now_coord.x][(int)now_coord.y] = 0;
 
+
+            //四车开始直接抓取
             if (now_coord.x == end_x && now_coord.y == end_y)
             {
                 final_x = end_x;
@@ -696,9 +696,7 @@ public:
                 final_distance = temp_final_distance;
             }
         }
-        if (is_debug_)
-        {
-        }
+
         ROS_INFO("x:%d y:%d final_category:%d final_location:%d", final_x, final_y, final_category, final_location);
 
         TransmissonMessageToRobot(2, robot_num, int16_t(final_x), int16_t(final_y), final_location, final_category);
@@ -986,6 +984,12 @@ public:
             break;
         case 4:
             map[5][7] = 1;
+            break;
+        case 5:
+            map[1][8] = 1;
+            break;
+        case 6:
+            map[1][5] = 1;
             break;
         default:
             break;

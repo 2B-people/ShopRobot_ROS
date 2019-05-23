@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-16 21:52:35
+ * @LastEditTime: 2019-05-23 11:40:08
  */
 #include <web_serial/web_server_class.h>
 
@@ -436,7 +436,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 is_move_ = false;
                 return;
             }
-            
+
             // ROS_INFO("RE_BUf is %s", re_buf.c_str());
             if (now_coord_.x == 10 && now_coord_.y == 10)
             {
@@ -519,6 +519,13 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     std::string temp = target_action_.name;
     ROS_WARN("target action is %s", temp.c_str());
 
+    //动作结束可以规划
+    data::ActionName action_srv;
+    action_srv.request.is_action = true;
+    action_srv.request.action_name = target_action_.name;
+    action_srv.request.action_state = target_action_.action_state;
+    action_client_.call(action_srv);
+
     //发送此次的目标
     Send(temp);
     is_run_action_ = true;
@@ -554,7 +561,7 @@ void WebServer::ShopExecuteCB(const data::ShopActionGoal::ConstPtr &goal)
     }
 
     //动作结束可以规划
-    data::ActionName action_srv;
+    //data::ActionName action_srv;
     action_srv.request.is_action = false;
     action_srv.request.action_name = target_action_.name;
     // ROS_ERROR("XXX%d", target_action_.action_state);
