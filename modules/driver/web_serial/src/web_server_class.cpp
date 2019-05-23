@@ -107,7 +107,7 @@ WebServer::WebServer(std::string name)
     {
         exit(-1);
     }
-    time_cb_ = nh_.createTimer(ros::Duration(1), boost::bind(&WebServer::ReInitWeb, this, _1));
+    time_cb_ = nh_.createTimer(ros::Duration(2.0), boost::bind(&WebServer::ReInitWeb, this, _1));
     Send("I");
 }
 
@@ -507,6 +507,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
             if (index == 20)
             {
                 Send(coord_goal_str);
+                ROS_ERROR("robot can't move and reset coord");
                 index = 0;
             }
             ros::Duration(0.1).sleep();
