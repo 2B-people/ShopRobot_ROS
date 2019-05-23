@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-23 11:40:08
+ * @LastEditTime: 2019-05-23 20:20:48
  */
 #include <web_serial/web_server_class.h>
 
@@ -244,11 +244,7 @@ void WebServer::ReceiveLoop(void)
             if (re_buf_string.substr(0, 6) == "finish")
             {
                 ROS_INFO("is finish");
-                if (is_run_action_)
-                {
-                    ROS_WARN("in here");
-                    is_finish_ = true;
-                }
+                is_finish_ = true;
             }
             else if (re_buf_string[0] == 'R')
             {
@@ -343,6 +339,10 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         in_coord.pose = 5;
         std::string coord_goal_str = CoordToData(in_coord);
         Send(coord_goal_str);
+        data::Coord last_coord;
+        int index = 0;
+        last_coord.x = now_coord_.x;
+        last_coord.y = now_coord_.y;
 
         // ROS_INFO("move is write %s", coord_goal_str.c_str());
         while (ros::ok && is_open_ && move_stop_ == false)
@@ -369,8 +369,38 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 in_coord.x = cmd_coord_.x;
                 in_coord.y = cmd_coord_.y;
                 in_coord.pose = 5;
+
+                Send("stop");
+                while (ros::ok())
+                {
+                    if (is_finish_ == true)
+                    {
+                        is_finish_ = false;
+                        break;
+                    }
+                }
+                ros::Duration(0.1).sleep();
+
                 std::string coord_goal_str = CoordToData(in_coord);
                 Send(coord_goal_str);
+            }
+
+            if (last_coord.x != now_coord_.x || last_coord.y != now_coord_.y)
+            {
+                index = 0;
+                last_coord.x = now_coord_.x;
+                last_coord.y = now_coord_.y;
+            }
+            else
+            {
+                index++;
+            }
+
+            if (index == 20)
+            {
+                std::string coord_goal_str = CoordToData(in_coord);
+                Send(coord_goal_str);
+                index = 0;
             }
 
             //判断目标坐标
@@ -401,6 +431,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
+
+            ros::Duration(0.1).sleep();
         }
     }
     else if (goal->pose == 2)
