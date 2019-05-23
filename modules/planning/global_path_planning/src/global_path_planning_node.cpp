@@ -763,6 +763,9 @@ public:
         auto state_1 = robot1_action.is_action;
         auto state_2 = robot2_action.is_action;
 
+        ROS_WARN("state1:%d", state_1);
+        ROS_WARN("state2:%d", state_2);
+
         if (out_wall)
         {
             if (int(last_coord_2.first) == now_2.x && int(last_coord_2.second) == now_2.y)
@@ -813,6 +816,14 @@ public:
             ROS_WARN("Coord 1:%d, %d", (int)local_1.first, (int)local_1.second);
             map_1[int(local_1.first)][int(local_1.second)] += 1;
         }
+
+        while (temp_path_2.size())
+        {
+            Coord local_2 = temp_path_2.front();
+            temp_path_2.pop();
+            ROS_WARN("Coord 2:%d, %d", (int)local_2.first, (int)local_2.second);
+        }
+
         temp_path_1 = path_1, temp_path_2 = path_2;
 
         if (state_1 == 0 && state_2 == 0 && out_wall == false)
@@ -913,17 +924,16 @@ public:
                         }
                     }
                 }
-
-                if (arrive_flag_1)
-                {
-                    final_coord_1.first = end_1.x;
-                    final_coord_1.second = end_1.y;
-                }
-                if (arrive_flag_2)
-                {
-                    final_coord_2.first = end_2.x;
-                    final_coord_2.second = end_2.y;
-                }
+            }
+            if (arrive_flag_1)
+            {
+                final_coord_1.first = end_1.x;
+                final_coord_1.second = end_1.y;
+            }
+            if (arrive_flag_2)
+            {
+                final_coord_2.first = end_2.x;
+                final_coord_2.second = end_2.y;
             }
         }
     }
