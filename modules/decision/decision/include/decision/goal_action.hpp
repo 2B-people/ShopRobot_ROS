@@ -242,7 +242,8 @@ public:
       robot1_open_action_clint_.sendGoal(goal,
                                          OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
-                                         boost::bind(&GoalAction::OpeningFB1, this, _1));
+                                         OPENINGCLINT::SimpleFeedbackCallback());
+      //boost::bind(&GoalAction::OpeningFB1, this, _1));
       break;
     case 3:
       opencar_open_clint_.sendGoal(goal,
@@ -250,9 +251,11 @@ public:
                                    boost::bind(&GoalAction::OpenCarDoneCB, this, _1, _2),
                                    OPENINGCLINT::SimpleActiveCallback(),
                                    OPENINGCLINT::SimpleFeedbackCallback());
+      break;
     case 4:
       robot4_open_action_clint_.sendGoal(goal,
-                                         OPENINGCLINT::SimpleDoneCallback(),
+                                         boost::bind(&GoalAction::OpenCB, this, _1, _2),
+                                         //OPENINGCLINT::SimpleDoneCallback(),
                                          OPENINGCLINT::SimpleActiveCallback(),
                                          OPENINGCLINT::SimpleFeedbackCallback());
       break;
@@ -556,7 +559,7 @@ private:
   void OpenCarDoneCB(const actionlib::SimpleClientGoalState &state, const data::OpeningResult::ConstPtr &result)
   {
     // ROS_INFO("aaaa");
-    private_blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
+    private_blackboard_ptr_->SetBoolValue(true, "robot4_opening_flag");
     private_blackboard_ptr_->SetBoolValue(true, "car_opening_flag");
   }
 
@@ -568,6 +571,11 @@ private:
       // debug
       // ROS_ERROR("IN HERE");
     }
+  }
+
+  void OpenCB(const actionlib::SimpleClientGoalState &state, const data::OpeningResult::ConstPtr &result)
+  {
+    private_blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
   }
 
   void OpeningFB1(const data::OpeningFeedback::ConstPtr &feedback)

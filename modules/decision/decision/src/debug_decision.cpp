@@ -51,6 +51,8 @@ int main(int argc, char **argv)
     auto robot4_special_move_ptr = std::make_shared<shop::decision::MoveAction>(4, 2, "robot4 special move", blackboard_ptr_, goal_action_ptr);
     auto robot4_special_action_ptr = std::make_shared<shop::decision::ShopAction>(4, 1, "robot4 special shop", blackboard_ptr_, goal_action_ptr);
 
+    //jud open action************************************
+
     auto car_open_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("car_open_jud", blackboard_ptr_,
                                                                                car_opening_ptr,
                                                                                [&]() {
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
     auto robot1_open_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot1 open jud", blackboard_ptr_,
                                                                                   robot1_opening_ptr,
                                                                                   [&]() {
-                                                                                      if (blackboard_ptr_->GetBoolValue("car_opening_flag") == true &&
+                                                                                      if (
                                                                                           blackboard_ptr_->GetBoolValue("robot1_opening_flag") == true)
                                                                                       {
                                                                                           return true;
@@ -97,6 +99,7 @@ int main(int argc, char **argv)
     auto set_roadblock_ptr = std::make_shared<shop::decision::PreconditionNode>("set_roadbloack_ptr", blackboard_ptr_,
                                                                                 robot4_special_action_ptr,
                                                                                 [&]() {
+                                                                                    ros::Duration(0.3).sleep();
                                                                                     std::string name = "O-" + std::to_string(location_place_);
                                                                                     goal_action_ptr->SetTargetActionName(4, name);
                                                                                     blackboard_ptr_->SetBoolValue(true, "set_roadblock_flag");
@@ -126,6 +129,7 @@ int main(int argc, char **argv)
     robot4_photo_seq_ptr->AddChildren(robot4_special_action_ptr);
     robot4_photo_seq_ptr->AddChildren(set_roadblock_jud_ptr);
 
+    //测试用************************************************************************//
     auto robot4_test_success_done_ptr = std::make_shared<shop::decision::SuccessDoNode>("robot4 test ptr", blackboard_ptr_,
                                                                                         robot4_photo_seq_ptr,
                                                                                         [&]() {
@@ -149,12 +153,12 @@ int main(int argc, char **argv)
                                                                                    },
                                                                                    shop::decision::AbortType::LOW_PRIORITY);
 
+    // open 开具的循环
     auto open_while_ptr = std::make_shared<shop::decision::WhileNode>("open while", blackboard_ptr_);
     open_while_ptr->AddChildren(distinguish_ptr);
     open_while_ptr->AddChildren(car_open_jud_ptr);
-    open_while_ptr->AddChildren(robot1_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_open_jud_ptr);
-    // open_while_ptr->AddChildren(set_roadblock_jud_ptr);
+    open_while_ptr->AddChildren(robot1_open_jud_ptr);
     open_while_ptr->AddChildren(robot4_photo_jud_ptr);
 
     auto open_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("open while jud", blackboard_ptr_,
@@ -171,6 +175,7 @@ int main(int argc, char **argv)
                                                                                  },
                                                                                  shop::decision::AbortType::BOTH);
 
+    // carry action的定义//
     auto robot1_carry_seq_ptr = std::make_shared<shop::decision::SequenceNode>("robot1 carry seq", blackboard_ptr_);
     robot1_carry_seq_ptr->AddChildren(robot1_move_ptr);
     robot1_carry_seq_ptr->AddChildren(robot1_action_ptr);
@@ -188,6 +193,7 @@ int main(int argc, char **argv)
     carry_while_ptr->AddChildren(robot1_carry_seq_ptr);
     carry_while_ptr->AddChildren(robot4_carry_seq_ptr);
 
+    //抓取的while
     auto carry_while_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("carry while jud", blackboard_ptr_,
                                                                                   carry_while_ptr,
                                                                                   [&]() {
@@ -206,17 +212,21 @@ int main(int argc, char **argv)
     final_jud_ptr->AddChildren(open_while_jud_ptr);
     final_jud_ptr->AddChildren(carry_while_jud_ptr);
 
+    //初始位置的设定
     data::Coord coord;
     coord.x = 4;
     coord.y = 2;
+
     goal_action_ptr->SetTargetCoord(4, coord);
     goal_action_ptr->SetTargetActionName(4, "T");
+
     // blackboard_ptr_->SetBoolValue(true, "robot1_opening_flag");
     blackboard_ptr_->SetBoolValue(true, "opening_flag");
 
     auto sh = BehaviorTree(final_jud_ptr, 10);
 
-    for (int i = 0; i < 13; i++)
+    //开局等待
+    for (int i = 1; i <= 11; i++)
     {
         ros::Duration(1).sleep();
         ROS_ERROR("wart %d s", i);

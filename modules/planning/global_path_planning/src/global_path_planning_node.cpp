@@ -19,19 +19,19 @@ typedef pair<int, int> Coord;
 
 class GlobalPlan : public GlobalBase
 {
-  public:
+public:
     GlobalPlan(std::string name) : GlobalBase(name), INF(999)
     {
         arrive_flag_1 = arrive_flag_2 = true;
         out_wall = false;
         priority_flag = true;
         final_coord_1 = final_coord_2 = Coord(10, 10);
-
     }
 
     void PositionOfObstacles(int map[num_x][num_y])
     {
         auto location = GetRoadblock();
+        ROS_WARN("PositionOfObstacles:%d", int(location));
         switch (location)
         {
         case 1:
@@ -62,7 +62,7 @@ class GlobalPlan : public GlobalBase
         queue<Coord> que;
         if (end.first == begin.first && end.second == begin.second)
         {
-    
+
             return que;
         }
         int x = end.first, y = end.second;
@@ -98,7 +98,6 @@ class GlobalPlan : public GlobalBase
         // if(end_2.x != now_1.x || end_2.y != now_1.y)
         // {
         //     map[now_1.x][now_1.y] = 1;
-            
         // }
         // if(end_1.x != now_2.x || end_1.y != now_2.y)
         // {
@@ -122,7 +121,7 @@ class GlobalPlan : public GlobalBase
                 int temp_y = local.second + move_y[i];
                 if (0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
                 {
-                    que.push(Coord(temp_x, temp_y)); 
+                    que.push(Coord(temp_x, temp_y));
                     map_path[temp_x][temp_y] = local;
                     map[temp_x][temp_y] = 1;
                     if (temp_x == end.first && temp_y == end.second)
@@ -142,11 +141,11 @@ class GlobalPlan : public GlobalBase
         queue<Coord> path;
 
         int move_x[4] = {0, 0, 1, -1}, move_y[4] = {1, -1, 0, 0};
-        for(int i = 0; i<4; i++)
+        for (int i = 0; i < 4; i++)
         {
             int temp_x = int(begin.first) + move_x[i];
             int temp_y = int(begin.second) + move_y[i];
-            if(0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
+            if (0 <= temp_x && temp_x < num_x && 0 <= temp_y && temp_y < num_y && map[temp_x][temp_y] != 1)
             {
                 path.push(Coord(temp_x, temp_y));
             }
@@ -158,11 +157,11 @@ class GlobalPlan : public GlobalBase
     {
         auto end = GetTargetCoord(2);
         path_1.push(Coord(end.x, end.y));
-        while(path_1.size())
+        while (path_1.size())
         {
             Coord arrive = path_1.front();
             path_1.pop();
-            if(int(arrive.first) == int(local.first) && int(arrive.second) == int(local.second))
+            if (int(arrive.first) == int(local.first) && int(arrive.second) == int(local.second))
             {
                 return false;
             }
@@ -170,33 +169,33 @@ class GlobalPlan : public GlobalBase
         return true;
     }
 
-    int SetUpGrabObstacles(int flag, Coord now1, Coord now2, int map1[num_x][num_y], int map2[num_x][num_y])
+    void SetUpGrabObstacles(int flag, Coord now1, Coord now2, int map1[num_x][num_y], int map2[num_x][num_y], int *create_flag)
     {
-        int create_flag = 0;
-        if(flag == 1)
+
+        if (flag == 1)
         {
-            if((int(now1.first) == 4 && int(now1.second) == 2) || (int(now1.first) == 3 && int(now1.second) == 2) || (int(now1.first) == 5 && int(now1.second) == 2))
+            if ((int(now1.first) == 4 && int(now1.second) == 2) || (int(now1.first) == 3 && int(now1.second) == 2) || (int(now1.first) == 5 && int(now1.second) == 2))
             {
                 map2[4][2] += 1;
                 map2[3][2] += 1;
                 map2[5][2] += 1;
                 // create_flag = 1;
             }
-            if((int(now1.first) == 7 && int(now1.second) == 4) || (int(now1.first) == 7 && int(now1.second) == 3) || (int(now1.first) == 7 && int(now1.second) == 5))
+            if ((int(now1.first) == 7 && int(now1.second) == 4) || (int(now1.first) == 7 && int(now1.second) == 3) || (int(now1.first) == 7 && int(now1.second) == 5))
             {
                 map2[7][4] += 1;
                 map2[7][3] += 1;
                 map2[7][5] += 1;
                 // create_flag = 2;
             }
-            if((int(now1.first) == 5 && int(now1.second) == 7) || (int(now1.first) == 6 && int(now1.second) == 7) || (int(now1.first) == 4 && int(now1.second) == 7))
+            if ((int(now1.first) == 5 && int(now1.second) == 7) || (int(now1.first) == 6 && int(now1.second) == 7) || (int(now1.first) == 4 && int(now1.second) == 7))
             {
                 map2[5][7] += 1;
                 map2[4][7] += 1;
                 map2[6][7] += 1;
                 // create_flag = 3;
             }
-            if((int(now1.first) == 2 && int(now1.second) == 5) || (int(now1.first) == 2 && int(now1.second) == 6) || (int(now1.first) == 2 && int(now1.second) == 4))
+            if ((int(now1.first) == 2 && int(now1.second) == 5) || (int(now1.first) == 2 && int(now1.second) == 6) || (int(now1.first) == 2 && int(now1.second) == 4))
             {
                 map2[2][5] += 1;
                 map2[2][4] += 1;
@@ -204,82 +203,114 @@ class GlobalPlan : public GlobalBase
                 // create_flag = 4;
             }
         }
-        else if(flag == 2)
+        else if (flag == 2)
         {
-            if((int(now2.first) == 4 && int(now2.second) == 2) || (int(now2.first) == 3 && int(now2.second) == 2) || (int(now2.first) == 5 && int(now2.second) == 2))
+            if ((int(now2.first) == 4 && int(now2.second) == 2) || (int(now2.first) == 3 && int(now2.second) == 2) || (int(now2.first) == 5 && int(now2.second) == 2))
             {
                 map1[3][2] += 1;
                 map1[5][2] += 1;
                 map1[4][2] += 1;
-                create_flag = 1;
+                *create_flag = 1;
             }
-            if((int(now2.first) == 7 && int(now2.second) == 4) || (int(now2.first) == 7 && int(now2.second) == 3) || (int(now2.first) == 7 && int(now2.second) == 5))
+            if ((int(now2.first) == 7 && int(now2.second) == 4) || (int(now2.first) == 7 && int(now2.second) == 3) || (int(now2.first) == 7 && int(now2.second) == 5))
             {
                 map1[7][3] += 1;
                 map1[7][5] += 1;
                 map1[7][4] += 1;
-                create_flag = 2;
+                *create_flag = 2;
             }
-            if((int(now2.first) == 5 && int(now2.second) == 7) || (int(now2.first) == 6 && int(now2.second) == 7) || (int(now2.first) == 4 && int(now2.second) == 7))
+            if ((int(now2.first) == 5 && int(now2.second) == 7) || (int(now2.first) == 6 && int(now2.second) == 7) || (int(now2.first) == 4 && int(now2.second) == 7))
             {
                 map1[4][7] += 1;
                 map1[6][7] += 1;
                 map1[5][7] += 1;
-                create_flag = 3;
+                *create_flag = 3;
             }
-            if((int(now2.first) == 2 && int(now2.second) == 5) || (int(now2.first) == 2 && int(now2.second) == 6) || (int(now2.first) == 2 && int(now2.second) == 4))
+            if ((int(now2.first) == 2 && int(now2.second) == 5) || (int(now2.first) == 2 && int(now2.second) == 6) || (int(now2.first) == 2 && int(now2.second) == 4))
             {
                 map1[2][4] += 1;
                 map1[2][6] += 1;
                 map1[2][5] += 1;
-                create_flag = 4;
+                *create_flag = 4;
             }
         }
-        return create_flag;
     }
 
-    void CreatePath(int create_flag, int map2[num_x][num_y])
+    Coord CreatePath(int create_flag, int map2[num_x][num_y])
     {
-        if(create_flag == 1)
+        auto now_1 = GetNowCoord(1);
+        Coord temp = Coord(0, 0);
+        ROS_WARN("SUCCESS:%d", create_flag);
+        if (create_flag == 1)
         {
-            if(map2[3][2] >= 2)
-                map2[3][2] -= 1;
-            if(map2[4][2] >= 2)
-                map2[4][2] -= 1;
-            if(map2[5][2] >= 2)
-                map2[5][2] -= 1;
+            if (map2[3][2] >= 2 || map2[4][2] >= 2 || map2[5][2] >= 2)
+            {
+                if ((now_1.x == 3 && now_1.y == 1) || (now_1.x == 2 && now_1.y == 2) || (now_1.x == 4 && now_1.y == 1))
+                {
+                    temp.first = 6;
+                    temp.second = 2;
+                }
+                if ((now_1.x == 5 && now_1.y == 1) || (now_1.x == 6 && now_1.y == 2))
+                {
+                    temp.first = 2;
+                    temp.second = 2;
+                }
+            }
         }
 
-        if(create_flag == 2)
+        if (create_flag == 2)
         {
-            if(map2[7][3] >= 2)
-                map2[7][3] -= 1;
-            if(map2[7][4] >= 2)
-                map2[7][4] -= 1;
-            if(map2[7][5] >= 2)
-                map2[7][5] -= 1;
+            if (map2[7][3] >= 2 || map2[7][4] >= 2 || map2[7][5] >= 2)
+            {
+                if ((now_1.x == 8 && now_1.y == 3) || (now_1.x == 8 && now_1.y == 4) || (now_1.x == 7 && now_1.y == 2))
+                {
+                    temp.first = 7;
+                    temp.second = 6;
+                }
+                if ((now_1.x == 8 && now_1.y == 5) || (now_1.x == 7 && now_1.y == 6))
+                {
+                    temp.first = 7;
+                    temp.second = 2;
+                }
+            }
         }
 
-        if(create_flag == 3)
+        if (create_flag == 3)
         {
-            if(map2[4][7] >= 2)
-                map2[4][7] -= 1;
-            if(map2[3][7] >= 2)
-                map2[3][7] -= 1;
-            if(map2[5][7] >= 2)
-                map2[5][7] -= 1;
+            if (map2[4][7] >= 2 || map2[6][7] >= 2 || map2[5][7] >= 2)
+            {
+                if ((now_1.x == 4 && now_1.y == 8) || (now_1.x == 3 && now_1.y == 7) || (now_1.x == 5 && now_1.y == 7))
+                {
+                    temp.first = 7;
+                    temp.second = 7;
+                }
+                if ((now_1.x == 6 && now_1.y == 8) || (now_1.x == 7 && now_1.y == 7))
+                {
+                    temp.first = 3;
+                    temp.second = 7;
+                }
+            }
         }
 
-        if(create_flag == 4)
+        if (create_flag == 4)
         {
-            if(map2[2][4] >= 2)
-                map2[2][4] -= 1;
-            if(map2[2][5] >= 2)
-                map2[2][5] -= 1;
-            if(map2[2][6] >= 2)
-                map2[2][6] -= 1;
+            if (map2[2][4] >= 2 || map2[2][5] >= 2 || map2[2][6] >= 2)
+            {
+                if ((now_1.x == 2 && now_1.y == 3) || (now_1.x == 1 && now_1.y == 5) || (now_1.x == 1 && now_1.y == 4))
+                {
+                    temp.first = 2;
+                    temp.second = 7;
+                }
+                if ((now_1.x == 1 && now_1.y == 6) || (now_1.x == 2 && now_1.y == 7))
+                {
+                    temp.first = 2;
+                    temp.second = 3;
+                }
+            }
         }
+        return temp;
     }
+
     void RobotGlobalPlanning(void)
     {    
         if(state_1 == 1 && state_2 != 1)
@@ -580,7 +611,8 @@ class GlobalPlan : public GlobalBase
                 map_1[int(local_2.first)][int(local_2.second)] += 1;
             }
             memcpy(map_1, map_2, sizeof(map_2));
-            create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+            if(state_1 == 1)
+                create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
             
             while (temp_path_2.size())
             {
@@ -589,15 +621,16 @@ class GlobalPlan : public GlobalBase
                 ROS_WARN("Coord 2:%d, %d", local_2.first, local_2.second);
                 map_2[int(local_2.first)][int(local_2.second)] += 1;
             }
-            create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
+            // create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
             //　结束设置地图
+            
 
-            ROS_WARN("create_path_flag:%d", create_path_flag);
+            // ROS_WARN("create_path_flag:%d", create_path_flag);
 
-            if(create_path_flag != 0)
-            {
-                CreatePath(create_path_flag, map_2);
-            }
+            // if(create_path_flag != 0)
+            // {
+            //     CreatePath(create_path_flag, map_2);
+            // }
 
 
             temp_path_1 = path_1, temp_path_2 = path_2;
@@ -618,29 +651,29 @@ class GlobalPlan : public GlobalBase
             temp_path_1 = path_1, temp_path_2 = path_2;
 
 
-            //判断2机器人是否在1机器人所经过的路径上
+            //判断１机器人是否在２机器人所经过的路径上
             if(out_wall == false)
             {
-                temp_path_1.push(Coord(end_1.x, end_1.y));
-                while(temp_path_1.size())
+                temp_path_2.push(Coord(end_2.x, end_2.y));
+                while(temp_path_2.size())
                 {
-                    Coord arrive = temp_path_1.front();
-                    temp_path_1.pop();
-                    if(int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
+                    Coord arrive = temp_path_2.front();
+                    temp_path_2.pop();
+                    if(int(arrive.first) == now_1.x && int(arrive.second) == now_1.y)
                     {
                         arrive_flag_1 = arrive_flag_2 = false;
 
-                        final_coord_1 = Coord(now_1.x, now_1.y);
-                        queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
+                        final_coord_2 = Coord(now_2.x, now_2.y);
+                        queue<Coord> out_coord = PlanOutWall(Coord(now_1.x, now_1.y), map_2);
                         while(out_coord.size())
                         {
                             Coord temp_out_coord = out_coord.front();
                             out_coord.pop();
-                            bool flag = JudgeCoordInWall(temp_out_coord, path_1);
+                            bool flag = JudgeCoordInWall(temp_out_coord, path_2);
                             if(flag)
                             {
-                                final_coord_2 = temp_out_coord;
-                                last_coord_2 = final_coord_2;
+                                final_coord_1 = temp_out_coord;
+                                last_coord_1 = final_coord_1;
                                 break;
                             }
                         }
@@ -648,38 +681,8 @@ class GlobalPlan : public GlobalBase
                         break;
                     }
                 }
-                temp_path_1 = path_1, temp_path_2 = path_2;
             }
-            ROS_WARN("YYY:%d", map_1[7][4]);
             temp_path_1 = path_1, temp_path_2 = path_2;
-            //计算1机器人所停位置
-            if (arrive_flag_1)
-            {
-                Coord last_coord = Coord(now_1.x, now_1.y);
-                while (1)
-                {
-                    if (temp_path_1.size() == 0)
-                    {
-                        final_coord_1.first = end_1.x;
-                        final_coord_1.second = end_1.y;
-                        break;
-                    }
-
-                    Coord stop_coord = temp_path_1.front();
-
-                    // ROS_WARN("LAST:%d, %d", last_coord.first, last_coord.second);
-                    // ROS_WARN("stop_coord: %d, %d", stop_coord.first, stop_coord.second);
-                    if (map_1[int(stop_coord.first)][int(stop_coord.second)] != 1)
-                    {
-                        final_coord_1 = last_coord;
-                        // ROS_WARN("STOP:%d, %d", last_coord.first, last_coord.second);
-                        break;
-                    }
-                    last_coord = stop_coord;
-                    temp_path_1.pop();
-                }
-            }
-
             //计算2机器人所停位置
             if (arrive_flag_2)
             {
@@ -695,14 +698,49 @@ class GlobalPlan : public GlobalBase
 
                     Coord stop_coord = temp_path_2.front();
 
+                    // ROS_WARN("LAST:%d, %d", last_coord.first, last_coord.second);
+                    // ROS_WARN("stop_coord: %d, %d", stop_coord.first, stop_coord.second);
                     if (map_2[int(stop_coord.first)][int(stop_coord.second)] != 1)
                     {
                         final_coord_2 = last_coord;
+                        // ROS_WARN("STOP:%d, %d", last_coord.first, last_coord.second);
                         break;
                     }
                     last_coord = stop_coord;
                     temp_path_2.pop();
                 }
+            }
+
+            //计算2机器人所停位置
+            if (arrive_flag_1)
+            {
+                Coord last_coord = Coord(now_1.x, now_1.y);
+                while (1)
+                {
+                    if (temp_path_1.size() == 0)
+                    {
+                        final_coord_1.first = end_1.x;
+                        final_coord_1.second = end_1.y;
+                        break;
+                    }
+
+                    Coord stop_coord = temp_path_1.front();
+
+                    if (map_1[int(stop_coord.first)][int(stop_coord.second)] != 1)
+                    {
+                        final_coord_1 = last_coord;
+                        break;
+                    }
+                    last_coord = stop_coord;
+                    temp_path_1.pop();
+                }
+            }
+
+            if(arrive_flag_2)
+                ROS_WARN("2 IS GUIHUA");
+            else
+            {
+                ROS_WARN("2 IS NO");
             }
 
             if(arrive_flag_1)
@@ -712,15 +750,8 @@ class GlobalPlan : public GlobalBase
                 ROS_WARN("1 IS NO");
             }
             
-            if(arrive_flag_2)
-                ROS_WARN("2 IS GUIHUA");
-            else
-            {
-                ROS_WARN("2 IS NO");
-            }
-
-            ROS_WARN("final-1:%d, %d", final_coord_1.first, final_coord_1.second);
             ROS_WARN("final-2:%d, %d", final_coord_2.first, final_coord_2.second);
+            ROS_WARN("final-1:%d, %d", final_coord_1.first, final_coord_1.second);
             ROS_INFO("OK!!!");
         }
         
@@ -752,7 +783,7 @@ class GlobalPlan : public GlobalBase
         return coord;
     }
 
-  private:
+private:
     const int INF;
 
     bool arrive_flag_1, arrive_flag_2;
