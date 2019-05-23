@@ -58,7 +58,7 @@ public:
         vector<Coord> determined_location;
         vector<int> determined_action;
         vector<int> determined_shelf_location;
-        int final_x , final_y, final_distance = 999;
+        int final_x, final_y, final_distance = 999;
         int final_action, final_shelf_location;
 
         auto goal_shelf = GetNowToShelf(robot_num);

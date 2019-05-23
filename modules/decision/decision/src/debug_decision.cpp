@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     auto set_roadblock_jud_ptr = std::make_shared<shop::decision::PreconditionNode>("robot4 set roadblock jud", blackboard_ptr_,
                                                                                     set_roadblock_ptr,
                                                                                     [&]() {
-                                                                                        if (blackboard_ptr_->GetBoolValue("robot1_opening_flag") == false &
+                                                                                        if (blackboard_ptr_->GetBoolValue("robot1_opening_flag") == false &&
                                                                                             blackboard_ptr_->GetBoolValue("set_roadblock_flag") == false)
                                                                                         {
                                                                                             return true;

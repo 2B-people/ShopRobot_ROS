@@ -6,11 +6,11 @@
   <!-- <include file="$(find tools)/launch/web_serial.launch"/> -->
   <node name="robot1" pkg="web_serial" type="robot1_web_server" output="screen">
     <param name="addr" value="192.168.31.7" type="str"/>
-    <param name="port" value="1115" type="int"/>
+    <param name="port" value="1111" type="int"/>
   </node>
   <node name="robot4" pkg="web_serial" type="robot4_web_server" output="screen">
     <param name="addr" value="192.168.31.7" type="str" />
-    <param name="port" value="1116" type="int"/>
+    <param name="port" value="1113" type="int"/>
   </node>
 
   <!-- <node name="debug_local_plan" pkg="tools" type=][''="debug_local_plan.py" output="screen">
@@ -34,8 +34,5 @@
   </node>
 
   <node name="global_path_planing" pkg="global_path_planing" type="global_path_planing" output="screen">
-  </node>
-
-    <node name="box_serial_node" pkg="mcu_serial" type="box_serial_node" output="screen">
   </node>
 </launch>
