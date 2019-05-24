@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-24 11:14:15
+ * @LastEditTime: 2019-05-24 16:11:30
  */
 #include <web_serial/web_server_class.h>
 
@@ -138,7 +138,7 @@ void WebServer::Run(void)
     while (ros::ok)
     {
         ros::spinOnce();
-        if (failure_index_ == 8)
+        if (failure_index_ == 5)
         {
             wifi_err_ = true;
             ROS_ERROR("wifi is done!");

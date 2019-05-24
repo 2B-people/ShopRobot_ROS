@@ -37,3 +37,7 @@ add_executable(test_behavior src/test_behavior.cpp)
 add_dependencies(test_behavior  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(test_behavior PRIVATE  ${catkin_LIBRARIES})
 
+add_executable(game_decision src/game.cpp)
+add_dependencies(game_decision  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(game_decision PRIVATE  ${catkin_LIBRARIES})
+

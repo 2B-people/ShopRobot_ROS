@@ -24,7 +24,6 @@ public:
     {
         arrive_flag_1 = arrive_flag_2 = true;
         out_wall = false;
-        priority_flag = true;
         final_coord_1 = final_coord_2 = Coord(10, 10);
     }
 
@@ -98,6 +97,7 @@ public:
         // if(end_2.x != now_1.x || end_2.y != now_1.y)
         // {
         //     map[now_1.x][now_1.y] = 1;
+
         // }
         // if(end_1.x != now_2.x || end_1.y != now_2.y)
         // {
@@ -156,7 +156,7 @@ public:
     bool JudgeCoordInWall(Coord local, queue<Coord> path_1)
     {
         auto end = GetTargetCoord(2);
-        path_1.push(Coord(end.x, end.y));
+        //path_1.push(Coord(end.x, end.y));
         while (path_1.size())
         {
             Coord arrive = path_1.front();
@@ -170,36 +170,63 @@ public:
     }
 
     void SetUpGrabObstacles(int flag, Coord now1, Coord now2, int map1[num_x][num_y], int map2[num_x][num_y], int *create_flag)
-    {
+    {   
+        auto end_1 = GetTargetCoord(1);
+
+        auto end_2 = GetTargetCoord(4);
 
         if (flag == 1)
         {
             if ((int(now1.first) == 4 && int(now1.second) == 2) || (int(now1.first) == 3 && int(now1.second) == 2) || (int(now1.first) == 5 && int(now1.second) == 2))
             {
-                map2[4][2] += 1;
-                map2[3][2] += 1;
-                map2[5][2] += 1;
+                if(int(now1.first) == int(end_1.x) && int(now1.second) == int(end_1.y))
+                {
+                    map2[4][2] += 1;
+                    map2[3][2] += 1;
+                    map2[5][2] += 1;
+                }
+                // map2[4][2] += 1;
+                // map2[3][2] += 1;
+                // map2[5][2] += 1;
                 // create_flag = 1;
             }
             if ((int(now1.first) == 7 && int(now1.second) == 4) || (int(now1.first) == 7 && int(now1.second) == 3) || (int(now1.first) == 7 && int(now1.second) == 5))
             {
-                map2[7][4] += 1;
-                map2[7][3] += 1;
-                map2[7][5] += 1;
+                if(int(now1.first) == int(end_1.x) && int(now1.second) == int(end_1.y))
+                {
+                    map2[7][4] += 1;
+                    map2[7][3] += 1;
+                    map2[7][5] += 1;
+                }
+                // map2[7][4] += 1;
+                // map2[7][3] += 1;
+                // map2[7][5] += 1;
                 // create_flag = 2;
             }
             if ((int(now1.first) == 5 && int(now1.second) == 7) || (int(now1.first) == 6 && int(now1.second) == 7) || (int(now1.first) == 4 && int(now1.second) == 7))
             {
-                map2[5][7] += 1;
-                map2[4][7] += 1;
-                map2[6][7] += 1;
+                if(int(now1.first) == int(end_1.x) && int(now1.second) == int(end_1.y))
+                {
+                    map2[5][7] += 1;
+                    map2[4][7] += 1;
+                    map2[6][7] += 1;
+                }
+                // map2[5][7] += 1;
+                // map2[4][7] += 1;
+                // map2[6][7] += 1;
                 // create_flag = 3;
             }
             if ((int(now1.first) == 2 && int(now1.second) == 5) || (int(now1.first) == 2 && int(now1.second) == 6) || (int(now1.first) == 2 && int(now1.second) == 4))
             {
-                map2[2][5] += 1;
-                map2[2][4] += 1;
-                map2[2][6] += 1;
+                if(int(now1.first) == int(end_1.x) && int(now1.second) == int(end_1.y))
+                {
+                    map2[2][5] += 1;
+                    map2[2][4] += 1;
+                    map2[2][6] += 1;
+                }
+                // map2[2][5] += 1;
+                // map2[2][4] += 1;
+                // map2[2][6] += 1;
                 // create_flag = 4;
             }
         }
@@ -207,31 +234,59 @@ public:
         {
             if ((int(now2.first) == 4 && int(now2.second) == 2) || (int(now2.first) == 3 && int(now2.second) == 2) || (int(now2.first) == 5 && int(now2.second) == 2))
             {
-                map1[3][2] += 1;
-                map1[5][2] += 1;
-                map1[4][2] += 1;
-                *create_flag = 1;
+                if(int(now2.first) == int(end_2.x) && int(now2.second) == int(end_2.y))
+                {
+                    map1[3][2] += 1;
+                    map1[5][2] += 1;
+                    map1[4][2] += 1;
+                    *create_flag = 1;
+                }
+                // map1[3][2] += 1;
+                // map1[5][2] += 1;
+                // map1[4][2] += 1;
+                // *create_flag = 1;
             }
             if ((int(now2.first) == 7 && int(now2.second) == 4) || (int(now2.first) == 7 && int(now2.second) == 3) || (int(now2.first) == 7 && int(now2.second) == 5))
             {
-                map1[7][3] += 1;
-                map1[7][5] += 1;
-                map1[7][4] += 1;
-                *create_flag = 2;
+                if(int(now2.first) == int(end_2.x) && int(now2.second) == int(end_2.y))
+                {
+                    map1[7][3] += 1;
+                    map1[7][5] += 1;
+                    map1[7][4] += 1;
+                    *create_flag = 2;
+                }
+                // map1[7][3] += 1;
+                // map1[7][5] += 1;
+                // map1[7][4] += 1;
+                // *create_flag = 2;
             }
             if ((int(now2.first) == 5 && int(now2.second) == 7) || (int(now2.first) == 6 && int(now2.second) == 7) || (int(now2.first) == 4 && int(now2.second) == 7))
             {
-                map1[4][7] += 1;
-                map1[6][7] += 1;
-                map1[5][7] += 1;
-                *create_flag = 3;
+                if(int(now2.first) == int(end_2.x) && int(now2.second) == int(end_2.y))
+                {
+                    map1[4][7] += 1;
+                    map1[6][7] += 1;
+                    map1[5][7] += 1;
+                    *create_flag = 3;
+                }
+                // map1[4][7] += 1;
+                // map1[6][7] += 1;
+                // map1[5][7] += 1;
+                // *create_flag = 3;
             }
             if ((int(now2.first) == 2 && int(now2.second) == 5) || (int(now2.first) == 2 && int(now2.second) == 6) || (int(now2.first) == 2 && int(now2.second) == 4))
             {
-                map1[2][4] += 1;
-                map1[2][6] += 1;
-                map1[2][5] += 1;
-                *create_flag = 4;
+                if(int(now2.first) == int(end_2.x) && int(now2.second) == int(end_2.y))
+                {
+                    map1[2][4] += 1;
+                    map1[2][6] += 1;
+                    map1[2][5] += 1;
+                    *create_flag = 4;
+                }
+                // map1[2][4] += 1;
+                // map1[2][6] += 1;
+                // map1[2][5] += 1;
+                // *create_flag = 4;
             }
         }
     }
@@ -313,470 +368,7 @@ public:
 
     void RobotGlobalPlanning(void)
     {
-        // if(state_1 == 1 && state_2 != 1)
-        // {
-        //     priority_flag = true;
-        // }
-        // else if(state_1 != 1 && state_2 == 1)
-        // {
-        //     priority_flag = false;
-        // }
-
-        // if(priority_flag)//１车优先级高
-        // {
-        //     int create_path_flag;
-
-        //     arrive_flag_1 = arrive_flag_2 = true;
-        //     int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-        //     PositionOfObstacles(map);
-        //     int map_1[num_x][num_y], map_2[num_x][num_y];
-
-        //     memcpy(map_1, map, sizeof(map));
-        //     memcpy(map_2, map, sizeof(map));
-
-        //     auto now_1 = GetNowCoord(1);
-        //     auto end_1 = GetTargetCoord(1);
-
-        //     auto now_2 = GetNowCoord(4);
-        //     auto end_2 = GetTargetCoord(4);
-
-        //     ROS_WARN("1 nowx:%d nowy:%d",now_1.x,now_1.y);
-        //     ROS_WARN("1 endx:%d endy:%d",end_1.x,end_1.y);
-
-        //     ROS_WARN("2 nowx:%d nowy:%d",now_2.x,now_2.y);
-        //     ROS_WARN("2 endx:%d endy:%d",end_2.x,end_2.y);
-
-        //     if(out_wall)
-        //     {
-        //         if(int(last_coord_2.first) == now_2.x && int(last_coord_2.second) == now_2.y)
-        //         {
-        //             out_wall = false;
-        //         }
-        //         else
-        //         {
-        //             arrive_flag_1 = arrive_flag_2 = false;
-        //         }
-
-        //     }
-
-        //     queue<Coord> path_1, path_2;
-
-        //     if(end_1.x != 10 && end_1.y != 10)
-        //     {
-        //         path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
-        //         path_1.push(Coord(end_1.x, end_1.y));
-        //     }
-        //     if(end_2.x != 10 && end_2.y != 10)
-        //     {
-        //         path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
-        //         path_2.push(Coord(end_2.x, end_2.y));
-        //     }
-
-        //     queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2;
-
-        //     //设置单车地图
-        //     while (temp_path_1.size())
-        //     {
-        //         Coord local_1 = temp_path_1.front();
-        //         temp_path_1.pop();
-        //         ROS_WARN("Coord 1:%d, %d", (int)local_1.first, (int)local_1.second);
-        //         map_1[int(local_1.first)][int(local_1.second)] += 1;
-        //     }
-
-        //     memcpy(map_2, map_1, sizeof(map_1));
-        //     create_path_flag = SetUpGrabObstacles(2, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
-
-        //     while (temp_path_2.size())
-        //     {
-        //         Coord local_2 = temp_path_2.front();
-        //         temp_path_2.pop();
-        //         ROS_WARN("Coord 2:%d, %d", local_2.first, local_2.second);
-        //         map_2[int(local_2.first)][int(local_2.second)] += 1;
-        //     }
-        //     create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
-        //     //　结束设置地图
-
-        //     ROS_WARN("create_path_flag:%d", create_path_flag);
-        //     if(create_path_flag != 0)
-        //     {
-        //         CreatePath(create_path_flag, map_2);
-        //     }
-
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-        //     //打印1 2 车路径所经过的路线
-        //     while (temp_path_1.size())
-        //     {
-        //         Coord local_1 = temp_path_1.front();
-        //         temp_path_1.pop();
-        //         ROS_WARN("End 1:%d", map_1[int(local_1.first)][int(local_1.second)]);
-        //     }
-
-        //     while (temp_path_2.size())
-        //     {
-        //         Coord local_2 = temp_path_2.front();
-        //         temp_path_2.pop();
-        //         ROS_WARN("End 2:%d", map_2[int(local_2.first)][int(local_2.second)]);
-        //     }
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-
-        //     //判断2机器人是否在1机器人所经过的路径上
-        //     if(out_wall == false)
-        //     {
-        //         temp_path_1.push(Coord(end_1.x, end_1.y));
-        //         while(temp_path_1.size())
-        //         {
-        //             Coord arrive = temp_path_1.front();
-        //             temp_path_1.pop();
-        //             if(int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
-        //             {
-        //                 arrive_flag_1 = arrive_flag_2 = false;
-
-        //                 final_coord_1 = Coord(now_1.x, now_1.y);
-        //                 queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
-        //                 while(out_coord.size())
-        //                 {
-        //                     Coord temp_out_coord = out_coord.front();
-        //                     out_coord.pop();
-        //                     bool flag = JudgeCoordInWall(temp_out_coord, path_1);
-        //                     if(flag)
-        //                     {
-        //                         final_coord_2 = temp_out_coord;
-        //                         last_coord_2 = final_coord_2;
-        //                         break;
-        //                     }
-        //                 }
-        //                 out_wall = true;
-        //                 break;
-        //             }
-        //         }
-        //         temp_path_1 = path_1, temp_path_2 = path_2;
-        //     }
-        //     ROS_WARN("YYY:%d", map_1[7][4]);
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-        //     //计算1机器人所停位置
-        //     if (arrive_flag_1)
-        //     {
-        //         Coord last_coord = Coord(now_1.x, now_1.y);
-        //         while (1)
-        //         {
-        //             if (temp_path_1.size() == 0)
-        //             {
-        //                 final_coord_1.first = end_1.x;
-        //                 final_coord_1.second = end_1.y;
-        //                 break;
-        //             }
-
-        //             Coord stop_coord = temp_path_1.front();
-
-        //             // ROS_WARN("LAST:%d, %d", last_coord.first, last_coord.second);
-        //             // ROS_WARN("stop_coord: %d, %d", stop_coord.first, stop_coord.second);
-        //             if (map_1[int(stop_coord.first)][int(stop_coord.second)] != 1)
-        //             {
-        //                 final_coord_1 = last_coord;
-        //                 // ROS_WARN("STOP:%d, %d", last_coord.first, last_coord.second);
-        //                 break;
-        //             }
-        //             last_coord = stop_coord;
-        //             temp_path_1.pop();
-        //         }
-        //     }
-
-        //     //计算2机器人所停位置
-        //     if (arrive_flag_2)
-        //     {
-        //         Coord last_coord = Coord(now_2.x, now_2.y);
-        //         while (1)
-        //         {
-        //             if (temp_path_2.size() == 0)
-        //             {
-        //                 final_coord_2.first = end_2.x;
-        //                 final_coord_2.second = end_2.y;
-        //                 break;
-        //             }
-
-        //             Coord stop_coord = temp_path_2.front();
-
-        //             if (map_2[int(stop_coord.first)][int(stop_coord.second)] != 1)
-        //             {
-        //                 final_coord_2 = last_coord;
-        //                 break;
-        //             }
-        //             last_coord = stop_coord;
-        //             temp_path_2.pop();
-        //         }
-        //     }
-
-        //     if(arrive_flag_1)
-        //         ROS_WARN("1 IS GUIHUA");
-        //     else
-        //     {
-        //         ROS_WARN("1 IS NO");
-        //     }
-
-        //     if(arrive_flag_2)
-        //         ROS_WARN("2 IS GUIHUA");
-        //     else
-        //     {
-        //         ROS_WARN("2 IS NO");
-        //     }
-
-        //     ROS_WARN("final-1:%d, %d", final_coord_1.first, final_coord_1.second);
-        //     ROS_WARN("final-2:%d, %d", final_coord_2.first, final_coord_2.second);
-        //     ROS_INFO("OK!!!");
-        // }
-        // else//２车优先级高
-        // {
-        //     int create_path_flag;
-
-        //     arrive_flag_1 = arrive_flag_2 = true;
-        //     int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        //                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-        //     PositionOfObstacles(map);
-        //     int map_1[num_x][num_y], map_2[num_x][num_y];
-
-        //     memcpy(map_1, map, sizeof(map));
-        //     memcpy(map_2, map, sizeof(map));
-
-        //     auto now_1 = GetNowCoord(1);
-        //     auto end_1 = GetTargetCoord(1);
-
-        //     auto now_2 = GetNowCoord(4);
-        //     auto end_2 = GetTargetCoord(4);
-
-        //     ROS_WARN("1 nowx:%d nowy:%d",now_1.x,now_1.y);
-        //     ROS_WARN("1 endx:%d endy:%d",end_1.x,end_1.y);
-
-        //     ROS_WARN("2 nowx:%d nowy:%d",now_2.x,now_2.y);
-        //     ROS_WARN("2 endx:%d endy:%d",end_2.x,end_2.y);
-
-        //     if(out_wall)
-        //     {
-        //         if(int(last_coord_１.first) == now_１.x && int(last_coord_１.second) == now_１.y)
-        //         {
-        //             out_wall = false;
-        //         }
-        //         else
-        //         {
-        //             arrive_flag_1 = arrive_flag_2 = false;
-        //         }
-
-        //     }
-
-        //     queue<Coord> path_1, path_2;
-
-        //     if(end_1.x != 10 && end_1.y != 10)
-        //     {
-        //         path_1 = PathPlanning(Coord(now_1.x, now_1.y), Coord(end_1.x, end_1.y));
-        //         path_1.push(Coord(end_1.x, end_1.y));
-        //     }
-        //     if(end_2.x != 10 && end_2.y != 10)
-        //     {
-        //         path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
-        //         path_2.push(Coord(end_2.x, end_2.y));
-        //     }
-
-        //     queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2;
-
-        //     //设置单车地图
-        //     while (temp_path_２.size())
-        //     {
-        //         Coord local_２=temp_path_２.front();
-        //         temp_path_2.pop();
-        //         ROS_WARN("Coord 2:%d, %d", (int)local_2.first, (int)local_2.second);
-        //         map_1[int(local_2.first)][int(local_2.second)] += 1;
-        //     }
-        //     memcpy(map_1, map_2, sizeof(map_2));
-        //     if(state_1 == 1)
-        //         create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
-
-        //     while (temp_path_2.size())
-        //     {
-        //         Coord local_2 = temp_path_2.front();
-        //         temp_path_2.pop();
-        //         ROS_WARN("Coord 2:%d, %d", local_2.first, local_2.second);
-        //         map_2[int(local_2.first)][int(local_2.second)] += 1;
-        //     }
-        //     create_path_flag = SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2);
-        //     //　结束设置地图
-
-        //     // ROS_WARN("create_path_flag:%d", create_path_flag);
-
-        //     // if(create_path_flag != 0)
-        //     // {
-        //     //     CreatePath(create_path_flag, map_2);
-        //     // }
-
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-        //     //打印1 2 车路径所经过的路线
-        //     while (temp_path_2.size())
-        //     {
-        //         Coord local_2 = temp_path_2.front();
-        //         temp_path_2.pop();
-        //         ROS_WARN("End 2:%d", map_2[int(local_2.first)][int(local_2.second)]);
-        //     }
-
-        //     while (temp_path_1.size())
-        //     {
-        //         Coord local_1 = temp_path_1.front();
-        //         temp_path_1.pop();
-        //         ROS_WARN("End 1:%d", map_1[int(local_1.first)][int(local_1.second)]);
-        //     }
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-
-        //     //判断１机器人是否在２机器人所经过的路径上
-        //     if(out_wall == false)
-        //     {
-        //         temp_path_2.push(Coord(end_2.x, end_2.y));
-        //         while(temp_path_2.size())
-        //         {
-        //             Coord arrive = temp_path_2.front();
-        //             temp_path_2.pop();
-        //             if(int(arrive.first) == now_1.x && int(arrive.second) == now_1.y)
-        //             {
-        //                 arrive_flag_1 = arrive_flag_2 = false;
-
-        //                 final_coord_2 = Coord(now_2.x, now_2.y);
-        //                 queue<Coord> out_coord = PlanOutWall(Coord(now_1.x, now_1.y), map_2);
-        //                 while(out_coord.size())
-        //                 {
-        //                     Coord temp_out_coord = out_coord.front();
-        //                     out_coord.pop();
-        //                     bool flag = JudgeCoordInWall(temp_out_coord, path_2);
-        //                     if(flag)
-        //                     {
-        //                         final_coord_1 = temp_out_coord;
-        //                         last_coord_1 = final_coord_1;
-        //                         break;
-        //                     }
-        //                 }
-        //                 out_wall = true;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     temp_path_1 = path_1, temp_path_2 = path_2;
-        //     //计算2机器人所停位置
-        //     if (arrive_flag_2)
-        //     {
-        //         Coord last_coord = Coord(now_2.x, now_2.y);
-        //         while (1)
-        //         {
-        //             if (temp_path_2.size() == 0)
-        //             {
-        //                 final_coord_2.first = end_2.x;
-        //                 final_coord_2.second = end_2.y;
-        //                 break;
-        //             }
-
-        //             Coord stop_coord = temp_path_2.front();
-
-        //             // ROS_WARN("LAST:%d, %d", last_coord.first, last_coord.second);
-        //             // ROS_WARN("stop_coord: %d, %d", stop_coord.first, stop_coord.second);
-        //             if (map_2[int(stop_coord.first)][int(stop_coord.second)] != 1)
-        //             {
-        //                 final_coord_2 = last_coord;
-        //                 // ROS_WARN("STOP:%d, %d", last_coord.first, last_coord.second);
-        //                 break;
-        //             }
-        //             last_coord = stop_coord;
-        //             temp_path_2.pop();
-        //         }
-        //     }
-
-        //     //计算2机器人所停位置
-        //     if (arrive_flag_1)
-        //     {
-        //         Coord last_coord = Coord(now_1.x, now_1.y);
-        //         while (1)
-        //         {
-        //             if (temp_path_1.size() == 0)
-        //             {
-        //                 final_coord_1.first = end_1.x;
-        //                 final_coord_1.second = end_1.y;
-        //                 break;
-        //             }
-
-        //             Coord stop_coord = temp_path_1.front();
-
-        //             if (map_1[int(stop_coord.first)][int(stop_coord.second)] != 1)
-        //             {
-        //                 final_coord_1 = last_coord;
-        //                 break;
-        //             }
-        //             last_coord = stop_coord;
-        //             temp_path_1.pop();
-        //         }
-        //     }
-
-        //     if(arrive_flag_2)
-        //         ROS_WARN("2 IS GUIHUA");
-        //     else
-        //     {
-        //         ROS_WARN("2 IS NO");
-        //     }
-
-        //     if(arrive_flag_1)
-        //         ROS_WARN("1 IS GUIHUA");
-        //     else
-        //     {
-        //         ROS_WARN("1 IS NO");
-        //     }
-
-        //     ROS_WARN("final-2:%d, %d", final_coord_2.first, final_coord_2.second);
-        //     ROS_WARN("final-1:%d, %d", final_coord_1.first, final_coord_1.second);
-        //     ROS_INFO("OK!!!");
-        // }
-
-        auto now_1 = GetNowCoord(1);
-        auto end_1 = GetTargetCoord(1);
-
-        auto now_2 = GetNowCoord(4);
-        auto end_2 = GetTargetCoord(4);
-
-        ROS_WARN("1 nowx:%d nowy:%d", now_1.x, now_1.y);
-        ROS_WARN("1 endx:%d endy:%d", end_1.x, end_1.y);
-
-        ROS_WARN("2 nowx:%d nowy:%d", now_2.x, now_2.y);
-        ROS_WARN("2 endx:%d endy:%d", end_2.x, end_2.y);
-
-        auto robot1_action = GetAction(1);
-        auto robot2_action = GetAction(1);
-
-
-        auto state_1 = robot1_action.is_action;
-        auto state_2 = robot2_action.is_action;
-
-        ROS_WARN("state1:%d", state_1);
-        ROS_WARN("state2:%d", state_2);
-
-        if (out_wall)
-        {
-            if (int(last_coord_2.first) == now_2.x && int(last_coord_2.second) == now_2.y)
-            {
-                out_wall = false;
-            }
-            else
-            {
-                arrive_flag_1 = arrive_flag_2 = false;
-            }
-        }
+        int create_path_flag = 0;
 
         arrive_flag_1 = arrive_flag_2 = true;
         int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -794,6 +386,30 @@ public:
 
         memcpy(map_1, map, sizeof(map));
         memcpy(map_2, map, sizeof(map));
+        
+        auto now_1 = GetNowCoord(1);
+        auto end_1 = GetTargetCoord(1);
+
+        auto now_2 = GetNowCoord(4);
+        auto end_2 = GetTargetCoord(4);
+
+        ROS_WARN("1 nowx:%d nowy:%d", now_1.x, now_1.y);
+        ROS_WARN("1 endx:%d endy:%d", end_1.x, end_1.y);
+
+        ROS_WARN("2 nowx:%d nowy:%d", now_2.x, now_2.y);
+        ROS_WARN("2 endx:%d endy:%d", end_2.x, end_2.y);
+
+        if (out_wall)
+        {
+            if (int(last_coord_2.first) == now_2.x && int(last_coord_2.second) == now_2.y)
+            {
+                out_wall = false;
+            }
+            else
+            {
+                arrive_flag_1 = arrive_flag_2 = false;
+            }
+        }
 
         queue<Coord> path_1, path_2;
 
@@ -807,8 +423,8 @@ public:
             path_2 = PathPlanning(Coord(now_2.x, now_2.y), Coord(end_2.x, end_2.y));
             path_2.push(Coord(end_2.x, end_2.y));
         }
-        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2;
 
+        queue<Coord> temp_path_1 = path_1, temp_path_2 = path_2;
         while (temp_path_1.size())
         {
             Coord local_1 = temp_path_1.front();
@@ -816,126 +432,249 @@ public:
             ROS_WARN("Coord 1:%d, %d", (int)local_1.first, (int)local_1.second);
             map_1[int(local_1.first)][int(local_1.second)] += 1;
         }
+        memcpy(map_2, map_1, sizeof(map_1));
+        SetUpGrabObstacles(2, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2, &create_path_flag);
 
         while (temp_path_2.size())
         {
             Coord local_2 = temp_path_2.front();
             temp_path_2.pop();
-            ROS_WARN("Coord 2:%d, %d", (int)local_2.first, (int)local_2.second);
+            ROS_WARN("Coord 2:%d, %d", local_2.first, local_2.second);
+            map_2[int(local_2.first)][int(local_2.second)] += 1;
+        }
+        SetUpGrabObstacles(1, Coord(int(now_1.x), int(now_1.y)), Coord(int(now_2.x), int(now_2.y)), map_1, map_2, &create_path_flag);
+
+        ROS_WARN("create_path_flag:%d", create_path_flag);
+        if (create_path_flag)
+        {
+            ROS_WARN("success");
+            Coord temp = CreatePath(create_path_flag, map_2);
+            if (temp.first != 0 && temp.second != 0)
+            {
+                final_coord_2 = temp;
+                arrive_flag_1 = arrive_flag_2 = false;
+            }
+        }
+
+        if (map_2[int(now_2.x)][int(now_2.y)] >= 2)
+        {
+            map_2[int(now_2.x)][int(now_2.y)] = 1;
         }
 
         temp_path_1 = path_1, temp_path_2 = path_2;
-
-        if (state_1 == 0 && state_2 == 0 && out_wall == false)
+        //打印1 2 车路径所经过的路线
+        while (temp_path_1.size())
         {
-            bool flag = false;
-            //判断两车是否有交叉点
+            Coord local_1 = temp_path_1.front();
+            temp_path_1.pop();
+            ROS_WARN("End 1:%d", map_1[int(local_1.first)][int(local_1.second)]);
+        }
+
+        while (temp_path_2.size())
+        {
+            Coord local_2 = temp_path_2.front();
+            temp_path_2.pop();
+            ROS_WARN("End 2:%d", map_2[int(local_2.first)][int(local_2.second)]);
+        }
+        temp_path_1 = path_1, temp_path_2 = path_2;
+
+        //判断2机器人是否在1机器人所经过的路径上
+        // if (out_wall == false)
+        // {
+        //     temp_path_1.push(Coord(end_1.x, end_1.y));
+        //     while (temp_path_1.size())
+        //     {
+        //         Coord arrive = temp_path_1.front();
+        //         temp_path_1.pop();
+        //         if (int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
+        //         {
+        //             arrive_flag_1 = arrive_flag_2 = false;
+
+        //             final_coord_1 = Coord(now_1.x, now_1.y);
+        //             queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
+        //             while (out_coord.size())
+        //             {
+        //                 Coord temp_out_coord = out_coord.front();
+        //                 out_coord.pop();
+        //                 bool flag = JudgeCoordInWall(temp_out_coord, path_1);
+        //                 if (flag)
+        //                 {
+        //                     final_coord_2 = temp_out_coord;
+        //                     last_coord_2 = final_coord_2;
+        //                     break;
+        //                 }
+        //             }
+        //             out_wall = true;
+        //             break;
+        //         }
+        //     }
+        //     temp_path_1 = path_1, temp_path_2 = path_2;
+        // }
+
+         if (out_wall == false)
+        {
+            temp_path_1.push(Coord(end_1.x, end_1.y));
             while (temp_path_1.size())
             {
-                flag = false;
-                Coord local_1 = temp_path_1.front();
+                Coord arrive = temp_path_1.front();
                 temp_path_1.pop();
-                while (temp_path_2.size())
+                if (int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
                 {
-                    Coord local_2 = temp_path_2.front();
-                    temp_path_2.pop();
-                    if (local_1.first == local_2.first && local_1.second == local_2.second)
-                    {
-                        arrive_flag_1 = arrive_flag_2 = false;
-                        flag = true;
-                        break;
-                    }
-                    if (flag)
-                    {
-                        break;
-                    }
-                    temp_path_1 = path_1;
-                }
-            }
-            //如果有，则判断２车的起点是否在路径内　如果是，则离开，如果不是，则不动
-            if (flag)
-            {
-                if (out_wall == false)
-                {
-                    while (temp_path_1.size())
-                    {
-                        Coord arrive = temp_path_1.front();
-                        temp_path_1.pop();
-                        if (int(arrive.first) == now_2.x && int(arrive.second) == now_2.y)
-                        {
-                            arrive_flag_1 = arrive_flag_2 = false;
+                    arrive_flag_1 = arrive_flag_2 = false;
 
-                            final_coord_1 = Coord(now_1.x, now_1.y);
-                            queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
-                            while (out_coord.size())
-                            {
-                                Coord temp_out_coord = out_coord.front();
-                                out_coord.pop();
-                                bool flag = JudgeCoordInWall(temp_out_coord, path_1);
-                                if (flag)
-                                {
-                                    final_coord_2 = temp_out_coord;
-                                    last_coord_2 = final_coord_2;
-                                    break;
-                                }
-                            }
-                            out_wall = true;
+                    final_coord_1 = Coord(now_1.x, now_1.y);
+                    queue<Coord> out_coord = PlanOutWall(Coord(now_2.x, now_2.y), map_1);
+                    queue<Coord> temp_out = out_coord;
+                    //int num_local = out_coord.size();
+                    bool out_flag = true;
+                    while (out_coord.size())
+                    {
+                        Coord temp_out_coord = out_coord.front();
+                        out_coord.pop();
+                        bool flag = JudgeCoordInWall(temp_out_coord, path_1);
+                        if (flag)
+                        {
+                            out_flag = false;
+                            final_coord_2 = temp_out_coord;
+                            last_coord_2 = final_coord_2;
                             break;
                         }
                     }
-                    temp_path_1 = path_1, temp_path_2 = path_2;
-                    if (out_wall == false)
-                        arrive_flag_1 = true;
-                }
-                if(arrive_flag_1 && arrive_flag_2)
-                {
-                    if(state_1 == 1 && state_2 == 1)
+                    if(out_flag)
                     {
-                        if((end_1.x == 3 && end_1.y == 2) || (end_1.x == 4 && end_1.y == 2) || (end_1.x == 5 && end_1.y == 2))
+                        bool new_flag = false;
+                        while (temp_out.size())
                         {
-                            if((end_2.x == 3 && end_2.y == 2) || (end_2.x == 4 && end_2.y == 2) || (end_2.x == 5 && end_2.y == 2))
+                            Coord temp_out_coord = temp_out.front();
+                            temp_out.pop();
+                            if(temp_out_coord.first != int(now_1.x) && temp_out_coord.second != int(now_1.y))
                             {
-                                arrive_flag_2 = false;
+                                auto location = GetRoadblock();
+                                //ROS_WARN("PositionOfObstacles:%d", int(location));
+                                switch (location)
+                                {
+                                case 1:
+                                    if(temp_out_coord.first != 8 && temp_out_coord.second != 1)
+                                        new_flag = true;
+                                    // map[8][1] = 1;
+                                    break;
+                                case 2:
+                                    if(temp_out_coord.first != 8 && temp_out_coord.second != 4)
+                                        new_flag = true;
+                                    // map[8][4] = 1;
+                                    break;
+                                case 3:
+                                    if(temp_out_coord.first != 8 && temp_out_coord.second != 8)
+                                        new_flag = true;
+                                    // map[8][8] = 1;
+                                    break;
+                                case 4:
+                                    if(temp_out_coord.first != 5 && temp_out_coord.second != 7)
+                                        new_flag = true;
+                                    // map[5][7] = 1;
+                                    break;
+                                case 5:
+                                    if(temp_out_coord.first != 1 && temp_out_coord.second != 8)
+                                        new_flag = true;
+                                    //map[1][8] = 1;
+                                    break;
+                                case 6:
+                                    if(temp_out_coord.first != 1 && temp_out_coord.second != 5)
+                                        new_flag = true;
+                                    //map[1][5] = 1;
+                                    break;
+                                default:
+                                    break;
+                                }
+                            }
+                            if (new_flag)
+                            {
+                                //out_flag = true;
+                                final_coord_2 = temp_out_coord;
+                                last_coord_2 = final_coord_2;
+                                break;
                             }
                         }
-
-                        if((end_1.x == 7 && end_1.y == 3) || (end_1.x == 7 && end_1.y == 4) || (end_1.x == 7 && end_1.y == 5))
-                        {
-                            if((end_2.x == 7 && end_2.y == 3) || (end_2.x == 7 && end_2.y == 4) || (end_2.x == 7 && end_2.y == 5))
-                            {
-                                arrive_flag_2 = false;
-                            }
-                        }
-
-                        if((end_1.x == 4 && end_1.y == 7) || (end_1.x == 5 && end_1.y == 7) || (end_1.x == 6 && end_1.y == 7))
-                        {
-                            if((end_2.x == 4 && end_2.y == 7) || (end_2.x == 5 && end_2.y == 7) || (end_2.x == 6 && end_2.y == 7))
-                            {
-                                arrive_flag_2 = false;
-                            }
-                        }
-
-                        if((end_1.x == 2 && end_1.y == 6) || (end_1.x == 2 && end_1.y == 5) || (end_1.x == 2 && end_1.y == 4))
-                        {
-                            if((end_2.x == 2 && end_2.y == 6) || (end_2.x == 2 && end_2.y == 5) || (end_2.x == 2 && end_2.y == 4))
-                            {
-                                arrive_flag_2 = false;
-                            }
-                        }
+                        
                     }
+                    out_wall = true;
+                    break;
                 }
             }
-            if (arrive_flag_1)
+            temp_path_1 = path_1, temp_path_2 = path_2;
+        }
+        // ROS_WARN("YYY:%d", map_1[7][4]);
+        temp_path_1 = path_1, temp_path_2 = path_2;
+        //计算1机器人所停位置
+        if (arrive_flag_1)
+        {
+            Coord last_coord = Coord(now_1.x, now_1.y);
+            while (1)
             {
-                final_coord_1.first = end_1.x;
-                final_coord_1.second = end_1.y;
-            }
-            if (arrive_flag_2)
-            {
-                final_coord_2.first = end_2.x;
-                final_coord_2.second = end_2.y;
+                if (temp_path_1.size() == 0)
+                {
+                    final_coord_1.first = end_1.x;
+                    final_coord_1.second = end_1.y;
+                    break;
+                }
+
+                Coord stop_coord = temp_path_1.front();
+
+                // ROS_WARN("LAST:%d, %d", last_coord.first, last_coord.second);
+                // ROS_WARN("stop_coord: %d, %d", stop_coord.first, stop_coord.second);
+                if (map_1[int(stop_coord.first)][int(stop_coord.second)] != 1)
+                {
+                    final_coord_1 = last_coord;
+                    // ROS_WARN("STOP:%d, %d", last_coord.first, last_coord.second);
+                    break;
+                }
+                last_coord = stop_coord;
+                temp_path_1.pop();
             }
         }
+
+        //计算2机器人所停位置
+        if (arrive_flag_2)
+        {
+            Coord last_coord = Coord(now_2.x, now_2.y);
+            while (1)
+            {
+                if (temp_path_2.size() == 0)
+                {
+                    final_coord_2.first = end_2.x;
+                    final_coord_2.second = end_2.y;
+                    break;
+                }
+
+                Coord stop_coord = temp_path_2.front();
+
+                if (map_2[int(stop_coord.first)][int(stop_coord.second)] != 1)
+                {
+                    final_coord_2 = last_coord;
+                    break;
+                }
+                last_coord = stop_coord;
+                temp_path_2.pop();
+            }
+        }
+
+        if (arrive_flag_1)
+            ROS_WARN("1 IS GUIHUA");
+        else
+        {
+            ROS_WARN("1 IS NO");
+        }
+
+        if (arrive_flag_2)
+            ROS_WARN("2 IS GUIHUA");
+        else
+        {
+            ROS_WARN("2 IS NO");
+        }
+
+        ROS_WARN("final-1:%d, %d", final_coord_1.first, final_coord_1.second);
+        ROS_WARN("final-2:%d, %d", final_coord_2.first, final_coord_2.second);
+        ROS_INFO("OK!!!");
     }
 
     data::Coord GetFinalCoord(uint8_t robot_num_)
@@ -969,10 +708,10 @@ private:
 
     bool arrive_flag_1, arrive_flag_2;
     bool out_wall;
-    bool priority_flag;
+    bool create_path_flag;
 
     Coord final_coord_1, final_coord_2;
-    Coord last_coord_2, last_coord_1;
+    Coord last_coord_2;
 };
 
 } // namespace pathplan
