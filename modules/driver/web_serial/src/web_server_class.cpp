@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-23 22:36:40
+ * @LastEditTime: 2019-05-24 00:42:39
  */
 #include <web_serial/web_server_class.h>
 
@@ -244,7 +244,7 @@ void WebServer::ReceiveLoop(void)
             if (re_buf_string.substr(0, 6) == "finish")
             {
                 ROS_INFO("is finish");
-              //  if (is_run_action_)
+                if (is_run_action_)
                 {
                     ROS_WARN("in here");
                     is_finish_ = true;
@@ -370,6 +370,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 in_coord.y = cmd_coord_.y;
                 in_coord.pose = 5;
                 int index = 0;
+                is_run_action_ = true;
 
                 Send("stop");
                 while (ros::ok())
@@ -379,19 +380,19 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                         is_finish_ = false;
                         break;
                     }
-                    else
-                    {
-                        index++;
-                    }
-                    if (index == 150)
-                    {
-                        Send("stop");
-                        index = 0;
-                    }
+                    // else
+                    // {
+                    //     index++;
+                    // }
+                    // if (index == 200)
+                    // {
+                    //     Send("stop");
+                    //     index = 0;
+                    // }
 
-                    ros::Duration(0.1).sleep();
+                    // ros::Duration(0.1).sleep();
                 }
-
+                is_run_action_ = false;
                 std::string coord_goal_str = CoordToData(in_coord);
                 Send(coord_goal_str);
             }
