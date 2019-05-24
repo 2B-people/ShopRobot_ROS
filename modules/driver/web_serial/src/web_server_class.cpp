@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-24 00:42:39
+ * @LastEditTime: 2019-05-24 11:14:15
  */
 #include <web_serial/web_server_class.h>
 
@@ -107,7 +107,7 @@ WebServer::WebServer(std::string name)
     {
         exit(-1);
     }
-    time_cb_ = nh_.createTimer(ros::Duration(1), boost::bind(&WebServer::ReInitWeb, this, _1));
+    time_cb_ = nh_.createTimer(ros::Duration(2.0), boost::bind(&WebServer::ReInitWeb, this, _1));
     Send("I");
 }
 
@@ -244,11 +244,7 @@ void WebServer::ReceiveLoop(void)
             if (re_buf_string.substr(0, 6) == "finish")
             {
                 ROS_INFO("is finish");
-                if (is_run_action_)
-                {
-                    ROS_WARN("in here");
-                    is_finish_ = true;
-                }
+                is_finish_ = true;
             }
             else if (re_buf_string[0] == 'R')
             {
@@ -343,6 +339,10 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
         in_coord.pose = 5;
         std::string coord_goal_str = CoordToData(in_coord);
         Send(coord_goal_str);
+        data::Coord last_coord;
+        int index = 0;
+        last_coord.x = now_coord_.x;
+        last_coord.y = now_coord_.y;
 
         // ROS_INFO("move is write %s", coord_goal_str.c_str());
         while (ros::ok && is_open_ && move_stop_ == false)
@@ -395,6 +395,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 is_run_action_ = false;
                 std::string coord_goal_str = CoordToData(in_coord);
                 Send(coord_goal_str);
+                index = 0;
             }
 
             //判断目标坐标
@@ -425,6 +426,8 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 feedback.progress = 0.0;
                 move_as_.publishFeedback(feedback);
             }
+
+            ros::Duration(0.1).sleep();
         }
     }
     else if (goal->pose == 2)
