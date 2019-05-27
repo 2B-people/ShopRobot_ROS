@@ -217,8 +217,9 @@ bool WorldBoard::RoadblockWirteCB(data::Roadblock::Request &req, data::Roadblock
 {
     auto middle_dirbase_ptr = GetDirPtr("shop_roadblock");
     auto roadblock_dir_ptr = std::dynamic_pointer_cast<RoadblockDir>(middle_dirbase_ptr);
+    roadblock_dir_ptr->OpenLock();
     roadblock_dir_ptr->Set(req.number);
-    roadblock_dir_ptr->Lock();
+    // roadblock_dir_ptr->Lock();
 
     return true;
 }

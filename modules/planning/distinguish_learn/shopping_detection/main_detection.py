@@ -8,6 +8,7 @@ from utils import ops as utils_ops
 import time
 import os
 import os
+import copy
 
 
 class Object_D(object):
@@ -80,42 +81,66 @@ class Object_D(object):
         return output_dict
 
     def swap_box(self, boxes, classes, scores):
-        result = {}
+        key = ['classes','scores']
+        result=[]
+        boxescpy=copy.deepcopy(boxes)
+        classescpy=copy.deepcopy(classes)
+        scorescpy=copy.deepcopy(scores)
 
-        num_max = boxes.index(max(boxes))
-        if num_max != 2:
-            boxes[num_max], boxes[2] = boxes[2], boxes[num_max]
-            classes[num_max], classes[2] = classes[2], classes[num_max]
-            scores[num_max], scores[2] = scores[2], scores[num_max]
+        print classes
+        #排序分数最低
+        if (boxes[2]>=0.33) & (boxes[2]<=0.67):
+            boxescpy[1],classescpy[1],scorescpy[1]= boxes[2],classes[2],scores[2]
+        elif boxes[2]<=0.33:
+            boxescpy[0],classescpy[0],scorescpy[0]= boxes[2],classes[2],scores[2]
+        elif boxes[2]>=0.67:
+            boxescpy[2],classescpy[2],scorescpy[2]= boxes[2],classes[2],scores[2]
+        #排序分数中等
+        if boxes[1]<0.33 :
+            boxescpy[0],classescpy[0],scorescpy[0]= boxes[1],classes[1],scores[1]
+        elif boxes[1]>0.67 :
+            boxescpy[2],classescpy[2],scorescpy[2]= boxes[1],classes[1],scores[1]
+        elif (boxes[1]>=0.33) & (boxes[1]<=0.67):
+            boxescpy[1],classescpy[1],scorescpy[1]= boxes[1],classes[1],scores[1]
+        #排序分数最高的
+        if (boxes[0]>=0.33) & (boxes[0]<=0.67):
+            boxescpy[1],classescpy[1],scorescpy[1]= boxes[0],classes[0],scores[0]
+        elif boxes[0]>0.67 :
+            boxescpy[2],classescpy[2],scorescpy[2]= boxes[0],classes[0],scores[0]
+        elif boxes[0] <= 0.33:
+            boxescpy[0],classescpy[0],scorescpy[0]= boxes[0],classes[0],scores[0]
 
-        num_min = boxes.index(min(boxes))
-        if num_min != 0:
-            boxes[num_min], boxes[0] = boxes[0], boxes[num_min]
-            classes[num_min], classes[0] = classes[0], classes[num_min]
-            scores[num_min], scores[0] = scores[0], scores[num_min]
+        print classescpy
 
-        classes = classes.tolist()
-        scores = scores.tolist()
+        # classescpy=classescpy.tolist()
+        # scorescpy = scorescpy.tolist()
+        result.append(classescpy)
+        result.append(scorescpy)
+        dict_fin=dict(zip(key,result))
+        # result['classes'] = classescpy
+        # result['scores'] = scorescpy
 
-        result['classes'] = classes
-        result['scores'] = scores
+        return dict_fin
 
-        return result
 
     def run_image(self, num):
         name = str(num)
+
         boxes = []
+        scores = []
+        classes = []
+        # self.num = self.num + 1
         image = Image.open(self.path_image + '/image' + name + '.jpg')
         # image = Image.open('shopping_images/image1.jpg')
         image_np = self.load_image_into_numpy_array(image)
+
         output_dict = self.run_inference_for_single_image(image_np, self.detection_graph)
         for i in range(3):
-            boxes.append(output_dict['detection_boxes'][i][1])
-        classes = output_dict['detection_classes'][0:3]
-        scores = output_dict['detection_scores'][0:3]
+            boxes.append((output_dict['detection_boxes'][i][1] + output_dict['detection_boxes'][i][3]) / 2)
+            classes.append(output_dict['detection_classes'][i])
+            scores.append(output_dict['detection_scores'][i])
         result = self.swap_box(boxes, classes, scores)
         return result
-
 
 if __name__ == '__main__':
     a = Object_D()

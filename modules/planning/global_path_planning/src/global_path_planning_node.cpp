@@ -79,7 +79,7 @@ public:
         int move_x[4] = {0, 0, 1, -1}, move_y[4] = {1, -1, 0, 0};
 
         int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                                  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
@@ -372,7 +372,7 @@ public:
 
         arrive_flag_1 = arrive_flag_2 = true;
         int map[num_x][num_y] = {{0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                                  {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
@@ -513,7 +513,7 @@ public:
 
          if (out_wall == false)
         {
-            temp_path_1.push(Coord(end_1.x, end_1.y));
+            //temp_path_1.push(Coord(end_1.x, end_1.y));
             while (temp_path_1.size())
             {
                 Coord arrive = temp_path_1.front();
@@ -603,6 +603,7 @@ public:
             }
             temp_path_1 = path_1, temp_path_2 = path_2;
         }
+
         // ROS_WARN("YYY:%d", map_1[7][4]);
         temp_path_1 = path_1, temp_path_2 = path_2;
         //计算1机器人所停位置

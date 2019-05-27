@@ -36,7 +36,7 @@ class CameraNode:
 if __name__ == '__main__':
     rospy.init_node("camera_node")
     
-    address = rospy.get_param("camera_node/url/address",default="192.168.31.10")
+    address = rospy.get_param("camera_node/url/address",default="192.168.31.195")
     url = "http://admin:admin@"+address+":8081/"
 
     writ_time = rospy.get_param("camera_node/camera/wirt_time",default=20)

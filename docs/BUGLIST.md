@@ -182,4 +182,4 @@ ros的param服务器有namespace的限制,使用时需要注意全局或者局�
 在OnInitialize发送目标任务,update只用于更新节点状态,应该无问题,在
 
 `bug021`
-写service的时候一定要注意写return状态,不然又是一个晚上
+写service的时候一定要注意写return状态,不然又是一个晚上。

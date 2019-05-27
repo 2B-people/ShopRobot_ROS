@@ -226,7 +226,7 @@ int main(int argc, char **argv)
     auto sh = BehaviorTree(final_jud_ptr, 10);
 
     //开局等待
-    for (int i = 1; i <= 11; i++)
+    for (int i = 1; i <= 15; i++)
     {
         ros::Duration(1).sleep();
         ROS_ERROR("wart %d s", i);
