@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-05-24 16:11:30
+ * @LastEditTime: 2019-06-03 10:20:53
  */
 #include <web_serial/web_server_class.h>
 
@@ -370,29 +370,29 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 in_coord.y = cmd_coord_.y;
                 in_coord.pose = 5;
                 int index = 0;
-                is_run_action_ = true;
-
-                Send("stop");
-                while (ros::ok())
-                {
-                    if (is_finish_ == true)
-                    {
-                        is_finish_ = false;
-                        break;
-                    }
-                    // else
-                    // {
-                    //     index++;
-                    // }
-                    // if (index == 200)
-                    // {
-                    //     Send("stop");
-                    //     index = 0;
-                    // }
-
-                    // ros::Duration(0.1).sleep();
-                }
-                is_run_action_ = false;
+                // stop,为了稳定，放弃这个方案
+                // is_run_action_ = true;
+                // Send("stop");
+                // while (ros::ok())
+                // {
+                //     if (is_finish_ == true)
+                //     {
+                //         is_finish_ = false;
+                //         break;
+                //     }
+                //     // else
+                //     // {
+                //     //     index++;
+                //     // }
+                //     // if (index == 200)
+                //     // {
+                //     //     Send("stop");
+                //     //     index = 0;
+                //     // }
+                //     // ros::Duration(0.1).sleep();
+                // }
+                // is_run_action_ = false;
+                
                 std::string coord_goal_str = CoordToData(in_coord);
                 Send(coord_goal_str);
                 index = 0;
