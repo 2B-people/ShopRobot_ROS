@@ -16,16 +16,19 @@ if __name__ == "__main__":
     # 格式(位置,分数,东西)
     goods_client.call(0, 1, 1)
     goods_client.call(1, 1, 2)
-    goods_client.call(2, 2, 3)
-    goods_client.call(3, 3, 4)
+    goods_client.call(2, 2, 4)
+
+    goods_client.call(3, 3, 7)
     goods_client.call(4, 0, 5)
     goods_client.call(5, 0, 6)
-    goods_client.call(6, 0, 7)
-    goods_client.call(7, 0, 8)
-    goods_client.call(8, 0, 9)
-    goods_client.call(9, 0, 10)
-    goods_client.call(10, 0,11)
-    goods_client.call(11, 0,12)
+
+    goods_client.call(6, 0, 8)
+    goods_client.call(7, 0, 9)
+    goods_client.call(8, 0, 11)
+    
+    goods_client.call(9, 0, 11)
+    goods_client.call(10, 0,12)
+    goods_client.call(11, 0,1)
 
     # goods_client.call(0, 1, 1)
     # goods_client.call(1, 1, 2)

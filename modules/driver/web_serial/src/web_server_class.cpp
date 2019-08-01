@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-06-03 10:20:53
+ * @LastEditTime: 2019-06-04 10:41:05
  */
 #include <web_serial/web_server_class.h>
 
@@ -267,7 +267,7 @@ void WebServer::ReceiveLoop(void)
             else if (re_buf_string[0] == 'S')
             {
                 ROS_WARN("IN HERE S");
-                DataToBarrier(re_buf_string);
+                // DataToBarrier(re_buf_string);
             }
         }
         else
@@ -880,6 +880,10 @@ void WebServer::DataToBarrier(std::string temp)
         break;
     }
 }
+
+
+// @breif:发送子函数
+// TODO:将初始化和发送接受变成一个类，方便修改
 bool WebServer::Send(std::string temp)
 {
     std::string str_ = "HDU" + temp;
@@ -890,6 +894,9 @@ bool WebServer::Send(std::string temp)
 
     send(client_sockfd_, (char *)str_.c_str(), BUFF_MAX, 0);
 }
+
+// @breif:接受子函数
+// TODO:将初始化和发送接受变成一个类，方便修改
 std::string WebServer::Recv(int *status)
 {
     std::string temp;
@@ -929,12 +936,14 @@ void WebServer::TargetCoordCB(const data::Coord::ConstPtr &msg)
     target_coord_.y = msg->y;
     target_coord_.pose = 5;
 }
+
 void WebServer::CmdCoordCB(const data::Coord::ConstPtr &msg)
 {
     cmd_coord_.x = msg->x;
     cmd_coord_.y = msg->y;
     cmd_coord_.pose = msg->pose;
 }
+
 void WebServer::TargetActionCB(const data::Action::ConstPtr &msg)
 {
     target_action_.name = msg->name;

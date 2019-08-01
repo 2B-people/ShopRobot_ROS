@@ -46,36 +46,37 @@ class DetectionNode(object):
                 self.number = self.photo_number
                 result = self.detection.run_image(self.number)
                 rospy.loginfo(result)
-                if self.number == 1:
-                    self.goods_client.call(
-                        0, result['scores'][0], result['classes'][0])
-                    self.goods_client.call(
-                        1, result['scores'][1], result['classes'][1])
-                    self.goods_client.call(
-                        2, result['scores'][2], result['classes'][2])
-                elif self.number == 2:
-                    self.goods_client.call(
-                        3, result['scores'][0], result['classes'][0])
-                    self.goods_client.call(
-                        4, result['scores'][1], result['classes'][1])
-                    self.goods_client.call(
-                        5, result['scores'][2], result['classes'][2])
-                elif self.number == 3:
-                    self.goods_client.call(
-                        6, result['scores'][0], result['classes'][0])
-                    self.goods_client.call(
-                        7, result['scores'][1], result['classes'][1])
-                    self.goods_client.call(
-                        8, result['scores'][2], result['classes'][2])
-                elif self.number == 4:
-                    self.goods_client.call(
-                        9, result['scores'][0], result['classes'][0])
-                    self.goods_client.call(
-                        10, result['scores'][1], result['classes'][1])
-                    self.goods_client.call(
-                        11, result['scores'][2], result['classes'][2])
-                else:
-                    rospy.logerr("REEOR:image_num is%d",self.number)
+                # 为了演示的稳定性，把这些全部关了
+                # if self.number == 1:
+                #     self.goods_client.call(
+                #         0, result['scores'][0], result['classes'][0])
+                #     self.goods_client.call(
+                #         1, result['scores'][1], result['classes'][1])
+                #     self.goods_client.call(
+                #         2, result['scores'][2], result['classes'][2])
+                # elif self.number == 2:
+                #     self.goods_client.call(
+                #         3, result['scores'][0], result['classes'][0])
+                #     self.goods_client.call(
+                #         4, result['scores'][1], result['classes'][1])
+                #     self.goods_client.call(
+                #         5, result['scores'][2], result['classes'][2])
+                # elif self.number == 3:
+                #     self.goods_client.call(
+                #         6, result['scores'][0], result['classes'][0])
+                #     self.goods_client.call(
+                #         7, result['scores'][1], result['classes'][1])
+                #     self.goods_client.call(
+                #         8, result['scores'][2], result['classes'][2])
+                # elif self.number == 4:
+                #     self.goods_client.call(
+                #         9, result['scores'][0], result['classes'][0])
+                #     self.goods_client.call(
+                #         10, result['scores'][1], result['classes'][1])
+                #     self.goods_client.call(
+                #         11, result['scores'][2], result['classes'][2])
+                # else:
+                #     rospy.logerr("REEOR:image_num is%d",self.number)
                 self.photo_number_client.call(self.number,False)
                 if self.number == 4:
                     action_result.success_flag = True
