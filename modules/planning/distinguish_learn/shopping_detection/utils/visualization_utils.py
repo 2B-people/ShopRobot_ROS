@@ -34,7 +34,7 @@ import PIL.ImageFont as ImageFont
 import six
 import tensorflow as tf
 
-from core import standard_fields as fields
+#from object_detection.core import standard_fields as fields
 
 
 _TITLE_LEFT_MARGIN = 10

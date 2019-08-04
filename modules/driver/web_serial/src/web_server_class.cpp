@@ -10,7 +10,7 @@
  * @Author: 2b-people
  * @LastEditors: Please set LastEditors
  * @Date: 2019-03-11 21:48:43
- * @LastEditTime: 2019-06-04 10:41:05
+ * @LastEditTime: 2019-08-04 16:08:15
  */
 #include <web_serial/web_server_class.h>
 
@@ -150,6 +150,7 @@ void WebServer::Run(void)
                 ROS_ERROR("%s accept error", name_.c_str());
             }
             ROS_WARN("recv accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
+            Send("I");
             wifi_err_ = false;
         }
     }
@@ -200,15 +201,15 @@ bool WebServer::InitWeb()
 
     sin_size_ = sizeof(struct sockaddr_in);
 
-    /*等待客户端连接请求到达*/
-    //@breif accept为,要一直等待阻塞型
+    /* 等待客户端连接请求到达 */
+    // @breif accept为,要一直等待阻塞型
     if ((client_sockfd_ = accept(server_sockfd_, (struct sockaddr *)&remote_addr_, &sin_size_)) < 0)
     {
         ROS_ERROR("%s accept error", name_.c_str());
         return false;
     }
     ROS_INFO("accept client %s/n", inet_ntoa(remote_addr_.sin_addr));
-    //send(client_sockfd_, "Welcome to shop ros server!!", 21, 0); //发送欢迎信息
+    // send(client_sockfd_, "Welcome to shop ros server!!", 21, 0); //发送欢迎信息
     return true;
 }
 
@@ -243,7 +244,7 @@ void WebServer::ReceiveLoop(void)
 
             if (re_buf_string.substr(0, 6) == "finish")
             {
-                ROS_INFO("is finish");
+                ROS_INFO("shop action is finish");
                 is_finish_ = true;
             }
             else if (re_buf_string[0] == 'R')
@@ -392,7 +393,7 @@ void WebServer::MoveExecuteCB(const data::MoveGoal::ConstPtr &goal)
                 //     // ros::Duration(0.1).sleep();
                 // }
                 // is_run_action_ = false;
-                
+
                 std::string coord_goal_str = CoordToData(in_coord);
                 Send(coord_goal_str);
                 index = 0;
@@ -880,7 +881,6 @@ void WebServer::DataToBarrier(std::string temp)
         break;
     }
 }
-
 
 // @breif:发送子函数
 // TODO:将初始化和发送接受变成一个类，方便修改

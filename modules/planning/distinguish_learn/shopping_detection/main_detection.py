@@ -4,7 +4,13 @@
 import numpy as np
 import tensorflow as tf
 from PIL import Image
+
+from matplotlib import pyplot as plt
+
 from utils import ops as utils_ops
+from utils import visualization_utils as vis_util
+from utils import label_map_util
+
 import time
 import os
 import os
@@ -16,13 +22,19 @@ class Object_D(object):
         path = os.path.realpath(__file__)
         # print path
         # bug 因为py生成了pyc文件,在实际调用时为pyc文件,影响到了字符串的索引
-        # path_model = path[:-17] + '/model'
-        # self.path_image = path[:-17] + '/shopping_images'
-        path_model = path[:-18] + '/model'
-        self.path_image = path[:-18] + '/shopping_images'
+        path_model = path[:-17] + '/model'
+        self.path_image = path[:-17] + '/shopping_images'
+        # path_model = path[:-18] + '/model'
+        # self.path_image = path[:-18] + '/shopping_images'
+        self.items = ["red box", "green box", "blue box",
+                      "SYY", "Yakult", "AD milk",
+                      "Beer", "Red Bull", "HI-TIGER",
+                      "Tennis", "Rubik's cube", "Deluxe Milk"]
         self.MODEL_NAME = path_model
         self.PATH_TO_FROZEN_GRAPH = self.MODEL_NAME + '/frozen_inference_graph.pb'
-        
+        self.PATH_TO_LABELS = os.path.join('data', 'shopping.pbtxt')
+        self.image_info = []
+        self.category_index = label_map_util.create_category_index_from_labelmap(self.PATH_TO_LABELS, use_display_name=True)
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
@@ -87,7 +99,7 @@ class Object_D(object):
         classescpy=copy.deepcopy(classes)
         scorescpy=copy.deepcopy(scores)
 
-        print classes
+        # print classes
         #排序分数最低
         if (boxes[2]>=0.33) & (boxes[2]<=0.67):
             boxescpy[1],classescpy[1],scorescpy[1]= boxes[2],classes[2],scores[2]
@@ -140,6 +152,23 @@ class Object_D(object):
             classes.append(output_dict['detection_classes'][i])
             scores.append(output_dict['detection_scores'][i])
         result = self.swap_box(boxes, classes, scores)
+        # print result
+        print(self.items[result['classes'][0] - 1], self.items[result['classes'][1] - 1], self.items[result['classes'][2] - 1])
+
+        vis_util.visualize_boxes_and_labels_on_image_array(
+            image_np,
+            output_dict['detection_boxes'],
+            output_dict['detection_classes'],
+            output_dict['detection_scores'],
+            self.category_index,
+            instance_masks=output_dict.get('detection_masks'),
+            use_normalized_coordinates=True,
+            min_score_thresh=output_dict['detection_scores'][2] - 0.01,
+            line_thickness=8)
+        plt.figure(figsize=(12,8))
+        plt.imshow(image_np)
+        plt.show()
+
         return result
 
 if __name__ == '__main__':
@@ -149,6 +178,6 @@ if __name__ == '__main__':
     # print box[0]
     # print box[1]
     # print box['classes']
-    print box
+    # print box
 
 
